@@ -570,14 +570,6 @@ if command -v fuse-overlayfs &>/dev/null; then
     if [ "$OVERLAY_RC" -eq 0 ]; then
         RUN_PATH="$MERGED_DIR"
         echo -e "${GREEN}[✓] Local write layer active${NC}"
-        # Auto-apply crack if _crack or Crack folder exists in the release
-        for cdir in "$GAME_DIR/_crack" "$GAME_DIR/_Crack" "$GAME_DIR/Crack" "$GAME_DIR/crack"; do
-            if [ -d "$cdir" ]; then
-                echo -e "${GREEN}[✓] Auto-applying crack files from $(basename "$cdir") to local write layer...${NC}"
-                cp -rn "$cdir"/* "$WRITE_DIR/" 2>/dev/null || true
-                break
-            fi
-        done
     else
         echo -e "${YELLOW}[*] Write layer unavailable - running read-only (saves still go to the Proton prefix)${NC}"
         # Kept, not hidden: a game that runs from the cloud copy shows its default (Russian) text, so the reason matters.
@@ -609,9 +601,9 @@ if [ -z "$TARGET_EXE" ]; then
 fi
 echo -e "${GREEN}[✓] Executable: ${CYAN}${TARGET_EXE}${NC}"
 
-# Refuse releases that require Windows kernel drivers or hypervisor cracks (.sys) which cannot run on Linux/Proton
-if find "$GAME_DIR" -maxdepth 4 \( -name "*.sys" -o -iname "*simplesvm*" -o -iname "*hyperkd*" \) 2>/dev/null | grep -q .; then
-    fail "This release requires Windows kernel hypervisor drivers (.sys) that cannot run on SteamOS/Proton"
+# Refuse releases that require Windows kernel drivers (.sys) which cannot run on Linux/Proton
+if find "$GAME_DIR" -maxdepth 4 -name "*.sys" 2>/dev/null | grep -q .; then
+    fail "This game requires Windows kernel drivers (.sys) that cannot run on SteamOS/Proton"
 fi
 
 # Refuse games using Microsoft DirectStorage (dstorage.dll) which stall or freeze over network streaming mounts

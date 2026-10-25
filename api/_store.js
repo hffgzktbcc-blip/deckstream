@@ -20,7 +20,7 @@ async function redis(args) {
   return j.result;
 }
 
-const key = (id) => `deckdebrid:device:${id}`;
+const key = (id) => `deckstream:device:${id}`;
 
 async function loadDevice(id) {
   if (!persistent()) return mem.get(id) || null;
@@ -34,7 +34,7 @@ async function saveDevice(id, device) {
 }
 
 // Small JSON documents under their own prefix (start-up profiles), with their own lifetime.
-const docKey = (kind, id) => `deckdebrid:${kind}:${id}`;
+const docKey = (kind, id) => `deckstream:${kind}:${id}`;
 
 async function loadDoc(kind, id) {
   if (!persistent()) return mem.get(docKey(kind, id)) || null;
@@ -60,6 +60,6 @@ async function claim(kind, id, ttlSec) {
 }
 
 // Devices only: docs and locks share the map under their own prefix and don't count toward the local device cap.
-const memSize = () => [...mem.keys()].filter(k => !k.startsWith('deckdebrid:')).length;
+const memSize = () => [...mem.keys()].filter(k => !k.startsWith('deckstream:')).length;
 
 module.exports = { loadDevice, saveDevice, loadDoc, saveDoc, claim, persistent, memSize };

@@ -1,15 +1,15 @@
 {
-  "version": "vc4ab3bbcc7",
+  "version": "v76f9aa22b7",
   "files": {
     "deckstream-daemon.py": {
-      "sha256": "cd9d97df78920bfcffb7d85d2650b773292a9666168dde443bb697440eeb6413",
+      "sha256": "3f5e5342176eaad59fedbbfea249d0f7c8c0a5a1a1b46fb3e37998203620d363",
       "mode": "755",
-      "bytes": 161513
+      "bytes": 161315
     },
     "stream-runner.sh": {
-      "sha256": "7cde2e4d0f29edbf3b13f82dc426801938754df808eeab683b46c65f98a40648",
+      "sha256": "2fbc1d217651877aba9298e8be02c8d864d5370be79b3164da7b59548ab12ae6",
       "mode": "755",
-      "bytes": 54866
+      "bytes": 54333
     },
     "startup_profile.py": {
       "sha256": "51022593768e5dae6f84b79acd189871f5241921f19821fbe23484a7f199efd3",
@@ -27,14 +27,14 @@
       "bytes": 13626
     },
     "saves.py": {
-      "sha256": "2d2cb04737f361cdf85d7593ca1b4e5ec7311e8f4f623ee37b19c9fd04e17b16",
+      "sha256": "b5a3eb12a0af317edde4034b906e400df11fbf693d4a0cf3fb93e477f1dab13b",
       "mode": "755",
-      "bytes": 21567
+      "bytes": 21494
     },
     "proton_matcher.py": {
-      "sha256": "6b8cab03d7fa73254e1354543f3c29db2388dbea14246a3af180fb0eba74ab54",
+      "sha256": "7cbdbc16682970b18871453fa0d5d7807e4276fc331dbe93a880d762571e712c",
       "mode": "755",
-      "bytes": 7343
+      "bytes": 7327
     },
     "doctor.py": {
       "sha256": "f3334670fafa088d92d2c50d472a7a5030c1351b99da40d2b151ff9000634408",

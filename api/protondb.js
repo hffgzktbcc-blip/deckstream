@@ -22,7 +22,7 @@ module.exports = async (req, res) => {
     if (!appId && title) {
       // Strip scene release tags, repacks, and noise for clean Steam search
       cleanGameTitle = title
-        .replace(/\b(v?\d+(\.\d+)+|repack|fitgirl|dodi|gog|rune|tenoke|flt|codex|skidrow|steamrip|insaneramzes|multi\d+|goldberg|portable|direct play)\b/gi, '')
+        .replace(/\b(v?\d+(\.\d+)+|deluxe|ultimate|complete|goty|edition|remastered|directors cut|enhanced)\b/gi, '')
         .replace(/[\[\]\(\)\-_]/g, ' ')
         .replace(/\s+/g, ' ')
         .trim();
@@ -33,7 +33,7 @@ module.exports = async (req, res) => {
       } else {
         const steamSearchUrl = `https://store.steampowered.com/api/storesearch/?term=${encodeURIComponent(cleanGameTitle)}&l=english&cc=US`;
         const steamRes = await fetch(steamSearchUrl, {
-          headers: { 'User-Agent': 'DeckDebrid/1.0' },
+          headers: { 'User-Agent': 'DeckStream/1.0' },
           signal: AbortSignal.timeout(6000)
         });
         if (steamRes.ok) {
@@ -64,7 +64,7 @@ module.exports = async (req, res) => {
 
     const protonUrl = `https://www.protondb.com/api/v1/reports/summaries/${appId}.json`;
     const protonRes = await fetch(protonUrl, {
-      headers: { 'User-Agent': 'DeckDebrid/1.0' },
+      headers: { 'User-Agent': 'DeckStream/1.0' },
       signal: AbortSignal.timeout(6000)
     });
 

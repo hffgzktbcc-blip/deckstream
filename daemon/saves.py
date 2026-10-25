@@ -92,8 +92,7 @@ _EDITION = re.compile(
     r"game\s+of\s+the\s+year(\s+edition)?|goty|definitive\s+edition|gold\s+edition|premium\s+edition|"
     r"collector'?s\s+edition|legacy\s+edition|special\s+edition|standard\s+edition)\b", re.I)
 _NOISE = re.compile(
-    r"\b(repack|setup|installer|archive|steam[\s-]?rip|gog[\s-]?rip|rip|gog|rune|tenoke|flt|codex|skidrow|"
-    r"insaneramzes|multi\d+|portable|direct\s+play|fixed|pc)\b", re.I)
+    r"\b(installer|archive|setup|vfs|package|bundle|standalone|portable|direct\s+play|fixed|pc)\b", re.I)
 
 
 def clean_title(name):

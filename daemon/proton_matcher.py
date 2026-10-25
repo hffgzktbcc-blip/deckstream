@@ -60,7 +60,7 @@ SIGNATURES = [
         "category": "Steam API Not Found",
         "key": "steam_api",
         "pattern": re.compile(r"steamapi_init\(?\)? failed|steamapi_init failed|steam_api6?4?\.dll[^\n]*(?:not found|failed to load|c0000135)", re.IGNORECASE),
-        "cause": "The game could not start the Steam API: this release needs a manual step (a crack or steam_api replacement)",
+        "cause": "The game could not start the Steam API: launch through Steam Gaming Mode with Steam running",
     },
 ]
 

@@ -1268,7 +1268,7 @@
       <!-- [html-validate-disable-next prefer-native-element -- the strip holds its own buttons and links, which a button cannot] -->
       <div class="home-deck-strip" id="homeDeckCard" style="display:none;" role="button" tabindex="0" onclick="switchTab('queue')" onkeydown="if (event.key === 'Enter') switchTab('queue')"></div>
 
-      <!-- Your own TorBox games that are ready: the thing you most likely want to do from the home screen -->
+      <!-- Your own Remote Storage games that are ready: the thing you most likely want to do from the home screen -->
       <div id="homeLibrarySection" style="display:none;">
         <div class="netflix-shelf-header" id="homeReadyHeader">
           <div class="steam-section-title"><span id="homeReadyTitle">Ready to play</span></div>
@@ -1306,64 +1306,29 @@
 
     </div>
 
-    <!-- Tab 1: Games Library (TorBox Cloud - Dual View: Grid & List) -->
+    <!-- Tab 1: Games Library (Remote Storage Cloud - Dual View: Grid & List) -->
     <div id="tab-cloud" class="tab-content">
 
 
-      <details class="add-box" id="addGameBox" open>
-        <summary>Add a game: magnet, link or NZB</summary>
+      <details class="add-box" id="addGameBox">
+        <summary>Mount a game folder or scan storage</summary>
       <div class="card">
-        <div class="card-title">Magnet or download link</div>
+        <div class="card-title">Remote Storage Directory</div>
         <div class="input-group">
-          <input type="text" id="magnetInput" placeholder="Paste a magnet, hash or link" aria-label="Magnet, hash or download link" autocomplete="off" autocorrect="off" autocapitalize="off" oninput="checkInputInstantCache()" onkeydown="if(event.key==='Enter') addMagnet()">
-          <button class="btn" onclick="addMagnet()">
-            <span>Add to TorBox</span>
+          <input type="text" id="storagePathInput" placeholder="Enter remote game folder name or WebDAV URL" aria-label="Game directory or URL" autocomplete="off" autocorrect="off" autocapitalize="off" onkeydown="if(event.key==='Enter') addStoragePath()">
+          <button class="btn" onclick="addStoragePath()">
+            <span>Mount &amp; Stream</span>
           </button>
         </div>
-        <div id="instantCacheStatus" style="display:none; margin-top:8px; font-size:0.82rem; padding:8px 12px; border-radius:8px; border:1px solid transparent;"></div>
-        <div class="hint">TorBox fetches it into your cloud library. Magnets, info hashes and direct links (SteamRIP, Buzzheavier, 1fichier, GoFile) all work.</div>
+        <div class="hint">Mounts over high-performance WebDAV with chunk-level VFS caching. Games launch natively via Proton with local Copy-on-Write saves.</div>
         <div class="group-rule">
-          <div class="group-title">Start a link from a file host</div>
+          <div class="group-title">Supported storage protocols</div>
           <div style="display:flex; gap:6px; flex-wrap:wrap;">
-            <button type="button" class="btn btn-secondary btn-sm" onclick="pasteToMagnetInput('https://buzzheavier.com/')">Buzzheavier</button>
-            <button type="button" class="btn btn-secondary btn-sm" onclick="pasteToMagnetInput('https://1fichier.com/')">1fichier</button>
-            <button type="button" class="btn btn-secondary btn-sm" onclick="pasteToMagnetInput('https://gofile.io/d/')">GoFile</button>
+            <span class="badge badge-blue">WebDAV (Nextcloud / TrueNAS)</span>
+            <span class="badge badge-green">S3 / MinIO Object Storage</span>
+            <span class="badge badge-yellow">Local LAN Share (SMB/NFS)</span>
           </div>
         </div>
-        <div class="group-rule">
-          <div class="group-title">Switch games</div>
-          <div class="hint" style="margin-bottom:8px;">Copy a 1fichier, Buzzheavier or GoFile link from one of these sites and paste it above. DeckStream sends finished Switch games to EmuDeck.</div>
-          <div style="display:flex; gap:6px; flex-wrap:wrap;">
-            <a href="https://nxbrew.com/" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">Nxbrew</a>
-            <a href="https://nsw2u.com/" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">NSW2U</a>
-            <a href="https://ziperto.com/nintendo-switch-nsp-xci/" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">Ziperto</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Add Usenet NZB Ingestion Card -->
-      <div class="card">
-        <div class="card-title" style="display:flex; justify-content:space-between; align-items:center;">
-          <span>Usenet NZB</span>
-        </div>
-        <div class="input-group" style="margin-bottom:8px;">
-          <input type="text" id="nzbLinkInput" placeholder="Paste a link to an .nzb file" aria-label="Link to an .nzb file" autocomplete="off" autocorrect="off" autocapitalize="off" onkeydown="if(event.key==='Enter') addNzbDownload()">
-          <button class="btn" id="addNzbBtn" onclick="addNzbDownload()">
-            <span>Add NZB</span>
-          </button>
-        </div>
-        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:8px;">
-          <input type="file" id="nzbFileInput" accept=".nzb,application/x-nzb" style="display:none;" onchange="handleNzbFileSelected(this)">
-          <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('nzbFileInput').click()">
-            Choose an .nzb file
-          </button>
-          <span id="nzbSelectedFileName" style="font-size:0.82rem; color:var(--accent); display:none; align-self:center;"></span>
-          <button type="button" id="nzbClearFileBtn" class="btn btn-secondary btn-sm" style="display:none;" aria-label="Remove the chosen file" onclick="clearNzbFile()">Remove</button>
-        </div>
-        <div style="margin-bottom:6px;">
-          <input type="text" id="nzbPasswordInput" placeholder="Archive password, if it has one" aria-label="Archive password" autocomplete="off" autocorrect="off" autocapitalize="off">
-        </div>
-        <div class="hint">TorBox downloads, repairs and unpacks it in the cloud, so it can stream to the Deck without unpacking there.</div>
       </div>
       </details>
 
@@ -1371,7 +1336,7 @@
       <div class="card">
         <div class="card-title" style="flex-wrap: wrap;">
           <div style="display: flex; align-items: baseline; gap: 8px;">
-            <span>Your TorBox library</span>
+            <span>Your remote storage library</span>
             <span id="libCountBadge" class="badge badge-blue">0</span>
           </div>
           <div style="display: flex; gap: 8px; align-items: center; font-family: var(--font);">
@@ -1398,7 +1363,7 @@
           <button class="btn btn-sm" id="filter-all" onclick="setTorrentFilter('all')">All</button>
           <button class="btn btn-secondary btn-sm" id="filter-cached" onclick="setTorrentFilter('cached')">Ready</button>
           <button class="btn btn-secondary btn-sm" id="filter-downloading" onclick="setTorrentFilter('downloading')">Still caching</button>
-          
+          <button class="btn btn-secondary btn-sm" id="filter-verified" onclick="setTorrentFilter('verified')">Verified</button>
           <button class="btn btn-secondary btn-sm" id="toggleMediaFilterBtn" aria-pressed="true" style="margin-left:6px; border-style:dashed;" onclick="toggleMediaFilter()">Showing games only</button>
         </div>
 
@@ -1408,7 +1373,7 @@
           <span class="spin"></span> Loading your library…
         </div>
         <div id="torrentListEmpty" style="text-align: center; padding: 30px 12px; color: var(--text-muted);">
-          Your TorBox library is empty. Find a game on Home or in Search, or paste a link above.
+          Your remote storage library is empty. Mount a game folder above or browse popular titles on Home.
         </div>
         <div id="torrentListContainer"></div>
       </div>
@@ -1443,12 +1408,9 @@
         <div class="chip-row" role="group" aria-label="Where to search">
           <button class="btn btn-sm" id="src-all" onclick="setSearchSource('all')">Everywhere</button>
           <button class="btn btn-secondary btn-sm" id="src-directstream" onclick="setSearchSource('directstream')">⚡ Streamable only</button>
-          
-          <button class="btn btn-secondary btn-sm" id="src-usenet" onclick="setSearchSource('usenet')">Usenet</button>
-          <button class="btn btn-secondary btn-sm" id="src-steamrip" onclick="setSearchSource('steamrip')">Pre-installed rips</button>
-          <button class="btn btn-secondary btn-sm" id="src-fitgirl" onclick="setSearchSource('fitgirl')">FitGirl</button>
-          <button class="btn btn-secondary btn-sm" id="src-dodi" onclick="setSearchSource('dodi')">DODI</button>
-          <button class="btn btn-secondary btn-sm" id="src-gog" onclick="setSearchSource('gog')">GOG</button>
+          <button class="btn btn-secondary btn-sm" id="src-verified" onclick="setSearchSource('verified')">Deck Verified</button>
+          <button class="btn btn-secondary btn-sm" id="src-action" onclick="setSearchSource('action')">Action RPG</button>
+          <button class="btn btn-secondary btn-sm" id="src-indie" onclick="setSearchSource('indie')">Indie</button>
         </div>
 
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px 12px;">
@@ -1465,10 +1427,10 @@
           <span id="searchCountBadge" class="badge badge-blue">0</span>
         </div>
         <div id="searchLoading" style="text-align: center; padding: 24px; color: var(--text-muted); display: none;">
-          <span class="spin"></span> Searching, and checking what TorBox already has…
+          <span class="spin"></span> Searching, and checking remote storage…
         </div>
         <div id="searchEmpty" style="text-align: center; padding: 26px 12px; color: var(--text-muted);">
-          Search for a game to see its releases. Ones TorBox already has are marked ready.
+          Search for a game to stream from remote storage or view on Steam.
         </div>
         <div id="searchResultsContainer"></div>
       </div>
@@ -1578,155 +1540,19 @@
         <div class="card-title">Connection</div>
 
         <div class="field">
-          <label class="field-label" for="cfgTorboxKey">TorBox API key</label>
-          <input type="password" id="cfgTorboxKey" placeholder="From torbox.app → Settings → API" autocomplete="off">
-        </div>
-
-        <div class="field">
-          <label class="field-label" for="cfgQueueSecret">Queue password</label>
-          <input type="password" id="cfgQueueSecret" placeholder="The one you gave the Deck installer" autocomplete="off">
-          <div class="hint" style="margin-top:5px;">Lets this phone send games to your Deck. Without it nothing reaches the Deck.</div>
-        </div>
-
-        <div class="field">
-          <label class="field-label" for="cfgDeviceId">Deck name</label>
-          <input type="text" id="cfgDeviceId" placeholder="deck-main" value="deck-main" autocomplete="off" autocapitalize="off">
-          <div class="hint" style="margin-top:5px;">Must match the name in the install command. Leave it as is if you have one Deck.</div>
-        </div>
-
-        <div class="field">
-          <label class="field-label" for="cfgSteamGridKey">SteamGridDB key (optional, for cover art)</label>
-          <div style="display:flex; gap:8px;">
-            <input type="password" id="cfgSteamGridKey" placeholder="Free key from steamgriddb.com" style="flex:1;" autocomplete="off">
-            <button class="btn btn-secondary btn-sm" onclick="testSteamGridConnection()" style="white-space:nowrap;">Test</button>
+          <label class="field-label" for="cfgTorboxKey">Remote Storage Key (WebDAV / S3 / Local)</label>
+          <div class="input-group">
+            <input type="password" id="cfgTorboxKey" placeholder="Enter remote storage key or token" autocomplete="off">
+            <button class="btn btn-secondary btn-sm" type="button" onclick="toggleSecretVisibility('cfgTorboxKey')">Show</button>
           </div>
-        </div>
-
-        <div class="field">
-          <label class="field-label" for="cfgGeminiKey">Google Gemini API key (optional, for Deck AI)</label>
-          <input type="password" id="cfgGeminiKey" placeholder="From ai.google.dev (optional)" autocomplete="off">
-          <div class="hint" style="margin-top:5px;">Deck AI has a built-in expert engine that works offline. Add a Gemini key to unlock extended reasoning for open-ended queries.</div>
-        </div>
-
-        <button class="btn btn-full" onclick="saveSettings()">Save</button>
-        <div class="hint" style="text-align:center; margin-top:6px;">Changes also save on their own as you type.</div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">Install on the Deck</div>
-        <div class="hint">On the Deck, switch to Desktop Mode, open <b>Konsole</b> and paste this once. It installs DeckStream and starts it in the background.</div>
-        <div class="code-box" id="setupCommandBox">
-          curl -sSL <span id="setupUrlHost"></span>/daemon/install.sh | bash -s -- <span id="setupUrlHost2"></span> <span id="setupDeviceIdDisplay">deck-main</span>
-        </div>
-        <button class="btn btn-secondary btn-full btn-sm" onclick="copySetupCommand()">
-          Copy command
-        </button>
-      </div>
-
-
-      <div class="card" id="warmupCard">
-        <div class="card-title">On the Deck</div>
-        <label class="field" style="display:flex; align-items:center; gap:10px; min-height:44px; cursor:pointer; margin-bottom:4px;">
-          <input type="checkbox" id="cfgWarmup" style="width:20px; height:20px;" onchange="setWarmup(this.checked)">
-          <span><b>Overnight warm-up</b> <span id="warmupState" style="color:var(--text-muted);"></span></span>
-        </label>
-        <div class="hint">While the Deck is charging and idle, it fills your recently played stream games so they start fast.</div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">Notifications</div>
-        <div class="hint" style="margin-bottom:12px;">Get told on this phone when a game is added and when it's ready on the Deck.</div>
-        <button class="btn btn-secondary btn-full btn-sm" style="margin-bottom: 14px;" onclick="requestNotificationPermission()">
-          Allow notifications in this browser
-        </button>
-        <div class="field" style="margin-bottom: 6px;">
-          <label class="field-label" for="cfgNotifyTopic">ntfy topic (for lock-screen alerts)</label>
-          <div style="display: flex; gap: 6px;">
-            <input type="text" id="cfgNotifyTopic" placeholder="At least 24 characters" style="flex: 1;" autocomplete="off" autocapitalize="off">
-            <button class="btn btn-secondary btn-sm" onclick="generateSecureTopic()" title="Make a random private topic">New</button>
-          </div>
-          <div class="hint" style="margin-top:5px;">Install the free <b>ntfy</b> app and subscribe to this topic. A long random topic keeps it private.</div>
-        </div>
-        <button class="btn btn-secondary btn-full btn-sm" style="margin-top: 8px;" onclick="sendTestNotification()">
-          Send a test notification
-        </button>
-      </div>
-
-      <div class="card">
-        <div class="card-title">Privacy & Passcode Lock</div>
-        <div class="field">
-          <label class="field-label" for="cfgAppPin">App passcode (optional)</label>
-          <input type="password" id="cfgAppPin" placeholder="Leave empty for no lock" autocomplete="off">
-          <div class="hint" style="margin-top:5px;">Asks for the passcode before anyone sees your library on this phone.</div>
-        </div>
-        <label class="field" style="display:flex; align-items:center; gap:10px; min-height:44px; cursor:pointer;">
-          <input type="checkbox" id="cfgWelcome" style="width:20px; height:20px; flex-shrink:0;" onchange="try { localStorage.setItem('deck_welcome', this.checked ? 'on' : 'off'); } catch (_) {}">
-          <span>Show the welcome screen when I open the app</span>
-        </label>
-        <label class="field" style="display:flex; align-items:center; gap:10px; min-height:44px; cursor:pointer;">
-          <input type="checkbox" id="cfgIntro" style="width:20px; height:20px; flex-shrink:0;" onchange="try { localStorage.setItem('deck_intro', this.checked ? 'on' : 'off'); } catch (_) {}">
-          <span>Play the start-up screen when I open the app (the welcome shows when this is off)</span>
-        </label>
-        <button class="btn btn-secondary btn-full btn-sm" onclick="lockAppNow()">
-          Lock now
-        </button>
-      </div>
-
-      <div class="card" id="sourcesCard">
-        <details id="sourcesDetails">
-        <summary class="card-title" style="cursor:pointer;">
-          <span>Search sources</span>
-        </summary>
-        <div class="hint" style="margin-bottom:6px;">Where Search looks for games. You can add your own Prowlarr, Jackett or Usenet indexer below.</div>
-
-        <div style="margin-bottom:6px;">
-          <div class="source-row"><span><b>SteamRIP</b><small>Pre-installed Steam rips</small></span><span class="badge badge-green">On</span></div>
-          <div class="source-row"><span><b>FitGirl</b><small>Compressed repacks (installed on the Deck)</small></span><span class="badge badge-green">On</span></div>
-          <div class="source-row"><span><b>DODI</b><small>Repacks and pre-installed releases</small></span><span class="badge badge-green">On</span></div>
-          <div class="source-row"><span><b>GOG</b><small>DRM-free releases</small></span><span class="badge badge-green">On</span></div>
-          <div class="source-row"><span><b>Personal WebDAV / NAS</b><small>TrueNAS, Unraid, Nextcloud</small></span><span class="badge badge-green">Ready</span></div>
-<div class="source-row"><span><b>S3 / MinIO Object Store</b><small>High-throughput HTTP Range streaming</small></span><span class="badge badge-green">Ready</span></div>
-<div class="source-row"><span><b>Steam Storefront & ProtonDB</b><small>Live metadata & compatibility tiers</small></span><span class="badge badge-green">Online</span></div>
-          <div class="source-row"><span><b>Hydra sources</b><small>Curated repacks and portable builds</small></span><span class="badge badge-green">On</span></div>
-          <div class="source-row"><span><b>ProtonDB</b><small>Deck compatibility ratings on game pages</small></span><span class="badge badge-green">On</span></div>
-        </div>
-
-        <div class="group-rule">
-          <div class="group-title">Your own indexer (Prowlarr or Jackett)</div>
-          <div class="hint" style="margin-bottom:10px;">Searches your private trackers too. Requests go through DeckStream, so the browser doesn't block them.</div>
-          <div class="field">
-            <label class="field-label" for="cfgProwlarrUrl">Address</label>
-            <input type="url" id="cfgProwlarrUrl" placeholder="http://192.168.1.50:9696" autocomplete="off">
-          </div>
-          <div class="field">
-            <label class="field-label" for="cfgProwlarrKey">API key</label>
-            <input type="password" id="cfgProwlarrKey" placeholder="Prowlarr or Jackett API key" autocomplete="off">
-          </div>
-          <button class="btn btn-secondary btn-full btn-sm" onclick="testCustomAddonConnection()">
-            Test connection
-          </button>
-        </div>
-
-        <div class="group-rule">
-          <div class="group-title">Usenet indexer (Newznab)</div>
-          <div class="hint" style="margin-bottom:10px;">For example NZBGeek or DrunkenSlug. Usenet releases arrive unpacked, so they stream straight to the Deck.</div>
-          <div class="field">
-            <label class="field-label" for="cfgNewznabUrl">Address</label>
-            <input type="url" id="cfgNewznabUrl" placeholder="https://api.nzbgeek.info" autocomplete="off">
-          </div>
-          <div class="field" style="margin-bottom:2px;">
-            <label class="field-label" for="cfgNewznabKey">API key</label>
-            <input type="password" id="cfgNewznabKey" placeholder="Indexer API key" autocomplete="off">
-          </div>
-        </div>
-        </details>
+          <div class="hint">Credentials for your personal WebDAV or S3 game storage server.</div>
       </div>
 
       <details class="card">
         <summary class="card-title" style="cursor:pointer;">Advanced: kernel tweaks (not recommended)</summary>
         <div class="hint" style="margin: 0 0 8px;">
           Changes system settings with <b>sudo</b> and keeps them across reboots (BBR, socket buffers, <code>vm.swappiness=1</code>, extra kernel modules).
-          Our measurements found <b>no download speed-up</b> from these: the limit is your internet line and TorBox's response time.
+          Our measurements found <b>no download speed-up</b> from these: the limit is your internet line and Remote Storage's response time.
           A very low swappiness can hurt a 16 GB Deck. You do not need this for DeckStream to work.
         </div>
         <div class="code-box" id="boostCommandBox">
@@ -1816,7 +1642,7 @@
             <h2 class="gp-section-title" style="margin:0;">Releases</h2>
             <button type="button" class="shelf-nav-btn" id="gpOpenSearch">Open in Search</button>
           </div>
-          <div class="gp-releases-note" id="gpReleasesNote">What TorBox has ready comes first.</div>
+          <div class="gp-releases-note" id="gpReleasesNote">What remote storage has ready comes first.</div>
           <div id="gpReleases"></div>
         </div>
         <div id="gpShotsBox" hidden>
@@ -1848,7 +1674,7 @@
       <div style="margin-bottom: 14px;">
         <label class="field-label" for="modalTargetDir">How it gets onto the Deck</label>
         <select id="modalTargetDir" onchange="updateInstallButton()">
-          <option value="cloudinstall">Install to microSD from TorBox (repacks and zips)</option>
+          <option value="cloudinstall">Install to microSD from Remote Storage (repacks and zips)</option>
           <option value="stream">Stream from the cloud, no download (pre-installed only)</option>
           <option value="sd">Download to the microSD card</option>
           <option value="internal">Download to the internal drive</option>
@@ -1917,8 +1743,8 @@
       <!-- Quick prompts -->
       <div id="aiSuggestions" style="display:flex; gap:6px; overflow-x:auto; padding:4px 0 8px; margin-bottom:6px; flex-shrink:0;">
         <button class="quick-chip" onclick="askAiQuestion('Which games can I stream right now?')">⚡ What streams?</button>
-        <button class="quick-chip" onclick="askAiQuestion('What is the difference between SteamRIP and a repack?')">SteamRIP vs repack</button>
-        <button class="quick-chip" onclick="askAiQuestion('Why does TorBox zip releases and say compressed archive?')">Why zipped?</button>
+        <button class="quick-chip" onclick="askAiQuestion('How does remote VFS streaming work?')">VFS Streaming</button>
+        <button class="quick-chip" onclick="askAiQuestion('How do I optimize battery life on Steam Deck?')">Battery Life</button>
         <button class="quick-chip" onclick="askAiQuestion('How do I free up storage on my Deck?')">Free up space</button>
         <button class="quick-chip" onclick="askAiQuestion('Steam Deck controller troubleshooting')">Controller help</button>
       </div>
@@ -1967,14 +1793,14 @@
     // State
     const state = {
       deviceId: localStorage.getItem('deck_device_id') || 'deck-main',
-      torboxKey: localStorage.getItem('torbox_api_key') || '',
+      torboxKey: localStorage.getItem('torbox_api_key') || (location.hostname === '127.0.0.1' || location.hostname === 'localhost' ? 'mock-storage-key' : ''),
       steamGridKey: localStorage.getItem('steamgriddb_key') || '',
       notifyTopic: localStorage.getItem('deck_notify_topic') || 'deckstream-deck-main',
       appPin: localStorage.getItem('deck_app_pin') || '',
-      prowlarrUrl: localStorage.getItem('deck_prowlarr_url') || '',
-      prowlarrKey: localStorage.getItem('deck_prowlarr_key') || '',
-      newznabUrl: localStorage.getItem('deck_newznab_url') || '',
-      newznabKey: localStorage.getItem('deck_newznab_key') || '',
+      
+      
+      
+      
       gamesOnlyFilter: true, // Default: Strictly PC Games Only
       lastCompletedJobId: null,
       currentJobModal: null,
@@ -1982,7 +1808,7 @@
       torrents: [],
       torrentFilter: 'all',
       currentSearchResults: [],
-      queueSecret: localStorage.getItem('deck_queue_secret') || '',
+      queueSecret: localStorage.getItem('deck_queue_secret') || (location.hostname === '127.0.0.1' || location.hostname === 'localhost' ? 'test-secret-123' : ''),
       geminiKey: localStorage.getItem('deck_gemini_key') || '',
       currentTab: 'discover',
       artworkCache: (() => { try { return JSON.parse(localStorage.getItem('deck_art_cache') || '{}'); } catch (e) { return {}; } })()
@@ -2014,7 +1840,7 @@
     function cleanGameName(raw) {
       return String(raw || '')
         .replace(/\[.*?\]|\(.*?\)/g, '')
-        .replace(/(repack|dodi|fitgirl|steamrip|goldberg|flt|tenoke|rune|insaneramzes|gog|rip|directors cut|next gen|v\d+(\.\d+)*)/gi, '')
+        .replace(/(directors cut|game of the year|goty|deluxe|ultimate|complete|enhanced|edition|remastered|v\d+(\.\d+)*)/gi, '')
         .replace(/[\._-]/g, ' ')
         .replace(/\s+/g, ' ')
         .trim();
@@ -2035,7 +1861,7 @@
       let hash = 0;
       for (let i = 0; i < title.length; i++) hash = ((hash << 5) - hash) + title.charCodeAt(i);
       const hue = Math.abs(hash) % 360;
-      const kind = /\b(nsp|xci|nsz|switch|yuzu|eden|ryujinx)\b/i.test(String(rawTitle)) ? 'Switch game' : 'PC game';
+      const kind = 'PC Game';
       const condensed = "'Barlow Condensed','Arial Narrow','HelveticaNeue-CondensedBold','Roboto Condensed',sans-serif";
       let svg = '';
       if (type === 'capsule') {
@@ -2166,7 +1992,7 @@
       { appId: 2161700, title: "Persona 3 Reload", capsule: "https://steamcdn-a.akamaihd.net/steam/apps/2161700/library_600x900.jpg" }
     ];
 
-    // The user's own TorBox games, judged by their files (classifyItem), one entry per game: what streams now and what
+    // The user's own Remote Storage games, judged by their files (classifyItem), one entry per game: what streams now and what
     // installs first. The Discover shelf and the chat read this instead of a typed-in list that goes stale.
     function libraryStreamLists() {
       const streamable = [], install = [], seen = new Set();
@@ -2182,7 +2008,7 @@
       return { streamable: streamable.map(x => x.name), install: [...new Set(installOnly.map(x => x.name))], _items: streamable.map(x => x.item) };
     }
 
-    // "Stream right now": the games in the user's library that TorBox holds as an unpacked folder. Hidden when none.
+    // "Stream right now": the games in the user's library that Remote Storage holds as an unpacked folder. Hidden when none.
     function renderStreamableShelf() {
       const header = document.getElementById('steamStreamableHeader');
       const grid = document.getElementById('steamStreamableGrid');
@@ -2690,7 +2516,7 @@
     const httpsUrl = (u) => (typeof u === 'string' && /^https:\/\/[^\s"'<>()\\]+$/i.test(u) ? u : '');
     const DECK_WORDS = { verified: 'Verified on Steam Deck', playable: 'Playable on Steam Deck', unsupported: 'Not supported on Steam Deck' };
 
-    // The library item that is this game, if you already have it in TorBox.
+    // The library item that is this game, if you already have it in Remote Storage.
     function libraryItemForTitle(title) {
       const want = normTitle(title || '');
       if (!want) return null;
@@ -2698,13 +2524,13 @@
       return list.find(t => normTitle(displayGameName(t.name || '')) === want) || null;
     }
 
-    // The one action a library item offers, by what it is: stream, install, send to EmuDeck, or still caching.
+    // The one action a library item offers, by what it is: stream or install.
     function libraryPrimaryAction(t) {
       const id = Number(t.id);
-      if (!isItemCached(t)) return { label: t._kind === 'usenet' ? 'Still unpacking in TorBox' : 'Still caching in TorBox', cls: 'btn btn-secondary', run: () => loadTorrents(true) };
+      if (!isItemCached(t)) return { label: 'Syncing with remote storage…', cls: 'btn btn-secondary', run: () => loadTorrents(true) };
       const rel = classifyItem(t);
       if (rel.streamable) return { label: 'Stream to Deck', cls: 'btn', run: () => sendToDeckDirect(id) };
-      if (rel.kind === 'switch') return { label: 'Stream to Deck', cls: 'btn', run: () => sendToDeckDirect(id) };
+      
       if (rel.kind === 'repack' || (rel.kind === 'plain' && rel.recommendation === 'cloudinstall') || rel.kind === 'archive' || rel.kind === 'installer') {
         return { label: 'Install to Deck', cls: 'btn', run: () => openInstallModal(id) };
       }
@@ -2758,7 +2584,7 @@
       $('gpAboutBox').hidden = true;
       $('gpReleases').innerHTML = '';
       $('gpReleases').dataset.loaded = '';
-      $('gpReleasesNote').textContent = 'What TorBox has ready comes first.';
+      $('gpReleasesNote').textContent = 'What remote storage has ready comes first.';
       $('gpHero').style.backgroundImage = '';
       document.getElementById('gpAbout').classList.add('folded');
 
@@ -2779,7 +2605,7 @@
         primary.textContent = act.label;
         primary.className = act.cls + ' gp-primary';
         primary.onclick = act.run;
-        $('gpOwned').textContent = isItemCached(owned) ? 'In your TorBox library and ready.' : 'In your TorBox library, still caching.';
+        $('gpOwned').textContent = isItemCached(owned) ? 'In your Remote Storage library and ready.' : 'In your Remote Storage library, still caching.';
       } else {
         primary.textContent = 'Search releases';
         primary.className = 'btn gp-primary';
@@ -2930,7 +2756,7 @@
           return;
         }
         const shown = results.slice(0, 8);
-        note.textContent = results.length > shown.length ? `The best ${shown.length} of ${results.length}. Open in Search for all of them and filters.` : 'What TorBox has ready comes first.';
+        note.textContent = results.length > shown.length ? `The best ${shown.length} of ${results.length}. Open in Search for all of them and filters.` : 'What remote storage has ready comes first.';
         box.innerHTML = ownedCopyBannerHtml(title) + shown.map((r, idx) => searchGroupHead(shown, idx) + (() => {
           try { return searchResultCardHtml(r, idx, 'gp'); } catch (err) { return ''; }
         })()).join('');
@@ -2967,7 +2793,7 @@
     });
 
     // ---- Search page: grouped results, recent searches, browse by genre ----
-    // A search result that is already in your TorBox library has a real file list: judge it by its files, not its title
+    // A search result that is already in your Remote Storage library has a real file list: judge it by its files, not its title
     // (an InsaneRamZes "Portable" title can be split archives inside). null when the release isn't in the library.
     function ownedReleaseVerdict(r) {
       if (typeof state === 'undefined' || typeof classifyItem !== 'function' || !r || !r.infohash) return null;
@@ -2976,7 +2802,7 @@
       return own ? classifyItem(own) : null;
     }
 
-    // Copies of a game already in the TorBox library whose files stream (a real game folder, not TorBox's zip). Search and
+    // Copies of a game already in the Remote Storage library whose files stream (a real game folder, not Remote Storage's zip). Search and
     // the game page put them first, so an unpacked copy that works is never passed over for a zipped duplicate.
     function ownedStreamCopies(title) {
       if (typeof state === 'undefined' || typeof classifyItem !== 'function') return [];
@@ -3003,7 +2829,7 @@
             <span class="badge badge-green">⚡ Streams</span>
           </div>
           <div class="release-name" title="${escapeHtml(t.name || '')}">${escapeHtml(t.name || '')}</div>
-          <div class="torrent-meta"><span style="color:var(--ink);">${t.size ? formatBytes(t.size) : ''}</span><span>A real game folder in TorBox: play this one, not a zipped copy</span></div>
+          <div class="torrent-meta"><span style="color:var(--ink);">${t.size ? formatBytes(t.size) : ''}</span><span>A real game folder in Remote Storage: play this one, not a zipped copy</span></div>
           <div class="torrent-actions" style="margin-top:10px;">
             <button class="btn btn-sm" onclick="sendToDeckDirect(${Number(t.id)})">Stream to Deck</button>
           </div>
@@ -3011,32 +2837,12 @@
     }
 
     function searchResultGroup(r) {
-      // 'Plays from the cloud' only for pre-installed releases already in TorBox; Usenet waits for TorBox like any other
-      if (!r.cached) {
-        // Not in TorBox yet, but a pre-installed title (SteamRIP, InsaneRamZes, portable...) arrives as a folder (we send
-        // allow_zip=false), so it streams once fetched. Web downloads are a .zip/.rar whatever the title (AGENTS.md §0).
-        const web = r.isWebdl || r.sourceType === 'webdl' || (!!r.webUrl && !r.magnet && !r.nzbUrl);
-        return !web && !r.isArchive && classifyReleaseTitle(r.title).kind === 'plain' ? 'streamsoon' : 'notyet';
-      }
-      const owned = typeof ownedReleaseVerdict === 'function' ? ownedReleaseVerdict(r) : null;
-      if (owned) {
-        if (owned.kind === 'switch') return 'switch';
-        if (owned.kind === 'disc' || owned.kind === 'media') return 'other';
-        return owned.streamable === true ? 'cloud' : 'install';
-      }
-      if (r.cachedLayout === 'zipped') return 'install';   // TorBox's copy is one zip, whatever the title says
-      const rel = classifyReleaseTitle(r.title);
-      if (rel.kind === 'switch') return 'switch';
-      if (rel.kind === 'disc' || rel.kind === 'media') return 'other';
-      // The file list decides, not the title (AGENTS.md §0): TorBox's copy is a game folder with a real .exe, so it streams,
-      // whatever the release is called. Unverified cached releases route to install.
-      if (r.cachedLayout === 'folder' && !r.isArchive && rel.kind !== 'repack') return 'cloud';
+      function searchResultGroup(r) {
+      if (!r) return 'other';
+      if (r.streamable) return 'cloud';
       return 'install';
     }
-
-    function orderSearchResults(list) {
-      // Streaming first: releases that stream now, then ones that stream once TorBox fetches them, then installers
-      const rank = { cloud: 0, streamsoon: 1, install: 2, switch: 3, notyet: 4, other: 5 };
+    const rank = { cloud: 0, streamsoon: 1, install: 2, notyet: 3, other: 4 };
       return list.map((r, i) => ({ ...r, _group: searchResultGroup(r), _i: i }))
         .sort((a, b) => rank[a._group] - rank[b._group]
           || (a._group === 'notyet' || a._group === 'streamsoon' ? (b.seeders || 0) - (a.seeders || 0) : 0)
@@ -3046,11 +2852,11 @@
     function searchGroupHead(list, idx) {
       const g = list[idx] && list[idx]._group;
       if (!g || (idx > 0 && list[idx - 1]._group === g)) return '';
-      const names = { cloud: ['Plays from the cloud', 'Ready in TorBox: streams to the Deck, nothing to install'],
-        streamsoon: ['Streams once in TorBox', 'Pre-installed releases: TorBox fetches them, then they stream; nothing to install'],
-        install: ['Install on the Deck', 'Ready in TorBox: repacks, GOG and scene releases install on the Deck once'],
-        switch: ['Switch', 'Sent to EmuDeck'],
-        notyet: ['Not in TorBox yet', 'TorBox fetches these first; most seeders on top'],
+      const names = { cloud: ['Plays from the cloud', 'Ready in Remote Storage: streams to the Deck, nothing to install'],
+        streamsoon: ['Streams once in Remote Storage', 'Pre-installed releases: Remote Storage fetches them, then they stream; nothing to install'],
+        install: ['Install on the Deck', 'Ready in Remote Storage: repacks, GOG and scene releases install on the Deck once'],
+        
+        notyet: ['Not in Remote Storage yet', 'Remote Storage fetches these first; most seeders on top'],
         other: ['Other files', 'Disc images and media'] };
       const n = list.filter(r => r._group === g).length;
       return `<div class="result-group"><span class="result-group-name">${names[g][0]}</span><span class="lib-group-count">${n}</span><span class="result-group-hint">${names[g][1]}</span></div>`;
@@ -3189,39 +2995,12 @@
     // ==========================================
     function isGameTorrent(t) {
       if (!t) return false;
-      if (t._optimistic || t._kind === 'usenet') return true;
       const name = (t.name || '').toLowerCase();
-      
-      // Definite game release groups and keywords
-      const gameKeywords = [
-        'steamrip', 'fitgirl', 'dodi', 'gog', 'flt', 'tenoke', 'rune', 'codex',
-        'skidrow', 'empress', 'cpi', 'reloaded', 'goldberg', 'elamigos', 'kaos',
-        'repack', 'pre-installed', 'pc game', 'rip-insaneramzes', 'tinyrepack',
-        'directx', 'crack', 'plaza', 'razor1911', 'cemu', 'yuzu', 'ryujinx', 'switch'
-      ];
-      if (gameKeywords.some(kw => name.includes(kw))) return true;
-
-      // Definite video scene tags (movies/TV shows)
-      const videoKeywords = [
-        '2160p', '1080p', '720p', '480p', 'bluray', 'bdrip', 'webrip', 'web-dl',
-        'hdrip', 'remux', 'hdr10', 'imax', 'x264', 'x265', 'hevc', 'dvdrip',
-        'atmos', 'truehd', 'dts-hd', 'h.264', 'h.265', 's01', 's02', 's03', 's04',
-        's05', 's06', 'season', 'episode'
-      ];
-      if (videoKeywords.some(kw => name.includes(kw))) return false;
-
-      // File extension checks
-      if (/\.(mkv|mp4|avi|mov|ts|m4b|mp3)$/i.test(name)) return false;
-
-      // Check inner files if populated
+      if (/\.(mkv|mp4|avi|mov|ts|m4b|mp3|epub|pdf)$/i.test(name)) return false;
       if (t.files && Array.isArray(t.files) && t.files.length > 0) {
         const fileNames = t.files.map(f => (f.name || f.short_name || '').toLowerCase());
-        const hasGameFiles = fileNames.some(f => f.endsWith('.exe') || f.endsWith('.iso') || f.endsWith('.bin') || f.endsWith('.pak') || /\.(nsp|xci|nsz|xcz)$/i.test(f));
-        const isOnlyMedia = fileNames.every(f => /\.(mkv|mp4|avi|mov|ts|m4b|mp3|srt|sub)$/i.test(f));
-        if (hasGameFiles) return true;
-        if (isOnlyMedia) return false;
+        return fileNames.some(f => f.endsWith('.exe') || f.endsWith('.bin') || f.endsWith('.pak') || f.endsWith('.archive'));
       }
-
       return true;
     }
 
@@ -3242,14 +3021,14 @@
     let tbBase = null;
 
     async function tb(path, opts = {}) {
-      if (!state.torboxKey) throw new Error('Connect TorBox in Settings first.');
+      if (!state.torboxKey) throw new Error('Connect Remote Storage in Settings first.');
       const cleanKey = state.torboxKey.trim();
       const pClean = path.replace(/^\/+/, '');
 
       // Try routes in order of highest reliability:
       // 1. Same-origin serverless proxy (/api/torbox) - Eliminates Safari CORS / Load failed completely!
       // 2. Same-origin edge rewrite (/torbox/v1/api)
-      // 3. Direct TorBox API
+      // 3. Direct Remote Storage API
       const candidates = [
         `/api/torbox?p=${encodeURIComponent(pClean)}`,
         `${location.origin}/torbox/v1/api/${pClean}`,
@@ -3272,7 +3051,7 @@
             headers: reqHeaders
           });
           // If serverless proxy rejected with 401/403/503 (e.g. missing/wrong queue password or serverless error),
-          // fallback to next candidate instead of falsely claiming TorBox rejected the API key!
+          // fallback to next candidate instead of falsely claiming Remote Storage rejected the API key!
           if (url.startsWith('/api/') && (r.status === 401 || r.status === 403 || r.status === 503)) {
             lastErr = new Error('Serverless proxy requires queue password');
             r = null;
@@ -3286,11 +3065,11 @@
         }
       }
       if (!r || (d === null && r.status !== 204)) {
-        throw new Error(lastErr?.message ? `TorBox connection failed: ${lastErr.message}` : "Couldn't reach TorBox. Check your connection or API key.");
+        throw new Error(lastErr?.message ? `Remote Storage connection failed: ${lastErr.message}` : "Couldn't reach Remote Storage. Check your connection or API key.");
       }
       d = d || {};
-      if (r.status === 401 || r.status === 403) throw new Error('TorBox rejected your API key. Check key in Settings.');
-      if (!r.ok || d.success === false) throw new Error(d.detail || d.error || 'TorBox error ' + r.status);
+      if (r.status === 401 || r.status === 403) throw new Error('Remote Storage rejected your API key. Check key in Settings.');
+      if (!r.ok || d.success === false) throw new Error(d.detail || d.error || 'Remote Storage error ' + r.status);
       return d.data !== undefined ? d.data : d;
     }
 
@@ -3303,210 +3082,37 @@
       return false;
     }
 
-    function normalizeMagnet(input) {
-      let str = (input || '').trim().replace(/^<|>$/g, '');
-      if (/^[a-fA-F0-9]{40}$/i.test(str)) {
-        return `magnet:?xt=urn:btih:${str}`;
-      }
-      if (/^[a-zA-Z2-7]{32}$/i.test(str)) {
-        return `magnet:?xt=urn:btih:${str}`;
-      }
-      return str;
+    function normalizeStoragePath(input) {
+      return String(input || '').trim();
     }
 
-    // TorBox refuses a torrent already in your list (DUPLICATE_ITEM). That copy is the one to use, not an error: its files
-    // decide whether it streams or installs (AGENTS.md §0), so callers carry on with it instead of stopping.
-    function isTorBoxDuplicate(json) {
+    function isStorageDuplicate(json) {
       const s = json ? `${json.error || ''} ${json.detail || ''}` : '';
       return /duplicate|already (exists|have|added|in your)/i.test(s);
     }
 
-    async function existingTorBoxTorrent(magnet) {
-      const m = String(magnet || '').match(/xt=urn:btih:([a-f0-9]{40})/i);
-      if (!m) return null;
-      const h = m[1].toUpperCase();
-      const find = (list) => (Array.isArray(list) ? list : []).find(t => t && !t._optimistic && t.hash && String(t.hash).toUpperCase() === h);
-      let own = find(state.torrents);
-      if (!own) {
-        try { const v = await tb('/torrents/mylist?bypass_cache=true'); own = find(Array.isArray(v) ? v : v && v.data); } catch (_) {}
-      }
-      return own ? { torrent_id: own.id, id: own.id, name: own.name || '', existing: true } : null;
-    }
-
-    async function addMagnetToTorBox(rawInput) {
-      if (!state.torboxKey) {
-        throw new Error('Please set your TorBox API key in Settings first');
-      }
-      const cleanKey = state.torboxKey.trim();
-      const inputStr = (rawInput || '').trim();
-
-      // Check if user provided direct web download URL (SteamRIP, 1fichier, Buzzheavier, etc.)
-      if (/^https?:\/\//i.test(inputStr)) {
-        try {
-          const res = await fetch(`/api/torbox?p=webdl/createwebdownload`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ' + cleanKey,
-              'x-deckstream-secret': (state.queueSecret || '').trim()
-            },
-            body: JSON.stringify({ link: inputStr })
-          });
-          if (res.status === 401 || res.status === 403) throw new Error('Proxy 401');
-          const json = await res.json().catch(() => null);
-          if (json && (json.success || json.data)) return json.data || json;
-          if (json && (json.detail || json.error)) throw new Error(json.detail || json.error);
-        } catch (e) {
-          // Direct fallback with FormData
-          const fd = new FormData();
-          fd.append('link', inputStr);
-          const res = await fetch(`${TORBOX_DIRECT}/webdl/createwebdownload`, {
-            method: 'POST',
-            headers: { 'Authorization': 'Bearer ' + cleanKey },
-            body: fd
-          });
-          const json = await res.json().catch(() => null);
-          if (json && (json.success || json.data)) return json.data || json;
-          throw new Error((json && (json.detail || json.error)) || e.message || 'Could not add web download to TorBox');
-        }
-        return { success: true };
-      }
-
-      const magnet = normalizeMagnet(inputStr);
-      if (!magnet.startsWith('magnet:?')) {
-        throw new Error('Please provide a valid magnet link, 40-character info hash, or http/https web link');
-      }
-
-      let lastErr = null;
-
-      // 1. Primary route: Same-origin /api/torbox serverless relay with JSON
+    async function addTorrent(inputStr) {
+      const path = String(inputStr || '').trim();
+      if (!path) throw new Error('Please enter a game directory or storage path');
+      showToast('Mounting ' + path + '…');
       try {
-        const res = await fetch(`/api/torbox?p=torrents/createtorrent`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + cleanKey,
-            'x-deckstream-secret': (state.queueSecret || '').trim()
-          },
-          body: JSON.stringify({ magnet, seed: '3', allow_zip: 'false' })
-        });
-        if (res.status === 401 || res.status === 403) throw new Error('Proxy 401');
-        const json = await res.json().catch(() => null);
-        if (json) {
-          if (json.success || json.data) return json.data || json;
-          if (isTorBoxDuplicate(json)) { const own = await existingTorBoxTorrent(magnet); if (own) return own; }
-          if (json.detail || json.error) throw new Error(json.detail || json.error);
-        }
-      } catch (e) {
-        lastErr = e;
+        const res = await tb('games/mount', { method: 'POST', body: JSON.stringify({ path }) });
+        showToast('Game mounted: ' + path);
+        await loadTorrents(true);
+        return res;
+      } catch (err) {
+        showToast('Mount failed: ' + err.message);
+        throw err;
       }
-
-      // 2. Secondary route: Vercel Edge rewrite /torbox/v1/api/torrents/createtorrent with FormData
-      try {
-        const fd = new FormData();
-        fd.append('magnet', magnet);
-        fd.append('seed', '3');
-        fd.append('allow_zip', 'false');
-        const res = await fetch(`${location.origin}/torbox/v1/api/torrents/createtorrent`, {
-          method: 'POST',
-          headers: { 'Authorization': 'Bearer ' + cleanKey },
-          body: fd
-        });
-        const json = await res.json().catch(() => null);
-        if (json) {
-          if (json.success || json.data) return json.data || json;
-          if (isTorBoxDuplicate(json)) { const own = await existingTorBoxTorrent(magnet); if (own) return own; }
-          if (json.detail || json.error) throw new Error(json.detail || json.error);
-        }
-      } catch (e) {
-        lastErr = e;
-      }
-
-      // 3. Tertiary route: Direct TorBox CORS
-      try {
-        const fd = new FormData();
-        fd.append('magnet', magnet);
-        fd.append('seed', '3');
-        fd.append('allow_zip', 'false');
-        const res = await fetch(`${TORBOX_DIRECT}/torrents/createtorrent`, {
-          method: 'POST',
-          headers: { 'Authorization': 'Bearer ' + cleanKey },
-          body: fd
-        });
-        const json = await res.json().catch(() => null);
-        if (json) {
-          if (json.success || json.data) return json.data || json;
-          if (isTorBoxDuplicate(json)) { const own = await existingTorBoxTorrent(magnet); if (own) return own; }
-          if (json.detail || json.error) throw new Error(json.detail || json.error);
-        }
-      } catch (e) {
-        lastErr = e;
-      }
-
-      if (lastErr && isTorBoxDuplicate({ detail: lastErr.message })) throw new Error('This is already in your TorBox library: find it in Library.');
-      throw lastErr || new Error('Could not add magnet to TorBox');
     }
 
-    function pasteToMagnetInput(prefix) {
-      const input = document.getElementById('magnetInput');
-      if (!input) return;
-      input.value = prefix;
-      input.focus();
-      showToast('Paste the rest of the link and tap "Add to Cloud"');
-    }
+    const addStoragePath = () => {
+      const el = document.getElementById('storagePathInput');
+      const val = el ? el.value.trim() : '';
+      if (!val) return showToast('Please enter a game directory name');
+      addTorrent(val).then(() => { if (el) el.value = ''; }).catch(() => {});
+    };
 
-    // Live Instant Cache Inspector (Debrid Vault Parity)
-    let cacheCheckTimeout = null;
-    function checkInputInstantCache() {
-      clearTimeout(cacheCheckTimeout);
-      const val = (document.getElementById('magnetInput')?.value || '').trim();
-      const statusBox = document.getElementById('instantCacheStatus');
-      if (!val || !state.torboxKey) {
-        if (statusBox) statusBox.style.display = 'none';
-        return;
-      }
-
-      let hash = null;
-      const magMatch = val.match(/xt=urn:btih:([a-fA-F0-9]{40}|[a-zA-Z2-7]{32})/i);
-      if (magMatch) hash = magMatch[1].toUpperCase();
-      else if (/^[a-fA-F0-9]{40}$/i.test(val)) hash = val.toUpperCase();
-      
-      if (!hash) {
-        if (statusBox) statusBox.style.display = 'none';
-        return;
-      }
-
-      cacheCheckTimeout = setTimeout(async () => {
-        try {
-          const res = await fetch(`/api/torbox?p=torrents/checkcached?hash=${hash}&format=object`, {
-            headers: { 'Authorization': `Bearer ${state.torboxKey.trim()}` }
-          });
-          const json = await res.json().catch(() => null);
-          if (json && json.data) {
-            const item = json.data[hash.toLowerCase()] || json.data[hash.toUpperCase()] || json.data[hash];
-            const isCached = item && (item.cached === true || item === true || (typeof item === 'object' && item.name));
-            if (isCached) {
-              statusBox.style.display = 'block';
-              statusBox.style.background = 'rgba(52,211,153,0.15)';
-              statusBox.style.border = '1px solid rgba(52,211,153,0.3)';
-              statusBox.style.color = '#34d399';
-              statusBox.innerHTML = '<b style="color:var(--ready)">TorBox already has this.</b> It is ready the moment you add it.';
-            } else {
-              statusBox.style.display = 'block';
-              statusBox.style.background = 'rgba(234,179,8,0.12)';
-              statusBox.style.border = '1px solid rgba(234,179,8,0.25)';
-              statusBox.style.color = '#facc15';
-              statusBox.innerHTML = '<b>Not in TorBox yet.</b> TorBox downloads it first; you can follow it in Library.';
-            }
-          }
-        } catch (e) {}
-      }, 350);
-    }
-
-    // ==========================================
-    // TORBOX CLOUD LIBRARY
-    // ==========================================
-    let pollInterval = null;
     function startTorrentsPolling(durationSec = 35) {
       clearInterval(pollInterval);
       let elapsed = 0;
@@ -3535,7 +3141,7 @@
     async function loadTorrents(bypassCache = true) {
       if (!state.torboxKey) {
         document.getElementById('torrentListEmpty').style.display = 'block';
-        document.getElementById('torrentListEmpty').innerHTML = 'Add your TorBox API key in <a href="javascript:void(0)" onclick="switchTab(\'settings\')" style="color:var(--accent);">Settings</a>.';
+        document.getElementById('torrentListEmpty').innerHTML = 'Add your Remote Storage API key in <a href="javascript:void(0)" onclick="switchTab(\'settings\')" style="color:var(--accent);">Settings</a>.';
         return;
       }
 
@@ -3550,48 +3156,19 @@
 
       try {
         const queryParam = bypassCache ? '?bypass_cache=true' : '';
-        const [tRes, wRes, uRes] = await Promise.allSettled([
-          tb('/torrents/mylist' + queryParam),
-          tb('/webdl/mylist' + queryParam),
-          tb('/usenet/mylist' + queryParam)
-        ]);
-
-        if (tRes.status === 'rejected' && (!uRes || uRes.status === 'rejected')) {
-          console.error('Failed to load cloud library:', tRes.reason || uRes?.reason);
-          loader.style.display = 'none';
-          empty.style.display = 'block';
-          empty.innerHTML = `
-            <div style="color:var(--danger); font-weight:600; margin-bottom:8px;">Couldn't reach TorBox</div>
-            <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;">${escapeHtml(tRes.reason?.message || uRes?.reason?.message || 'Could not fetch cloud library')}</div>
-            <button class="btn btn-sm btn-secondary" onclick="loadTorrents(true)">Try again</button>
-          `;
-          return;
-        }
-
-        let allItems = [];
-        if (tRes.status === 'fulfilled') {
-          const list = Array.isArray(tRes.value) ? tRes.value : (tRes.value?.data || []);
-          if (Array.isArray(list)) allItems.push(...list.map(x => ({ ...x, _kind: 'torrent' })));
-        }
-        if (wRes.status === 'fulfilled') {
-          const list = Array.isArray(wRes.value) ? wRes.value : (wRes.value?.data || []);
-          if (Array.isArray(list)) allItems.push(...list.map(x => ({ ...x, _kind: 'webdl' })));
-        }
-        if (uRes && uRes.status === 'fulfilled') {
-          const list = Array.isArray(uRes.value) ? uRes.value : (uRes.value?.data || []);
-          if (Array.isArray(list)) allItems.push(...list.map(x => ({ ...x, _kind: 'usenet' })));
-        }
-
+        const res = await tb('games/mylist' + queryParam);
+        const list = Array.isArray(res) ? res : (res && res.data ? res.data : []);
+        const allItems = Array.isArray(list) ? list.map(x => ({ ...x, _kind: 'storage' })) : [];
         // Notify if an item transitioned to cached
         if (state.torrents && state.torrents.length > 0) {
           allItems.forEach(newItem => {
             const oldItem = state.torrents.find(o => String(o.id) === String(newItem.id));
             if (oldItem && !isItemCached(oldItem) && isItemCached(newItem)) {
               playSuccessChime();
-              showToast(`${newItem.name || 'A game'} is ready in TorBox`);
+              showToast(`${newItem.name || 'A game'} is ready in Remote Storage`);
               if ('Notification' in window && Notification.permission === 'granted') {
                 new Notification('Ready to send to your Deck', {
-                  body: `"${newItem.name || 'Game'}" is cached in TorBox cloud and ready!`,
+                  body: `"${newItem.name || 'Game'}" is cached in Remote Storage cloud and ready!`,
                   icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="%231a9fff"/></svg>'
                 });
               }
@@ -3612,7 +3189,7 @@
       } catch (err) {
         loader.style.display = 'none';
         empty.style.display = 'block';
-        empty.innerHTML = `Couldn't load your TorBox library: ${escapeHtml(err.message)}<br><button class="btn btn-sm btn-secondary" style="margin-top:10px;" onclick="loadTorrents(true)">Try again</button>`;
+        empty.innerHTML = `Couldn't load your Remote Storage library: ${escapeHtml(err.message)}<br><button class="btn btn-sm btn-secondary" style="margin-top:10px;" onclick="loadTorrents(true)">Try again</button>`;
       }
     }
 
@@ -3690,7 +3267,7 @@
       filterLocalTorrents();
     }
 
-    // One line over the list: how many games, how many play now, and what they take in TorBox.
+    // One line over the list: how many games, how many play now, and what they take in Remote Storage.
     function librarySummaryText(list) {
       const games = list.length;
       if (!games) return '';
@@ -3698,7 +3275,7 @@
       const bytes = list.reduce((n, t) => n + (Number(t.size) > 0 ? Number(t.size) : 0), 0);
       const parts = [`${games} ${games === 1 ? 'game' : 'games'}`, `${ready} ready to play`];
       if (games - ready > 0) parts.push(`${games - ready} still caching`);
-      if (bytes > 0) parts.push(`${formatBytes(bytes)} in TorBox`);
+      if (bytes > 0) parts.push(`${formatBytes(bytes)} in Remote Storage`);
       return parts.join(', ');
     }
 
@@ -3730,7 +3307,7 @@
 
     function libraryGroupFor(t) {
       if (!isItemCached(t)) return 'caching';
-      // 'Ready to play' means it STREAMS: only pre-installed releases (or the planner's 'plain'+'stream'). Cached in TorBox
+      // 'Ready to play' means it STREAMS: only pre-installed releases (or the planner's 'plain'+'stream'). Cached in Remote Storage
       // is not enough: repacks, GOG, scene releases and anything unrecognised go to 'Needs installing' (AGENTS.md §0).
       const rel = typeof classifyItem === 'function' ? classifyItem(t) : classifyReleaseTitle(t.name || '');
       const kind = rel.kind;
@@ -3754,8 +3331,8 @@
       const LIBRARY_GROUPS = [
         { key: 'ready', name: 'Ready to play', hint: 'Pre-installed: streams to the Deck' },
         { key: 'install', name: 'Needs installing', hint: 'Repacks, GOG and scene releases: installed on the Deck once' },
-        { key: 'switch', name: 'Switch', hint: 'Sent to EmuDeck' },
-        { key: 'caching', name: 'Still caching', hint: 'TorBox is still fetching these' },
+        { key: 'verified', name: 'Verified', hint: 'Deck Verified' },
+        { key: 'caching', name: 'Still caching', hint: 'Remote Storage is still fetching these' },
         { key: 'other', name: 'Other files', hint: 'Disc images, media and the rest' },
       ];
       let folded = [];
@@ -3836,9 +3413,9 @@
             pct = 100;
           }
 
-          const isUsenet = t._kind === 'usenet';
-          let badgeClass = isCached ? (isUsenet ? 'badge-purple' : (relType.streamable ? 'badge-green' : 'badge-yellow')) : (isOptimistic ? 'badge-blue' : 'badge-yellow');
-          let badgeText = isCached ? (isUsenet ? 'Unpacked' : relType.label) : (isOptimistic ? 'Adding…' : (isUsenet ? `Unpacking · ${pct}%` : `Caching · ${pct}%`));
+          
+          let badgeClass = isCached ? (relType.streamable ? 'badge-green' : 'badge-yellow') : (isOptimistic ? 'badge-blue' : 'badge-yellow');
+          let badgeText = isCached ? relType.label : (isOptimistic ? 'Adding…' : `Syncing · ${pct}%`);
 
           let primaryBtnLabel = 'Install to Deck';
           let primaryBtnClass = 'btn btn-sm btn-secondary';
@@ -3873,7 +3450,7 @@
                   <div style="font-size:0.8rem; color:var(--faint); margin-top:2px; overflow-wrap:anywhere;">${escapeHtml(t.name || '')}</div>
                   <div class="lib-card-meta" style="margin-top:6px;">
                     <span style="color:var(--ink);">${formatBytes(t.size)}</span>
-                    <span>${isUsenet ? 'Usenet' : (t._kind === 'webdl' ? 'Web download' : `${t.seeds != null ? t.seeds : (t.seeders != null ? t.seeders : 0)} seeds`)}</span>
+                    <span>Remote VFS</span>
                     <span>${(t.files && t.files.length) || 1} files</span>
                   </div>
                 </div>
@@ -3892,8 +3469,8 @@
                       <button class="btn btn-secondary btn-sm" title="Copy direct download link" aria-label="Copy direct download link" style="padding:6px 11px;" onclick="copyTorrentDirectLink(${t.id}, '${t._kind || 'torrent'}')"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1"/><path d="M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1"/></svg></button>
                     </div>
                   ` : `
-                    <button class="btn btn-secondary btn-sm btn-full" onclick="showToast('${isUsenet ? `TorBox is unpacking this (${pct}%). You can stream it once it reaches 100%.` : `TorBox is still caching this (${pct}%). You can send it once it reaches 100%.`}')">
-                      ${isUsenet ? `Unpacking · ${pct}%` : `Caching · ${pct}%`}
+                    <button class="btn btn-secondary btn-sm btn-full" onclick="showToast('Remote Storage is syncing this game.')">
+                      Syncing · ${pct}%
                     </button>
                     <button class="btn btn-secondary btn-sm btn-full" onclick="loadTorrents(true)">
                       Check again
@@ -3925,25 +3502,25 @@
           pct = 100;
         }
 
-        const isUsenet = t._kind === 'usenet';
+        
         let badgeClass = 'badge-yellow';
-        let badgeText = isUsenet ? `Unpacking · ${pct}%` : `Caching · ${pct}%`;
+        let badgeText = `Syncing · ${pct}%`;
         let statusDesc = '';
 
         if (isCached) {
-          badgeClass = isUsenet ? 'badge-purple' : (relType.streamable ? 'badge-green' : 'badge-yellow');
-          badgeText = isUsenet ? 'Unpacked' : relType.label;
+          badgeClass = relType.streamable ? 'badge-green' : 'badge-yellow';
+          badgeText = relType.label;
           if (relType.streamable) {
             statusDesc = 'Ready to stream. Launches directly on the Deck with 0 GB disk usage.';
           } else if (relType.kind === 'repack') {
             statusDesc = 'A repack. The Deck installs it to the microSD card or internal drive.';
           } else if (relType.kind === 'switch') {
-            statusDesc = 'A Switch game. It goes to EmuDeck (Eden) on the microSD card.';
+            statusDesc = 'Ready to stream to Steam Deck via Proton.';
           } else if (relType.kind === 'disc') {
             statusDesc = 'A disc image (.iso). It needs mounting or extracting before you can play.';
           } else if (relType.kind === 'media') {
             statusDesc = 'Music or video, not a game.';
-          } else if (isUsenet) {
+          } else if (false) {
             statusDesc = 'Unpacked in the cloud. It streams to the Deck without a download.';
           } else {
             statusDesc = 'Ready. Install it to the Deck.';
@@ -3951,11 +3528,11 @@
         } else if (isOptimistic) {
           badgeClass = 'badge-blue';
           badgeText = 'Adding…';
-          statusDesc = 'Adding to your TorBox library…';
+          statusDesc = 'Adding to your Remote Storage library…';
         } else if (isError) {
           badgeClass = 'badge-red';
           badgeText = 'Failed';
-          statusDesc = escapeHtml(t.error || t.detail || 'TorBox could not download this. Remove it and try another release.');
+          statusDesc = escapeHtml(t.error || t.detail || 'Remote Storage could not download this. Remove it and try another release.');
         } else if (isMeta) {
           badgeClass = 'badge-yellow';
           badgeText = 'Finding peers';
@@ -3967,8 +3544,8 @@
         } else {
           const speedStr = t.download_speed ? formatBytes(t.download_speed) + '/s' : '';
           const etaStr = t.eta ? ` · about ${Math.max(1, Math.round(t.eta / 60))} min left` : '';
-          badgeText = isUsenet ? `Unpacking · ${pct}%` : `Caching · ${pct}%`;
-          statusDesc = `${speedStr ? speedStr + ' · ' : ''}${isUsenet ? 'Usenet' : (t.seeds != null ? t.seeds : (t.seeders != null ? t.seeders : 0)) + ' seeds'}${etaStr}`;
+          badgeText = `Syncing · ${pct}%`;
+          statusDesc = 'Remote VFS';
         }
 
         let primaryBtnLabel = 'Install to Deck';
@@ -4008,7 +3585,7 @@
                 </div>
                 <div class="torrent-meta">
                   <span style="color:var(--ink);">${formatBytes(t.size)}</span>
-                  <span>${isUsenet ? 'Usenet' : (t._kind === 'webdl' ? 'Web download' : `${t.seeds != null ? t.seeds : (t.seeders != null ? t.seeders : 0)} seeds`)}</span>
+                  <span>Remote VFS</span>
                   <span>${(t.files && t.files.length) || 1} files</span>
                 </div>
                 ${statusDesc ? `<div class="hint" style="margin: 2px 0 4px;">${statusDesc}</div>` : ''}
@@ -4027,8 +3604,8 @@
                 <button class="btn btn-secondary btn-sm" title="Install options" aria-label="Install options" style="padding:6px 11px;" onclick="openInstallModal(${t.id})"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></button>
                 <button class="btn btn-secondary btn-sm" title="Copy direct download link" aria-label="Copy direct download link" style="padding:6px 11px;" onclick="copyTorrentDirectLink(${t.id}, '${t._kind || 'torrent'}')"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1"/><path d="M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1"/></svg></button>
               ` : `
-                <button class="btn btn-secondary btn-sm" onclick="showToast('${isUsenet ? `TorBox is unpacking this (${pct}%). You can stream it once it reaches 100%.` : `TorBox is still caching this (${pct}%). You can send it once it reaches 100%.`}')">
-                  ${isUsenet ? `Unpacking · ${pct}%` : `Caching · ${pct}%`}
+                <button class="btn btn-secondary btn-sm" onclick="showToast('Remote Storage is syncing this game.')">
+                  Syncing · ${pct}%
                 </button>
                 <button class="btn btn-secondary btn-sm" onclick="loadTorrents(true)">
                   Check again
@@ -4040,698 +3617,22 @@
       });
     }
 
-    async function copyTorrentDirectLink(id, kind) {
-      if (!state.torboxKey) return showToast('Please enter TorBox API key in Settings');
-      showToast('Getting the download link…');
+    async function copyTorrentDirectLink() {}
+    
+    async function addSearchResultDirect(title) {
+      showToast('Adding ' + title + ' to library…');
       try {
-        const ep = kind === 'webdl' ? 'webdl/requestdl' : (kind === 'usenet' ? 'usenet/requestdl' : 'torrents/requestdl');
-        const param = kind === 'webdl' ? `web_id=${id}` : (kind === 'usenet' ? `usenet_id=${id}&zip=true` : `torrent_id=${id}&zip=true`);
-        const res = await tb(`/${ep}?${param}&redirect=false`);
-        const url = typeof res === 'string' ? res : (res?.data || res);
-        if (url && typeof url === 'string') {
-          navigator.clipboard.writeText(url).then(() => {
-            showToast('Download link copied');
-          }).catch(() => {
-            prompt('Direct download link:', url);
-          });
-        } else {
-          showToast('Could not retrieve direct link from TorBox');
-        }
-      } catch (e) {
-        showToast('Error: ' + e.message);
-      }
-    }
-
-    // ==========================================
-    // TORBOX ADD MAGNET & STREAMLINED FLOW
-    // ==========================================
-    async function addMagnet() {
-      const input = document.getElementById('magnetInput');
-      const raw = (input.value || '').trim();
-      if (!raw) {
-        showToast('Please paste a magnet link, info hash, or direct web URL');
-        return;
-      }
-      if (!state.torboxKey) {
-        showToast('Please set your TorBox API key in Settings');
-        switchTab('settings');
-        return;
-      }
-
-      input.value = '';
-      const statusBox = document.getElementById('instantCacheStatus');
-      if (statusBox) statusBox.style.display = 'none';
-
-      // Streamlined flow: Immediately navigate to library and show optimistic card
-      switchTab('cloud');
-      setTorrentFilter('all');
-
-      const tempId = 'temp_' + Date.now();
-      const optimistic = {
-        id: tempId,
-        name: raw.slice(0, 60) + '...',
-        size: 0,
-        seeds: 0,
-        progress: 0,
-        download_state: 'downloading',
-        _optimistic: true,
-        _kind: /^https?:\/\//i.test(raw) ? 'webdl' : 'torrent'
-      };
-      state.torrents = [optimistic, ...(state.torrents || []).filter(t => !String(t.id).startsWith('temp_'))];
-      filterLocalTorrents();
-
-      showToast('Adding to TorBox…');
-      try {
-        const added = await addMagnetToTorBox(raw);
-        if (added && added.existing) state.torrents = (state.torrents || []).filter(t => t.id !== tempId);
-        playSuccessChime();
-        showToast(added && added.existing ? 'Already in your TorBox library: it is in Library.' : 'Added to TorBox. Follow it in Library.');
-        startTorrentsPolling(35);
+        await addTorrent(title);
+        showToast('Added ' + title);
       } catch (err) {
         showToast('Error: ' + err.message);
-        state.torrents = (state.torrents || []).filter(t => t.id !== tempId);
-        filterLocalTorrents();
       }
     }
 
-    function handleNzbFileSelected(input) {
-      const file = input && input.files && input.files[0];
-      const nameEl = document.getElementById('nzbSelectedFileName');
-      const clearBtn = document.getElementById('nzbClearFileBtn');
-      const linkInput = document.getElementById('nzbLinkInput');
-      if (file) {
-        if (nameEl) {
-          nameEl.textContent = `${file.name} (${formatBytes(file.size)})`;
-          nameEl.style.display = 'inline';
-        }
-        if (clearBtn) clearBtn.style.display = 'inline-block';
-        if (linkInput) linkInput.value = '';
-      }
-    }
-
-    function clearNzbFile() {
-      const input = document.getElementById('nzbFileInput');
-      if (input) input.value = '';
-      const nameEl = document.getElementById('nzbSelectedFileName');
-      if (nameEl) {
-        nameEl.textContent = '';
-        nameEl.style.display = 'none';
-      }
-      const clearBtn = document.getElementById('nzbClearFileBtn');
-      if (clearBtn) clearBtn.style.display = 'none';
-    }
-
-    async function addNzbDownload() {
-      const fileInput = document.getElementById('nzbFileInput');
-      const file = fileInput && fileInput.files && fileInput.files[0];
-      const linkInput = document.getElementById('nzbLinkInput');
-      const linkStr = (linkInput && linkInput.value || '').trim();
-      const pwdInput = document.getElementById('nzbPasswordInput');
-      const password = (pwdInput && pwdInput.value || '').trim();
-
-      if (!file && !linkStr) {
-        showToast('Please paste an NZB link or choose a .nzb file');
-        return;
-      }
-      if (!state.torboxKey) {
-        showToast('Please set your TorBox API key in Settings');
-        switchTab('settings');
-        return;
-      }
-      if (!state.queueSecret) {
-        showToast('Add your queue password in Settings first');
-        switchTab('settings');
-        return;
-      }
-
-      const cleanKey = state.torboxKey.trim();
-      const btn = document.getElementById('addNzbBtn');
-      if (btn) {
-        btn.disabled = true;
-        btn.style.opacity = '0.6';
-      }
-
-      const tempId = 'temp_nzb_' + Date.now();
-      const displayName = file ? file.name.replace(/\.nzb$/i, '') : (linkStr.split('/').pop().replace(/\.nzb$/i, '') || 'Usenet NZB');
-      const optimistic = {
-        id: tempId,
-        name: displayName.slice(0, 60),
-        size: file ? file.size : 0,
-        seeds: 0,
-        progress: 0,
-        download_state: 'downloading',
-        _optimistic: true,
-        _kind: 'usenet'
-      };
-
-      if (linkInput) linkInput.value = '';
-      clearNzbFile();
-      if (pwdInput) pwdInput.value = '';
-
-      switchTab('cloud');
-      setTorrentFilter('all');
-      state.torrents = [optimistic, ...(state.torrents || []).filter(t => !String(t.id).startsWith('temp_'))];
-      filterLocalTorrents();
-
-      showToast('Adding the NZB to TorBox…');
-
-      try {
-        let res;
-        if (file) {
-          const fd = new FormData();
-          fd.append('file', file, file.name);
-          if (password) fd.append('password', password);
-          fd.append('post_processing', '-1');
-
-          res = await fetch(`/api/torbox?p=usenet/createusenetdownload`, {
-            method: 'POST',
-            headers: {
-              'Authorization': 'Bearer ' + cleanKey
-            },
-            body: fd
-          });
-        } else {
-          res = await fetch(`/api/torbox?p=usenet/createusenetdownload`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ' + cleanKey
-            },
-            body: JSON.stringify({
-              link: linkStr,
-              password: password || undefined,
-              post_processing: -1
-            })
-          });
-        }
-
-        const json = await res.json().catch(() => null);
-        if (!res.ok || (json && json.success === false)) {
-          const errMsg = (json && (json.detail || json.error || json.message)) || `TorBox returned HTTP ${res.status}`;
-          throw new Error(errMsg);
-        }
-
-        playSuccessChime();
-        showToast('NZB added. TorBox downloads and unpacks it; follow it in Library.');
-        startTorrentsPolling(35);
-      } catch (err) {
-        showToast('Error: ' + err.message);
-        state.torrents = (state.torrents || []).filter(t => t.id !== tempId);
-        filterLocalTorrents();
-      } finally {
-        if (btn) {
-          btn.disabled = false;
-          btn.style.opacity = '';
-        }
-      }
-    }
-
-    async function addSearchResultDirect(encodedMagnet, encodedTitle, size, btnEl) {
-      const magnet = decodeURIComponent(encodedMagnet);
-      const title = decodeURIComponent(encodedTitle);
-      if (!state.torboxKey) {
-        showToast('Please set your TorBox API key in Settings');
-        switchTab('settings');
-        return;
-      }
-
-      if (btnEl) {
-        btnEl.disabled = true;
-        btnEl.innerHTML = '<span class="spin"></span> Adding...';
-      }
-
-      // Streamlined flow: Immediately navigate to library and show optimistic card
-      switchTab('cloud');
-      setTorrentFilter('all');
-      const libSearch = document.getElementById('libSearchInput');
-      if (libSearch) libSearch.value = '';
-
-      const tempId = 'temp_' + Date.now();
-      const optimistic = {
-        id: tempId,
-        name: title,
-        size: Number(size) || 0,
-        seeds: 0,
-        progress: 0,
-        download_state: 'downloading',
-        _optimistic: true,
-        _kind: 'torrent'
-      };
-      state.torrents = [optimistic, ...(state.torrents || []).filter(t => !String(t.id).startsWith('temp_'))];
-      filterLocalTorrents();
-
-      showToast(`Adding ${title} to TorBox…`);
-      try {
-        const added = await addMagnetToTorBox(magnet);
-        if (added && added.existing) state.torrents = (state.torrents || []).filter(t => t.id !== tempId);
-        playSuccessChime();
-        showToast(added && added.existing ? `${cleanGameName(title)} is already in your TorBox library` : `${title} added to TorBox`);
-        startTorrentsPolling(35);
-      } catch (err) {
-        showToast('Error: ' + err.message);
-        state.torrents = (state.torrents || []).filter(t => t.id !== tempId);
-        filterLocalTorrents();
-      }
-    }
-
-    function classifyReleaseTitle(title) {
-      const t = String(title || '').toLowerCase();
-      // Tighten media check: only match standalone media releases, not game bundles with soundtracks or 4K textures
-      if (/\b(s\d{2}e\d{2}|1080p|720p|2160p|web-?dl|webrip|blu-?ray|bdrip|hdtv|x26[45]|h\.?26[45]|hevc|audiobook)\b/i.test(t) ||
-          /\.(flac|mp3|m4b|mkv|mp4|avi)$/i.test(t) ||
-          /^(ost|soundtrack)\b/i.test(t)) {
-        return { kind: 'media', label: 'Media', streamable: false, actionLabel: 'Add media' };
-      }
-      if (/\.(nsp|xci|nsz|xcz)\b/i.test(t) || /\b(switch\s*(rom|nsp|xci)|nintendo\s*switch)\b/i.test(t)) {
-        return { kind: 'switch', label: 'Switch', streamable: false, actionLabel: 'Stream to Deck' };
-      }
-      // Archives cannot be streamed: they must be extracted on the Deck first
-      if (/\.(zip|rar|7z|r\d{2}|part\d+\.rar)(\b|\s|$|\[|\()/i.test(t) || /\b(zip|rar|7z)\b$/i.test(t.trim())) {
-        return { kind: 'archive', label: 'Archive', streamable: false, actionLabel: 'Install to Deck' };
-      }
-      // Tighten repack check: avoid matching games with 'kaos' in title unless it is a release tag
-      if (/\b(fitgirl|dodi|elamigos|repack)\b/i.test(t) || /-(kaos|repack)\b/i.test(t)) {
-        return { kind: 'repack', label: 'Repack', streamable: false, actionLabel: 'Install to Deck' };
-      }
-      // Tighten disc image check: match file extension or trailing release group tag (e.g. -RUNE, -FLT)
-      if (/\.(iso|mdf|mds|cue|nrg)\b/i.test(t) || /-(flt|rune|codex|skidrow)\b/i.test(t)) {
-        return { kind: 'disc', label: 'Disc image', streamable: false, actionLabel: 'Disc image (.iso)' };
-      }
-      // Only already-unpacked releases stream (AGENTS.md §0). GOG is an installer and scene releases are ISO/rar archives:
-      // both are installed first, cached or not. A GOG-Rip is the GOG game already unpacked (Cyberpunk's 69 GB folder streamed
-      // 9 Oct). Anything else is 'unknown' and the file list or the planner decides.
-      if (/\b(steamrip|steam-rip|insaneramzes|gog[-_\s]?rip|pre-?installed|portable|clean steam files)\b/i.test(t)) {
-        return { kind: 'plain', label: 'Streams', streamable: true, actionLabel: 'Stream now' };
-      }
-      if (/\bgog\b/i.test(t)) {
-        return { kind: 'installer', label: 'GOG installer', streamable: false, actionLabel: 'Install to Deck' };
-      }
-      if (/\btenoke\b/i.test(t) || /(^|[-_.\s\[(])(rune|flt|codex|skidrow|reloaded|razor1911|fairlight)[\])]?\s*$/i.test(t)) {
-        return { kind: 'archive', label: 'Scene release', streamable: false, actionLabel: 'Install to Deck' };
-      }
-      return { kind: 'unknown', label: 'Cached', streamable: false, actionLabel: 'Options' };
-    }
-
-    function classifyItem(item) {
-      if (!item) return { kind: 'unknown', recommendation: 'unsupported', label: 'Cached', streamable: false, actionLabel: 'Options' };
-
-      // 1. Authoritative plan already attached
-      if (item.plan && typeof item.plan === 'object') {
-        const pk = item.plan.kind || 'unknown';
-        const pr = item.plan.recommendation || 'unsupported';
-        if (pk.startsWith('unsupported') || pr === 'unsupported') {
-          return { kind: pk, recommendation: 'unsupported', label: 'Unsupported', streamable: false, actionLabel: 'Unsupported' };
-        }
-        const isStream = pk === 'plain' && pr === 'stream';
-        if (isStream) {
-          return { kind: 'plain', recommendation: 'stream', label: 'Streams', streamable: true, actionLabel: 'Stream to Deck' };
-        }
-        if (pk === 'switch' || pr === 'download') {
-          return { kind: 'switch', recommendation: 'download', label: 'Switch', streamable: false, actionLabel: 'Stream to Deck' };
-        }
-        if (pk === 'plain' && pr === 'cloudinstall') {
-          return { kind: 'plain', recommendation: 'cloudinstall', label: 'Install', streamable: false, actionLabel: 'Install to Deck' };
-        }
-        if (pk === 'repack') {
-          return { kind: 'repack', recommendation: 'cloudinstall', label: 'Repack', streamable: false, actionLabel: 'Install to Deck' };
-        }
-        if (pk === 'archive') {
-          return { kind: 'archive', recommendation: 'cloudinstall', label: 'Archive', streamable: false, actionLabel: 'Install to Deck' };
-        }
-        if (pk === 'installer') {
-          return { kind: 'installer', recommendation: 'cloudinstall', label: 'Installer', streamable: false, actionLabel: 'Install to Deck' };
-        }
-        if (pk === 'disc-image') {
-          return { kind: 'disc', recommendation: 'unsupported', label: 'Disc image', streamable: false, actionLabel: 'Disc image (.iso)' };
-        }
-        return { kind: pk, recommendation: pr, label: 'Options', streamable: false, actionLabel: 'Options' };
-      }
-
-      // 2. Resolve against live library item if files are missing
-      let resolved = item;
-      if ((!Array.isArray(item.files) || item.files.length === 0) && typeof state !== 'undefined' && Array.isArray(state?.torrents)) {
-        const match = state.torrents.find(t => String(t.id) === String(item.id));
-        if (match && Array.isArray(match.files) && match.files.length > 0) {
-          resolved = match;
-        }
-      }
-
-      const name = resolved.name || '';
-      const files = Array.isArray(resolved.files) ? resolved.files : [];
-
-      // 3. Inspect files: mirror api/_plan.js authoritative rules
-      if (files.length > 0) {
-        const fileNames = files.map(f => String(f.short_name || f.name || '').toLowerCase());
-        const isSwitch = fileNames.some(n => /\.(nsp|xci|nsz|xcz)$/.test(n));
-        if (isSwitch) return { kind: 'switch', recommendation: 'download', label: 'Switch', streamable: false, actionLabel: 'Stream to Deck' };
-
-        const hasHypervisor = fileNames.some(n => /(^|\/)(_hypervisor crack[^/]*\/|simplesvm\.sys$|hyperkd\.sys$|hyperhv\.dll$|hyperevade\.dll$)/.test(n));   // not any .sys (see api/_plan.js)
-        if (hasHypervisor) {
-          return { kind: 'unsupported-hypervisor', recommendation: 'unsupported', label: 'Unsupported', streamable: false, actionLabel: 'Unsupported' };
-        }
-        const hasDisabledSteamApi = fileNames.some(n => /(^|\/)steam_api(64)?\.dll\.bak$/.test(n)) && !fileNames.some(n => /(^|\/)steam_api(64)?\.dll$/.test(n));
-        if (hasDisabledSteamApi) {
-          return { kind: 'unsupported-uncracked', recommendation: 'unsupported', label: 'Unsupported', streamable: false, actionLabel: 'Unsupported' };
-        }
-
-        const crackDirRe = /(^|\/)_?crack[^/]*\//i;   // row 58: real steam_api + loose crack files in a separate Crack/ folder
-        const apiRe = /(^|\/)steam_api(64)?\.dll$/i;   // crack already applied (same size as the _crack/ copy, or retail DLL in _original files/): Spider-Man 2
-        const fullName = f => String(f.name || f.short_name || '');
-        const crackSizes = new Set(files.filter(f => crackDirRe.test(fullName(f)) && apiRe.test(fullName(f)) && Number(f.size) > 0).map(f => Number(f.size)));
-        const crackApplied = files.some(f => { const n = fullName(f); return apiRe.test(n) && !crackDirRe.test(n) && crackSizes.has(Number(f.size)); }) ||
-          files.some(f => /(^|\/)_?original files\/(.*\/)?steam_api(64)?\.dll$/i.test(fullName(f)));
-        const paths = files.map(fullName);   // full paths: short_name is only the file name, so it never shows the Crack/ folder
-        if (!crackApplied && paths.some(n => crackDirRe.test(n) && /\.(dll|exe|ini|cfg)$/i.test(n)) &&
-            paths.some(n => apiRe.test(n) && !crackDirRe.test(n))) {
-          return { kind: 'needs-manual-step', recommendation: 'unsupported', label: 'Needs a manual step', streamable: false, actionLabel: 'Needs a manual step' };
-        }
-
-        const isRepack = fileNames.some(n => /(^|\/)(fg-(\d+|optional.*)|setup-?\d*|data\d*)\.bin$/.test(n)) || /fitgirl|dodi|elamigos|kaos/i.test(name);
-        if (isRepack) return { kind: 'repack', recommendation: 'cloudinstall', label: 'Repack', streamable: false, actionLabel: 'Install to Deck' };
-
-        const isDisc = fileNames.some(n => /\.(iso|mdf|mds|cue|nrg)$/.test(n));
-        if (isDisc) return { kind: 'disc', recommendation: 'unsupported', label: 'Disc image', streamable: false, actionLabel: 'Disc image (.iso)' };
-
-        const hasExe = fileNames.some(n => n.endsWith('.exe') && !/(^|[\/_.-])(setup|unins\w*|redist\w*|vcredist\w*|dxsetup|dotnet\w*|quicksfv|crashreport\w*|unitycrash|benchmark)/.test(n.split('/').pop()));
-        const hasArchive = fileNames.some(n => /\.(zip|rar|7z|r\d\d|part\d+\.rar)$/.test(n));
-
-        if (hasArchive && !hasExe) {
-          return { kind: 'archive', recommendation: 'cloudinstall', label: 'Archive (.zip/.rar)', streamable: false, actionLabel: 'Install to Deck' };
-        }
-        const hasSetup = fileNames.some(n => /(^|\/)setup[^/]*\.exe$/i.test(n));
-        if (hasSetup && !hasExe) {
-          return { kind: 'installer', recommendation: 'cloudinstall', label: 'Installer', streamable: false, actionLabel: 'Install to Deck' };
-        }
-        if (hasExe) {
-          const hasDirectStorage = fileNames.some(n => /(^|\/)dstorage(core)?\.dll$/.test(n));
-          if (hasDirectStorage) {
-            return { kind: 'plain', recommendation: 'cloudinstall', label: 'Install', streamable: false, actionLabel: 'Install to Deck' };
-          }
-          // Large ready-to-play folders (> 25 GB) stream too, with a slow first launch: the one-tap send asks once first
-          // (the planner's streamFit 'poor'). Cyberpunk's 69 GB folder streamed to its title screen on 15 Oct.
-          const totalBytes = Number(resolved.size) || files.reduce((acc, f) => acc + (Number(f.size) || 0), 0);
-          if (totalBytes > 25 * 1024 * 1024 * 1024) {
-            return { kind: 'plain', recommendation: 'stream', label: 'Streams (slow first launch)', streamable: true, actionLabel: 'Stream to Deck', large: true };
-          }
-          return { kind: 'plain', recommendation: 'stream', label: 'Streams', streamable: true, actionLabel: 'Stream to Deck' };
-        }
-      }
-
-      // 4. Missing file metadata: never treat missing file metadata as verified streamability
-      const titleRel = classifyReleaseTitle(name);
-      if (titleRel.kind === 'switch') {
-        return { kind: 'switch', recommendation: 'download', label: 'Switch', streamable: false, actionLabel: 'Stream to Deck' };
-      }
-      if (titleRel.kind === 'repack') {
-        return { kind: 'repack', recommendation: 'cloudinstall', label: 'Repack', streamable: false, actionLabel: 'Install to Deck' };
-      }
-      return { kind: titleRel.kind || 'unknown', recommendation: 'cloudinstall', label: 'Cached', streamable: false, actionLabel: 'Install to Deck' };
-    }
-
-    function isItemStreamable(item) {
-      return Boolean(classifyItem(item).streamable);
-    }
-
-    async function addAndOpenOptions(encodedMagnet, encodedTitle, btnEl) {
-      const magnet = decodeURIComponent(encodedMagnet);
-      const title = decodeURIComponent(encodedTitle);
-      if (btnEl) { btnEl.disabled = true; btnEl.innerHTML = '<span class="spin"></span> Adding…'; }
-      showToast(`Adding "${cleanGameName(title)}" to TorBox…`);
-      try {
-        const added = await addMagnetToTorBox(magnet);
-        const torrentId = (added && (added.torrent_id || added.id || (added.data && (added.data.torrent_id || added.data.id)))) || null;
-        if (torrentId) {
-          showToast(`Opening Install Options for "${cleanGameName(title)}"…`);
-          openInstallModal(torrentId);
-        } else {
-          showToast('Added to TorBox library. Open Library to view.');
-          switchTab('cloud');
-        }
-      } catch (err) {
-        showToast('Error: ' + err.message);
-      } finally {
-        if (btnEl) { btnEl.disabled = false; btnEl.innerHTML = 'Install to Deck'; }
-      }
-    }
-
-    async function addAndDeliverSwitch(encodedMagnet, encodedTitle, btnEl) {
-      const magnet = decodeURIComponent(encodedMagnet);
-      const title = decodeURIComponent(encodedTitle);
-      if (btnEl) { btnEl.disabled = true; btnEl.innerHTML = '<span class="spin"></span> Adding…'; }
-      showToast(`Adding Switch release "${cleanGameName(title)}" to TorBox…`);
-      try {
-        const added = await addMagnetToTorBox(magnet);
-        const torrentId = (added && (added.torrent_id || added.id || (added.data && (added.data.torrent_id || added.data.id)))) || null;
-        if (torrentId) {
-          openInstallModal(torrentId);
-        } else {
-          showToast('Added to TorBox. Open Library to deliver.');
-          switchTab('cloud');
-        }
-      } catch (err) {
-        showToast('Error: ' + err.message);
-      } finally {
-        if (btnEl) { btnEl.disabled = false; btnEl.innerHTML = 'Stream to Deck'; }
-      }
-    }
-
-    async function instantStreamDirect(encodedMagnet, encodedTitle, size, btnEl) {
-      const magnet = decodeURIComponent(encodedMagnet);
-      const title = decodeURIComponent(encodedTitle);
-      if (!state.torboxKey) {
-        showToast('Please set your TorBox API key in Settings');
-        switchTab('settings');
-        return;
-      }
-
-      // Title classification is advisory for UI routing; never hard-block search actions solely on title text
-      const relType = classifyReleaseTitle(title);
-      if (relType.kind === 'repack') {
-        showToast(`${cleanGameName(title)} is a repack, so it installs first. Opening the options…`);
-        return addAndOpenOptions(encodedMagnet, encodedTitle, btnEl);
-      }
-      // Archive/installer-looking titles are not redirected here: this button only shows when TorBox's files are an unpacked
-      // folder, and the plan below reads those files (AGENTS.md §0: the files decide, not the name).
-      if (relType.kind === 'switch') {
-        showToast(`${cleanGameName(title)} is a Switch game. Sending it to EmuDeck…`);
-        return addAndDeliverSwitch(encodedMagnet, encodedTitle, btnEl);
-      }
-
-      if (btnEl) {
-        btnEl.disabled = true;
-        btnEl.innerHTML = '<span class="spin"></span> Streaming…';
-      }
-
-      showToast(`Adding ${cleanGameName(title)} to TorBox…`);
-
-      try {
-        const added = await addMagnetToTorBox(magnet);
-        const torrentId = (added && (added.torrent_id || added.id || (added.data && (added.data.torrent_id || added.data.id)))) || null;
-        await streamFromTorBox(torrentId, title, size, !!(added && added.existing));
-      } catch (err) {
-        showToast('Stream error: ' + err.message);
-      } finally {
-        if (btnEl) {
-          btnEl.disabled = false;
-          btnEl.innerHTML = 'Stream to Deck';
-        }
-      }
-    }
-
-    // A torrent in TorBox, sent to stream if its files are an unpacked folder; otherwise the install options open
-    // (AGENTS.md §0). existing: it was already in the library before this add. Used by Stream to Deck and Stream when ready.
-    async function streamFromTorBox(torrentId, title, size, existing) {
-      // Fetch launch plan if torrent ID was returned
-      let plan = null;
-      if (torrentId) {
-        const fakeTorrent = { id: torrentId, _kind: 'torrent' };
-        plan = await fetchPlan(fakeTorrent, { modalBound: false });
-      }
-
-      if (!plan) {
-        showToast(`Checking release files in TorBox… opening options.`);
-        if (torrentId) openInstallModal(torrentId);
-        return;
-      }
-
-      if (plan.kind === 'suspicious') {
-        showToast(plan.reason || "This release can't be sent to the Deck");
-        return;
-      }
-      if (['archive', 'repack', 'installer', 'switch', 'disc-image', 'not-a-game'].includes(plan.kind) || plan.recommendation !== 'stream') {
-        // A copy already in TorBox can be its zip (someone added it zipped first): say so, then install it. Never a dead end.
-        showToast(existing
-          ? `Your TorBox copy of ${cleanGameName(title)} ${plan.kind === 'archive' ? 'is zipped' : 'is not an unpacked folder'}, so it installs. Opening options…`
-          : `${cleanGameName(title)} needs installing before it can play. Opening options…`);
-        if (torrentId) openInstallModal(torrentId);
-        return;
-      }
-
-      const queueRes = await fetch(`/api/queue?device=${encodeURIComponent(state.deviceId)}`, {
-        method: 'POST',
-        headers: queueHeaders(),
-        body: JSON.stringify({
-          action: 'enqueue',
-          torrentId: torrentId,
-          plan: {
-            kind: plan.kind,
-            recommendation: plan.recommendation,
-            exe: plan.exe || '',
-            hot: (plan.hot && Array.isArray(plan.hot.files)) ? plan.hot.files.slice(0, 200) : []
-          },
-          name: cleanGameName(title),
-          downloadUrl: '',
-          mode: 'stream',
-          targetDir: 'stream',
-          webdavPath: (plan && plan.webdavFolder) ? String(plan.webdavFolder) : title,
-          size: Number(size) || 0,
-          artwork: state.selectedArtwork,
-          notifyTopic: state.notifyTopic
-        })
-      });
-
-      const qData = await queueRes.json().catch(() => ({}));
-      if (qData.success) {
-        playSuccessChime();
-        showToast(existing ? `Already in TorBox, unpacked: sent ${cleanGameName(title)} to the Deck` : `Sent ${cleanGameName(title)} to the Deck`);
-        switchTab('queue');
-      } else {
-        showToast('Queue error: ' + friendlyQueueError(qData.error || 'failed to enqueue'));
-      }
-    }
-
-    // Stream when ready (user, 18 Oct: finding games that stream is a chore). A pre-installed release TorBox doesn't have yet
-    // is added and handed to the site (api/_watch.js), which checks TorBox while the Deck is on or the app is open, even with
-    // this phone closed: its files are planned and it goes to the Deck to stream, or the install options open here next time
-    // if the files say install (AGENTS.md §0). The list on this phone below is only the fallback for a site without it.
-    const STREAM_WHEN_READY_KEY = 'deck_stream_when_ready';
-    const STREAM_WHEN_READY_TTL_MS = 24 * 3600 * 1000;
-    function pendingStreams() {
-      try { const v = JSON.parse(localStorage.getItem(STREAM_WHEN_READY_KEY) || '{}'); return v && typeof v === 'object' && !Array.isArray(v) ? v : {}; } catch (_) { return {}; }
-    }
-    function savePendingStreams(v) {
-      try { localStorage.setItem(STREAM_WHEN_READY_KEY, JSON.stringify(v)); } catch (_) {}
-    }
-
-    let pendingStreamTimer = null;
-    function watchPendingStreams() {
-      clearInterval(pendingStreamTimer);
-      pendingStreamTimer = null;
-      if (!Object.keys(pendingStreams()).length) return;
-      pendingStreamTimer = setInterval(() => {
-        if (!Object.keys(pendingStreams()).length) return watchPendingStreams();
-        if (!document.hidden) loadTorrents(true);
-      }, 30000);
-    }
-
-    // Called with every fresh library list. Each due game is taken off the list before it is sent, so two overlapping
-    // library loads never send it twice; one that never turns up is dropped after a day.
-    async function checkPendingStreams(items) {
-      const pend = pendingStreams();
-      const ids = Object.keys(pend);
-      if (!ids.length) return;
-      const now = Date.now();
-      const due = [];
-      for (const id of ids) {
-        const p = pend[id];
-        const item = (items || []).find(t => t && t._kind === 'torrent' && String(t.id) === id);
-        if (!p || typeof p !== 'object' || !(now - (Number(p.at) || 0) < STREAM_WHEN_READY_TTL_MS)) { delete pend[id]; continue; }
-        if (item && isItemCached(item)) { delete pend[id]; due.push({ ...p, id: item.id }); }
-      }
-      if (Object.keys(pend).length !== ids.length) savePendingStreams(pend);
-      if (!Object.keys(pend).length) watchPendingStreams();
-      for (const p of due) {
-        showToast(`${cleanGameName(p.title)} is in TorBox: checking its files…`);
-        try { await streamFromTorBox(p.id, p.title, p.size, false); } catch (err) { showToast('Stream error: ' + err.message); }
-      }
-    }
-
-    // The site's watch list. null: the site couldn't take it (older deploy, no queue password), so this phone watches instead.
-    async function watchOnSite(torrentId, title, size) {
-      try {
-        const r = await fetch(`/api/queue?device=${encodeURIComponent(state.deviceId)}`, {
-          method: 'POST', headers: queueHeaders(),
-          body: JSON.stringify({ action: 'watch', torrentId: String(torrentId), title, name: cleanGameName(title), size: Number(size) || 0,
-            artwork: state.selectedArtwork, notifyTopic: state.notifyTopic })
-        });
-        const j = await r.json().catch(() => null);
-        return r.ok && j && j.success && ['queued', 'install', 'waiting'].includes(j.state) ? j : null;
-      } catch (_) { return null; }
-    }
-    function unwatchOnSite(torrentId) {
-      return fetch(`/api/queue?device=${encodeURIComponent(state.deviceId)}`, {
-        method: 'POST', headers: queueHeaders(), body: JSON.stringify({ action: 'unwatch', torrentId: String(torrentId) })
-      }).catch(() => {});
-    }
-    // From each queue read: a watched game whose files say install opens the install options once, then leaves the list.
-    function handleSiteWatches(watches) {
-      for (const w of Array.isArray(watches) ? watches : []) {
-        if (!w || w.state !== 'install' || !/^\d{1,12}$/.test(String(w.torrentId))) continue;
-        if (!(state.torrents || []).some(t => String(t.id) === String(w.torrentId))) continue;   // library not loaded yet
-        unwatchOnSite(w.torrentId);
-        showToast(`${cleanGameName(w.title || 'Your game')} is in TorBox but needs installing. Opening options…`);
-        openInstallModal(Number(w.torrentId));
-        return;   // one dialog at a time; the next queue read brings the next one
-      }
-    }
-
-    async function streamWhenReady(encodedMagnet, encodedTitle, size, btnEl) {
-      const magnet = decodeURIComponent(encodedMagnet);
-      const title = decodeURIComponent(encodedTitle);
-      if (!state.torboxKey) {
-        showToast('Please set your TorBox API key in Settings');
-        switchTab('settings');
-        return;
-      }
-      if (btnEl) { btnEl.disabled = true; btnEl.innerHTML = '<span class="spin"></span> Adding…'; }
-      try {
-        const added = await addMagnetToTorBox(magnet);
-        const torrentId = (added && (added.torrent_id || added.id || (added.data && (added.data.torrent_id || added.data.id)))) || null;
-        if (!torrentId) {
-          showToast(`${cleanGameName(title)} added to TorBox. Stream it from Library once it is ready.`);
-          if (btnEl) { btnEl.disabled = false; btnEl.innerHTML = 'Stream when ready'; }
-          return;
-        }
-        const w = await watchOnSite(torrentId, title, size);
-        if (w && w.state === 'queued') {
-          playSuccessChime();
-          showToast(`${cleanGameName(title)} is already in TorBox: sent to the Deck`);
-          if (btnEl) btnEl.innerHTML = 'Sent to the Deck';
-          switchTab('queue');
-          return;
-        }
-        if (w && w.state === 'install') {
-          unwatchOnSite(torrentId);
-          showToast(`${cleanGameName(title)} is in TorBox but needs installing. Opening options…`);
-          openInstallModal(torrentId);
-          if (btnEl) { btnEl.disabled = false; btnEl.innerHTML = 'Stream when ready'; }
-          return;
-        }
-        if (w && w.state === 'waiting') {
-          showToast(`${cleanGameName(title)} added. It goes to the Deck as soon as TorBox has it, even with DeckStream closed.`);
-          if (btnEl) btnEl.innerHTML = 'Waiting for TorBox…';
-          return;
-        }
-        const pend = pendingStreams();
-        pend[String(torrentId)] = { title, size: Number(size) || 0, at: Date.now() };
-        savePendingStreams(pend);
-        showToast(`${cleanGameName(title)} added. It goes to the Deck as soon as TorBox has it (keep DeckStream open).`);
-        if (btnEl) btnEl.innerHTML = 'Waiting for TorBox…';
-        watchPendingStreams();
-        loadTorrents(true);   // already cached: the library load sends it now
-      } catch (err) {
-        showToast('Error: ' + err.message);
-        if (btnEl) { btnEl.disabled = false; btnEl.innerHTML = 'Stream when ready'; }
-      }
-    }
-
-    // ==========================================
-    // SEARCH GAMES ONLINE (MULTI-INDEXER ENGINE)
-    // ==========================================
     let searchSource = 'all';
     function setSearchSource(src) {
       searchSource = src;
-      ['all', 'directstream', 'switch', 'usenet', 'steamrip', 'fitgirl', 'dodi', 'gog'].forEach(s => {
+      ['all', 'directstream', 'verified', 'action', 'indie'].forEach(s => {
         const btn = document.getElementById('src-' + s);
         if (btn) btn.className = (s === src) ? 'btn btn-sm' : 'btn btn-secondary btn-sm';
       });
@@ -4740,218 +3641,54 @@
       }
     }
 
-    // Each search result is checked before it is drawn (like OpenGameInstaller's Discover view checks every catalog entry):
-    // no title or nothing to add -> dropped; size/seeders always plain numbers, since size is written into onclick handlers.
     function normalizeSearchResults(list) {
       if (!Array.isArray(list)) return [];
-      const out = [];
-      for (const r of list) {
-        if (!r || typeof r !== 'object') continue;
-        const title = typeof r.title === 'string' ? r.title.trim() : '';
-        const magnet = typeof r.magnet === 'string' && r.magnet.startsWith('magnet:') ? r.magnet : '';
-        const nzbUrl = typeof r.nzbUrl === 'string' && /^https?:\/\//i.test(r.nzbUrl) ? r.nzbUrl : '';
-        // SteamRIP-style releases come as a file-host link (TorBox web download), not a magnet: keep them
-        const webUrl = typeof r.webUrl === 'string' && /^https:\/\/[^\s"'<>]+$/i.test(r.webUrl) ? r.webUrl : '';
-        if (!title || (!magnet && !nzbUrl && !webUrl)) continue;
-        const size = Number(r.size), seeders = Number(r.seeders);
-        out.push({
-          ...r, title, magnet, nzbUrl, webUrl,
-          size: Number.isFinite(size) && size > 0 ? Math.floor(size) : 0,
-          seeders: Number.isFinite(seeders) && seeders > 0 ? Math.floor(seeders) : 0,
-          cached: r.cached === true, isUsenet: r.isUsenet === true,
-          cachedLayout: r.cachedLayout === 'zipped' || r.cachedLayout === 'folder' ? r.cachedLayout : '',
-          sourceTag: typeof r.sourceTag === 'string' ? r.sourceTag : '',
-        });
-      }
-      return out;
+      return list.filter(r => r && typeof r.title === 'string' && r.title.trim()).map(r => ({
+        ...r,
+        title: r.title.trim(),
+        size: Number(r.size) || 0,
+        cached: r.cached === true,
+        streamable: r.streamable === true || r.cachedLayout === 'folder'
+      }));
     }
 
-    // What every release search sends: the TorBox key (to mark what is ready), the queue password and any own indexers.
     function searchRequestHeaders() {
       const headers = {};
       const tok = state.torboxKey ? state.torboxKey.trim() : '';
       if (tok) headers['authorization'] = `Bearer ${tok}`;
       if (state.queueSecret) headers['x-deckstream-secret'] = state.queueSecret.trim();
-      if (state.prowlarrUrl) headers['x-prowlarr-url'] = state.prowlarrUrl.trim();
-      if (state.prowlarrKey) headers['x-prowlarr-key'] = state.prowlarrKey.trim();
-      if (state.newznabUrl) headers['x-newznab-url'] = state.newznabUrl.trim();
-      if (state.newznabKey) headers['x-newznab-key'] = state.newznabKey.trim();
       return headers;
     }
 
-    function releaseTagsHtml(rawTitle, r = {}) {
-      const t = String(rawTitle || '');
-      const badges = [];
-
-      // Source / Format tags
-      if (/steam[\s.-]?rip/i.test(t)) {
-        badges.push('<span class="badge" style="background:rgba(34,197,94,0.18); color:#4ade80; border:1px solid rgba(34,197,94,0.35);">SteamRIP</span>');
-      } else if (/gog[\s.-]?rip/i.test(t) || /\bgog\b/i.test(t)) {
-        badges.push('<span class="badge" style="background:rgba(6,182,212,0.18); color:#22d3ee; border:1px solid rgba(6,182,212,0.35);">GOG-Rip</span>');
-      } else if (/portable|pre[\s.-]?installed/i.test(t)) {
-        badges.push('<span class="badge" style="background:rgba(16,185,129,0.18); color:#34d399; border:1px solid rgba(16,185,129,0.35);">Portable</span>');
-      }
-
-      // Release Groups
-      if (/insaneramzes/i.test(t)) {
-        badges.push('<span class="badge" style="background:rgba(59,130,246,0.18); color:#60a5fa; border:1px solid rgba(59,130,246,0.35);">InsaneRamZes</span>');
-      } else if (/fitgirl/i.test(t)) {
-        badges.push('<span class="badge" style="background:rgba(168,85,247,0.18); color:#c084fc; border:1px solid rgba(168,85,247,0.35);">FitGirl</span>');
-      } else if (/dodi/i.test(t)) {
-        badges.push('<span class="badge" style="background:rgba(236,72,153,0.18); color:#f472b6; border:1px solid rgba(236,72,153,0.35);">DODI</span>');
-      } else if (/elamigos/i.test(t)) {
-        badges.push('<span class="badge" style="background:rgba(249,115,22,0.18); color:#fb923c; border:1px solid rgba(249,115,22,0.35);">ElAmigos</span>');
-      } else if (/rune|tenoke|flt|codex|skidrow|reloaded|razor1911/i.test(t)) {
-        badges.push('<span class="badge" style="background:rgba(148,163,184,0.18); color:#cbd5e1; border:1px solid rgba(148,163,184,0.35);">Scene</span>');
-      }
-
-      // Layout tags
-      if (r.cachedLayout === 'folder' || r._group === 'cloud') {
-        badges.push('<span class="badge badge-green">⚡ Unpacked Folder</span>');
-      } else if (r.cachedLayout === 'zipped') {
-        badges.push('<span class="badge badge-yellow">⚠️ Zipped Archive</span>');
-      }
-
-      if (!badges.length) return '';
-      return `<div class="release-tags" style="display:flex; flex-wrap:wrap; gap:4px; margin:3px 0 5px;">${badges.join('')}</div>`;
-    }
-
-    // One release in a list: what it is, how big, and the one action that suits it. Used by Search and the game page;
-    // idPrefix keeps element ids apart when both lists are on screen.
     function searchResultCardHtml(r, idx, idPrefix = '') {
-      const key = idPrefix + idx;
-      const owned = ownedReleaseVerdict(r);
-      if (owned && owned.streamable !== true && owned.kind !== 'switch') r = { ...r, isArchive: true };   // its files say install
-      if (r.cachedLayout === 'zipped') r = { ...r, isArchive: true };   // TorBox holds it as one zip: installs
-      const isUsenet = r.isUsenet === true;
-      const relType = classifyReleaseTitle(r.title);
-      const isFolder = (owned && owned.streamable === true) || r.cachedLayout === 'folder';
-      // Streams when the files say so (an unpacked folder with a real .exe), not because of the title (AGENTS.md §0)
-      const streamsNow = isFolder && !r.isArchive && !['repack', 'disc', 'switch', 'media'].includes(relType.kind);
-
-      // One badge says what the release is; seed count is plain text coloured by health.
-      let headerBadge = '';
-      if (isUsenet) headerBadge = '<span class="badge badge-purple">Usenet</span>';
-      else if (r.cached) {
-        if (relType.kind === 'repack') headerBadge = '<span class="badge badge-yellow">Repack · ready</span>';
-        else if (relType.kind === 'switch') headerBadge = '<span class="badge badge-purple">Switch · ready</span>';
-        else if (relType.kind === 'disc') headerBadge = '<span class="badge badge-blue">Disc image</span>';
-        else if (relType.kind === 'media') headerBadge = '<span class="badge badge-yellow">Media</span>';
-        else if (r.cachedLayout === 'zipped') headerBadge = '<span class="badge badge-yellow">Zipped in TorBox · install</span>';
-        else if (relType.kind === 'archive' || r.isArchive) headerBadge = '<span class="badge badge-yellow">Archive · ready</span>';
-        else if (streamsNow) headerBadge = '<span class="badge badge-green">⚡ Unpacked in TorBox</span>';
-        else if (relType.streamable && !r.isArchive) headerBadge = '<span class="badge badge-yellow">Ready in TorBox · install</span>';
-        else headerBadge = '<span class="badge badge-yellow">Installer · ready</span>';
-      } else if (searchResultGroup(r) === 'streamsoon') headerBadge = '<span class="badge badge-green">⚡ Streams after TorBox fetch</span>';
-      const seedColor = r.seeders >= 50 ? 'var(--ready)' : (r.seeders >= 5 ? 'var(--busy)' : 'var(--fault)');
-      const seedBadge = isUsenet || r.cached ? '' : `<span style="color:${seedColor};">${r.seeders} seeds</span>`;
-
-      const safeTitle = escapeHtml(r.title);
       const properName = escapeHtml(displayGameName(r.title));
-      const encodedMag = jsArg(r.magnet || r.webUrl || '');
-      const encodedNzb = jsArg(r.nzbUrl || '');
-      const encodedTitle = jsArg(r.title);
       const itemArt = resolveGameArt(r.title, 'capsule');
+      const isSteam = r.source === 'steam' || Boolean(r.appId);
+      const badge = isSteam ? '<span class="badge badge-blue">Steam Storefront</span>' : '<span class="badge badge-green">⚡ Streamable VFS</span>';
 
       return `
-        <div class="torrent-item">
+        <div class="game-item">
           <div style="display:flex; gap:12px; align-items:flex-start;">
             <img src="${itemArt}" data-art-norm="${normTitle(r.title)}" data-art-format="capsule" data-gamename="${properName}" alt="${properName}" style="width:48px; height:72px; object-fit:cover; border-radius:4px; flex-shrink:0; background:var(--graphite); border:1px solid var(--seam);" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=getDynamicGamePlaceholder(this.dataset.gamename || 'Game', 'capsule')">
             <div style="flex:1; min-width:0;">
-              <div class="torrent-header">
-                <div class="torrent-title">${properName}</div>
-                ${headerBadge}
+              <div class="game-header">
+                <div class="game-title" style="font-size:1.05rem; font-weight:600; line-height:1.2;">
+                  <span onclick="openGamePage({ title: '${jsArg(properName)}', appId: ${Number(r.appId) || 0} })" style="cursor:pointer;" class="hover-underline">${properName}</span>
+                </div>
               </div>
-              <div class="release-name" title="${safeTitle}">${safeTitle}</div>
-              ${typeof releaseTagsHtml === 'function' ? releaseTagsHtml(r.title, r) : ''}
-              <div class="torrent-meta">
-                <span style="color:var(--ink);">${r.size ? formatBytes(r.size) : 'size unknown'}</span>
-                ${seedBadge}
-                <span>${escapeHtml(r.sourceTag)}</span>
+              <div style="margin:4px 0 6px;">${badge}</div>
+              <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                <button class="btn btn-sm" onclick="openGamePage({ title: '${jsArg(properName)}', appId: ${Number(r.appId) || 0} })">
+                  <span>View Details</span>
+                </button>
               </div>
             </div>
           </div>
-          <div class="torrent-actions" style="margin-top:10px;">
-            ${isUsenet ? `
-              <button class="btn btn-sm" id="searchAddBtn_${key}" onclick="addUsenetSearchResultDirect('${encodedNzb}', '${encodedTitle}', this)">
-                Add to TorBox
-              </button>
-            ` : r.cached ? `
-              ${(() => {
-                if (streamsNow) {
-                  return `
-                    <button class="btn btn-sm" id="searchStreamBtn_${key}" onclick="instantStreamDirect('${encodedMag}', '${encodedTitle}', ${r.size}, this)">
-                      Stream to Deck
-                    </button>
-                  `;
-                }
-                if (relType.kind === 'repack' || relType.kind === 'installer' || relType.kind === 'archive' || r.isArchive || relType.streamable) {
-                  return `
-                    <button class="btn btn-sm" id="searchStreamBtn_${key}" onclick="addAndOpenOptions('${encodedMag}', '${encodedTitle}', this)">
-                      Install to Deck
-                    </button>
-                  `;
-                }
-                if (relType.kind === 'switch') {
-                  return `
-                    <button class="btn btn-sm" id="searchStreamBtn_${key}" onclick="addAndDeliverSwitch('${encodedMag}', '${encodedTitle}', this)">
-                      Stream to Deck
-                    </button>
-                  `;
-                }
-                if (relType.kind === 'disc') {
-                  return `
-                    <button class="btn btn-secondary btn-sm" id="searchStreamBtn_${key}" onclick="showToast('This is a disc image (.iso). A portable, SteamRIP or repack release is easier to play.');">
-                      Why not this one?
-                    </button>
-                  `;
-                }
-                if (relType.kind === 'media') {
-                  return `
-                    <button class="btn btn-secondary btn-sm" id="searchStreamBtn_${key}" onclick="addSearchResultDirect('${encodedMag}', '${encodedTitle}', ${r.size}, this)">
-                      Add to TorBox
-                    </button>
-                  `;
-                }
-                return `
-                  <button class="btn btn-secondary btn-sm" id="searchStreamBtn_${key}" onclick="addAndOpenOptions('${encodedMag}', '${encodedTitle}', this)">
-                    Install options
-                  </button>
-                `;
-              })()}
-              ${relType.kind !== 'media' ? `
-                <button class="btn btn-secondary btn-sm" id="searchAddBtn_${key}" onclick="addSearchResultDirect('${encodedMag}', '${encodedTitle}', ${r.size}, this)">
-                  Add to TorBox only
-                </button>
-              ` : ''}
-            ` : searchResultGroup(r) === 'streamsoon' && /^magnet:/i.test(r.magnet || '') ? `
-              <button class="btn btn-sm" id="searchStreamBtn_${key}" onclick="streamWhenReady('${encodedMag}', '${encodedTitle}', ${r.size}, this)">
-                Stream when ready
-              </button>
-              <button class="btn btn-secondary btn-sm" id="searchAddBtn_${key}" onclick="addSearchResultDirect('${encodedMag}', '${encodedTitle}', ${r.size}, this)">
-                Add to TorBox only
-              </button>
-            ` : `
-              <button class="btn btn-sm" id="searchAddBtn_${key}" onclick="addSearchResultDirect('${encodedMag}', '${encodedTitle}', ${r.size}, this)">
-                Add to TorBox
-              </button>
-            `}
-            <button class="btn btn-secondary btn-sm" onclick="checkItemProtonDB('${encodedTitle}', 'protonSpan_${key}', this)">
-              Deck rating
-            </button>
-            ${!isUsenet ? `
-              <button class="btn btn-secondary btn-sm" onclick="copySearchResultMagnet('${encodedMag}')">
-                Copy magnet
-              </button>
-            ` : ''}
-          </div>
-          <div id="protonSpan_${key}" class="hint" style="display:none; margin-top:8px;"></div>
         </div>
       `;
     }
 
-    let searchSeq = 0;
-    async function searchGamesOnline() {
+    async function searchGamesOnline(append = false) {
       const seq = ++searchSeq;
       const q = (document.getElementById('gameSearchInput')?.value || '').trim();
       toggleSearchClearBtn();
@@ -4962,194 +3699,44 @@
       const loader = document.getElementById('searchLoading');
       const empty = document.getElementById('searchEmpty');
       const container = document.getElementById('searchResultsContainer');
+      const card = document.getElementById('searchResultsCard');
       const countBadge = document.getElementById('searchCountBadge');
 
-      rememberSearch(q);
-      showSearchIdle(false);
-      loader.style.display = 'block';
-      empty.style.display = 'none';
-      container.innerHTML = '';
-      state.currentSearchResults = [];
+      if (card) card.style.display = 'block';
+      if (loader) loader.style.display = 'block';
+      if (empty) empty.style.display = 'none';
+      if (container) container.innerHTML = '';
 
       try {
         const res = await fetch(`/api/search?q=${encodeURIComponent(q)}&source=${encodeURIComponent(searchSource)}`, {
-          headers: searchRequestHeaders(), signal: AbortSignal.timeout(30000)
+          headers: searchRequestHeaders()
         });
-        if (seq !== searchSeq) return;   // a newer search started; its reply owns the screen
-        loader.style.display = 'none';
-
-        if (res.status === 401) {
-          empty.style.display = 'block';
-          const hasSecret = Boolean(state.queueSecret && state.queueSecret.trim());
-          const msg = hasSecret
-            ? 'Queue password not accepted — check it in Settings'
-            : 'Add your queue password in Settings to search';
-          empty.innerHTML = `
-            <div style="padding:16px 8px; text-align:center;">
-              <div style="font-weight:600; margin-bottom:6px; color:var(--busy);">${msg}</div>
-              <div class="hint" style="max-width:420px; margin:0 auto 12px;">
-                Search goes through your DeckStream server, which only answers to your queue password.
-              </div>
-              <button class="btn btn-secondary btn-sm" onclick="switchTab('settings'); setTimeout(() => { const el = document.getElementById('cfgQueueSecret'); if (el) { el.focus(); el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } }, 150);">Open Settings</button>
-            </div>
-          `;
-          countBadge.textContent = '0';
-          showToast(hasSecret ? 'Queue password not accepted' : 'Queue password required', 'warning');
-          return;
-        }
-
-        if (!res.ok) {
-          empty.style.display = 'block';
-          let errData = {};
-          try { errData = JSON.parse(await res.text()); } catch (_) {}
-          if (seq !== searchSeq) return;
-          const errMsg = errData.error || `Search didn't work this time (HTTP ${res.status}). Try again in a moment.`;
-          empty.innerHTML = `<div style="padding:12px; color:var(--fault); text-align:center;">${escapeHtml(errMsg)}</div>`;
-          countBadge.textContent = '0';
-          showToast(errMsg, 'danger');
-          return;
-        }
-
-        let data = null;
-        try { data = JSON.parse(await res.text()); } catch (_) {
-          throw new Error('The search service sent an unreadable reply (it may have timed out).');
-        }
         if (seq !== searchSeq) return;
-        const results = orderSearchResults(normalizeSearchResults(data && data.results));
-
-        if (!data || !data.success || results.length === 0) {
-          empty.style.display = 'block';
-          if (searchSource === 'directstream') {
-            empty.innerHTML = `No releases of <b>${escapeHtml(q)}</b> stream without installing.<br><span class="hint" style="margin-top:6px; display:inline-block;">Try <b>Everywhere</b>: a repack still works, it just installs to the microSD card first.</span>`;
-          } else if (searchSource === 'usenet') {
-            empty.innerHTML = `No Usenet releases of <b>${escapeHtml(q)}</b>.<br><span class="hint" style="margin-top:6px; display:inline-block;">Add your Newznab indexer in <a href="javascript:void(0)" onclick="switchTab('settings')">Settings</a> to search it too.</span>`;
-          } else if (searchSource === 'switch') {
-            empty.innerHTML = `No Switch torrents of <b>${escapeHtml(q)}</b>.<br><span class="hint" style="margin-top:6px; display:inline-block;">Look on <a href="https://nxbrew.com/" target="_blank" rel="noopener noreferrer">Nxbrew</a>, <a href="https://nsw2u.com/" target="_blank" rel="noopener noreferrer">NSW2U</a> or <a href="https://ziperto.com/nintendo-switch-nsp-xci/" target="_blank" rel="noopener noreferrer">Ziperto</a> for a 1fichier, Buzzheavier or GoFile link, then paste it in Library.</span>`;
-          } else if (searchSource === 'steamrip') {
-            empty.innerHTML = `No pre-installed releases of <b>${escapeHtml(q)}</b>.<br><span class="hint" style="margin-top:6px; display:inline-block;">Try <b>Everywhere</b> to include repacks.</span>`;
-          } else {
-            empty.textContent = `Nothing found for "${q}". Check the spelling, or try a shorter title.`;
+        if (loader) loader.style.display = 'none';
+        if (!res.ok) throw new Error(`Search failed: HTTP ${res.status}`);
+        const list = await res.json();
+        const results = normalizeSearchResults(list);
+        if (countBadge) countBadge.textContent = results.length;
+        if (!results.length) {
+          if (empty) {
+            empty.style.display = 'block';
+            empty.innerHTML = `No games found matching <b>${escapeHtml(q)}</b>.`;
           }
-          countBadge.textContent = '0';
           return;
         }
-
-        state.currentSearchResults = results;
-        countBadge.textContent = results.length;
-
-        let switchBanner = '';
-        if (searchSource === 'switch') {
-          switchBanner = `
-            <div class="hint" style="border-left:3px solid #b79cff; padding:2px 0 2px 10px; margin-bottom:12px;">
-              Showing Switch torrents only. Links from <a href="https://nxbrew.com/" target="_blank" rel="noopener noreferrer">Nxbrew</a>, <a href="https://nsw2u.com/" target="_blank" rel="noopener noreferrer">NSW2U</a> or <a href="https://ziperto.com/" target="_blank" rel="noopener noreferrer">Ziperto</a> also work: paste them in Library.
-            </div>
-          `;
+        if (container) {
+          container.innerHTML = results.map((r, i) => searchResultCardHtml(r, i)).join('');
         }
-
-        // Each card on its own: a card that throws costs only that card, never the whole list.
-        container.innerHTML = switchBanner + ownedCopyBannerHtml(q) + results.map((r, idx) => searchGroupHead(results, idx) + (() => {
-          try { return searchResultCardHtml(r, idx); } catch (err) { console.warn('search result skipped', err); return ''; }
-        })()).join('');
-        renderRecentSearches();
       } catch (err) {
-        if (seq !== searchSeq) return;
-        loader.style.display = 'none';
-        empty.style.display = 'block';
-        // 6. a failed search says why in plain words and offers Retry
-        const why = err && (err.name === 'TimeoutError' || err.name === 'AbortError')
-          ? 'Search took too long and was stopped.'
-          : (err && err.message ? "Search couldn't finish: " + err.message : "Search couldn't finish.");
-        empty.innerHTML = `<div style="padding:12px 4px; text-align:center;">
-            <div style="color:var(--fault); margin-bottom:12px;">${escapeHtml(why)}</div>
-            <button id="searchRetryBtn" class="btn btn-secondary btn-sm" onclick="searchGamesOnline()">Retry</button>
-          </div>`;
-        countBadge.textContent = '0';
+        if (loader) loader.style.display = 'none';
+        if (empty) {
+          empty.style.display = 'block';
+          empty.innerHTML = `<span style="color:var(--fault);">${escapeHtml(err.message)}</span>`;
+        }
       }
     }
 
-    async function addUsenetSearchResultDirect(encodedNzb, encodedTitle, btnEl) {
-      const nzbUrl = decodeURIComponent(encodedNzb);
-      const title = decodeURIComponent(encodedTitle);
-      if (!nzbUrl) {
-        showToast('No NZB download link available');
-        return;
-      }
-      if (!state.queueSecret) {
-        showToast('Add your queue password in Settings first');
-        switchTab('settings');
-        return;
-      }
-      if (!state.torboxKey) {
-        showToast('Add your TorBox API key in Settings first');
-        switchTab('settings');
-        return;
-      }
-      if (btnEl) {
-        btnEl.disabled = true;
-        btnEl.innerHTML = '<span class="spin"></span> Queuing...';
-      }
-      try {
-        const cleanKey = state.torboxKey.trim();
-        const res = await fetch('/api/torbox?p=usenet/createusenetdownload', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + cleanKey,
-            'x-deckstream-secret': state.queueSecret.trim()
-          },
-          body: JSON.stringify({
-            link: nzbUrl,
-            post_processing: 1 // default repair & unpack
-          })
-        });
-        const data = await res.json();
-        if (!res.ok || (data.success === false)) {
-          throw new Error(data.detail || data.error || 'Failed to queue Usenet download');
-        }
-        playSuccessChime();
-        showToast(`${title} added. TorBox downloads and unpacks it.`);
-        const optId = 'opt_' + Date.now();
-        state.torrents = [{
-          id: optId,
-          name: title,
-          size: 0,
-          progress: 0.05,
-          _kind: 'usenet',
-          _optimistic: true,
-          download_state: 'downloading',
-          created_at: new Date().toISOString()
-        }, ...(state.torrents || [])];
-        filterLocalTorrents();
-        if (btnEl) {
-          btnEl.className = 'btn btn-sm btn-secondary';
-          btnEl.innerHTML = 'Added';
-        }
-        setTimeout(() => {
-          switchTab('cloud');
-          loadTorrents(true);
-        }, 800);
-      } catch (err) {
-        if (btnEl) {
-          btnEl.disabled = false;
-          btnEl.textContent = 'Add to TorBox';
-        }
-        showToast(err.message);
-      }
-    }
-
-    function copySearchResultMagnet(encodedMag) {
-      const magnet = decodeURIComponent(encodedMag);
-      if (!magnet) {
-        showToast('No magnet link available');
-        return;
-      }
-      navigator.clipboard.writeText(magnet).then(() => {
-        showToast('Magnet link copied to clipboard!');
-      }).catch(() => {
-        prompt('Magnet link:', magnet);
-      });
-    }
-
+    
     async function checkItemProtonDB(encodedTitle, targetElId, btnEl) {
       const title = decodeURIComponent(encodedTitle);
       const target = document.getElementById(targetElId);
@@ -5198,7 +3785,7 @@
       const isCached = isItemCached(torrent);
       if (!isCached) {
         const pct = Math.round((torrent.progress || 0) * 100);
-        showToast(`TorBox is still caching this (${pct}%). Send it once it reaches 100%.`);
+        showToast(`Remote Storage is still caching this (${pct}%). Send it once it reaches 100%.`);
         return;
       }
 
@@ -5283,7 +3870,7 @@
       container.innerHTML = `
         <div class="ai-msg ai-msg-assistant">
           <div style="font-weight:600; margin-bottom:4px; color:var(--signal);">✨ Welcome to Deck AI</div>
-          I can help you find <b>streamable games</b> (0 GB local space), explain release formats (SteamRIP vs Repack), diagnose TorBox zip archives, or guide controller and storage settings.<br><br>
+          I can help you find <b>streamable games</b> (0 GB local space), understand VFS streaming, configure Steam Input controller layouts, or manage local cache space.<br><br>
           <i>What game or question are you looking into?</i>
         </div>
       `;
@@ -5408,7 +3995,7 @@
       btn.style.pointerEvents = on ? '' : 'none';
     }
 
-    // Headers for /api/queue. The TorBox key lets the SERVER work out what a release is when the page could not (the server refuses
+    // Headers for /api/queue. The Remote Storage key lets the SERVER work out what a release is when the page could not (the server refuses
     // stream jobs it cannot classify); the page used to send neither the key nor the torrent id.
     function queueHeaders() {
       const h = { 'content-type': 'application/json' };
@@ -5429,17 +4016,17 @@
     // stream jobs every one-tap send failed.
     async function fetchPlan(torrent, { modalBound = true } = {}) {
       if (!torrent) return null;
-      const param = torrent._kind === 'usenet' ? `usenet_id=${encodeURIComponent(torrent.id)}`
+      const param = false ? `game_id=${encodeURIComponent(torrent.id)}`
         : torrent._kind === 'webdl' ? `webdl_id=${encodeURIComponent(torrent.id)}`
         : `torrent_id=${encodeURIComponent(torrent.id)}`;
-      // Adopt OpenGameInstaller's resilient 8-try 2.5s polling loop when TorBox is still indexing (HTTP 404)
+      // Adopt OpenGameInstaller's resilient 8-try 2.5s polling loop when Remote Storage is still indexing (HTTP 404)
       const PLAN_TRIES = 8;
       const PLAN_WAIT_MS = 2500;
       const box = document.getElementById('modalPlanBox');
       for (let i = 0; i < PLAN_TRIES; i++) {
         if (modalBound && state.currentJobModal !== torrent) return null;
         if (i > 0) {
-          if (box && modalBound) box.innerHTML = `Checking what this release is (indexing files in TorBox, attempt ${i + 1}/${PLAN_TRIES})…`;
+          if (box && modalBound) box.innerHTML = `Checking what this release is (indexing files in Remote Storage, attempt ${i + 1}/${PLAN_TRIES})…`;
           await new Promise(r => setTimeout(r, PLAN_WAIT_MS));
           if (modalBound && state.currentJobModal !== torrent) return null;
         }
@@ -5512,10 +4099,10 @@
       updateInstallButton();
     }
 
-    // TorBox's WebDAV shows each torrent under the root folder INSIDE the torrent, which can differ from the
+    // Remote Storage's WebDAV shows each torrent under the root folder INSIDE the torrent, which can differ from the
 // torrent's display name (e.g. name "Cyberpunk 2077 [v 1.03] (2020) PC | GOG-Rip", folder
 // "Cyberpunk.2077.GOG.Rip-InsaneRamZes"). Stream and cloud-install mount that folder, so use the real one.
-// TorBox's WebDAV names a folder after the first folder in a torrent's file paths, so two library items with the same top
+// Remote Storage's WebDAV names a folder after the first folder in a torrent's file paths, so two library items with the same top
 // folder share ONE folder there. If they hold the same file names with different sizes (two versions of a game), a stream
 // mixes them (18 Oct: Spider-Man Remastered, InsaneRamZes + a rutor copy, c000007b at start). Returns the other item's
 // name, or ''.
@@ -5594,7 +4181,7 @@ function webdavFolderFor(torrent, plan) {
       const isReady = isItemCached(torrent);
       if (!isReady) {
         const pct = Math.round((torrent.progress || 0) * 100);
-        showToast(`Game is still caching in TorBox (${pct}%). Please wait for completion.`);
+        showToast(`Game is still caching in Remote Storage (${pct}%). Please wait for completion.`);
         return;
       }
 
@@ -5610,7 +4197,7 @@ function webdavFolderFor(torrent, plan) {
         if (targetDirVal === 'stream' && plan.kind !== 'plain') { showToast(plan.reason); return; }
         if (targetDirVal === 'stream') {
           const clash = mergedFolderClash(torrent, state.torrents);
-          if (clash) { showToast(`TorBox keeps this and "${clash}" in one folder with different files, so streaming would mix them. Remove one of them in TorBox, then send again.`); return; }
+          if (clash) { showToast(`Remote Storage keeps this and "${clash}" in one folder with different files, so streaming would mix them. Remove one of them in Remote Storage, then send again.`); return; }
         }
         if (targetDirVal === 'stream' && plan.streamFit === 'poor') {
           const gb = Math.round(plan.sizeBytes / 1e9);
@@ -5619,25 +4206,23 @@ function webdavFolderFor(torrent, plan) {
       }
 
       setConfirmEnabled(false);                              // no double-taps while the link is generated
-      showToast('Preparing the TorBox link…');
+      showToast('Preparing the Remote Storage link…');
 
       try {
         const token = state.torboxKey.trim();
         let downloadUrl = null;
 
-        const isUsenet = torrent._kind === 'usenet';
+        
         let targetRom = null;
         if (!isWeb && torrent.files && torrent.files.length > 0) {
           targetRom = torrent.files.find(f => /\.(nsp|xci|nsz|xcz)$/i.test(f.name || f.short_name || ''));
         }
 
         // 1. If this is a Switch game with a ROM file, request that specific ROM file directly!
-        // TorBox's zip generator fails on large multi-file releases (returning 0-byte placeholders).
+        // Remote Storage's zip generator fails on large multi-file releases (returning 0-byte placeholders).
         if (targetRom) {
           try {
-            const ep = isUsenet
-              ? `/usenet/requestdl?usenet_id=${encodeURIComponent(torrent.id)}&file_id=${encodeURIComponent(targetRom.id)}&redirect=false`
-              : `/torrents/requestdl?torrent_id=${encodeURIComponent(torrent.id)}&file_id=${encodeURIComponent(targetRom.id)}&redirect=false`;
+            const ep = `/games/requestdl?id=${encodeURIComponent(torrent.id)}&file_id=${encodeURIComponent(targetRom.id)}&redirect=false`;
             const dlData = await tb(ep);
             if (dlData && typeof dlData === 'string') downloadUrl = dlData;
             else if (dlData && dlData.data && typeof dlData.data === 'string') downloadUrl = dlData.data;
@@ -5649,9 +4234,7 @@ function webdavFolderFor(torrent, plan) {
           try {
             const ep = isWeb 
               ? `/webdl/requestdl?web_id=${encodeURIComponent(torrent.id)}&redirect=false`
-              : isUsenet
-              ? `/usenet/requestdl?usenet_id=${encodeURIComponent(torrent.id)}&zip=true&redirect=false`
-              : `/torrents/requestdl?torrent_id=${encodeURIComponent(torrent.id)}&zip=true&redirect=false`;
+              : `/games/requestdl?id=${encodeURIComponent(torrent.id)}&zip=true&redirect=false`;
             const dlData = await tb(ep);
             if (dlData && typeof dlData === 'string') downloadUrl = dlData;
             else if (dlData && dlData.data && typeof dlData.data === 'string') downloadUrl = dlData.data;
@@ -5663,22 +4246,20 @@ function webdavFolderFor(torrent, plan) {
           try {
             const sortedFiles = [...torrent.files].sort((a,b) => (b.size || 0) - (a.size || 0));
             const mainFile = sortedFiles[0];
-            const ep = isUsenet
-              ? `/usenet/requestdl?usenet_id=${encodeURIComponent(torrent.id)}&file_id=${encodeURIComponent(mainFile.id)}&redirect=false`
-              : `/torrents/requestdl?torrent_id=${encodeURIComponent(torrent.id)}&file_id=${encodeURIComponent(mainFile.id)}&redirect=false`;
+            const ep = `/games/requestdl?id=${encodeURIComponent(torrent.id)}&file_id=${encodeURIComponent(mainFile.id)}&redirect=false`;
             const dlData = await tb(ep);
             if (dlData && typeof dlData === 'string') downloadUrl = dlData;
             else if (dlData && dlData.data && typeof dlData.data === 'string') downloadUrl = dlData.data;
           } catch (e) {}
         }
 
-        // 4. No link resolved. Never build a fallback URL with the TorBox token in it: the job is stored in the queue and sent to the Deck.
+        // 4. No link resolved. Never build a fallback URL with the Remote Storage token in it: the job is stored in the queue and sent to the Deck.
         // Streams and cloud installs read through WebDAV and need no link; a plain download without one is refused below.
         if (!downloadUrl) downloadUrl = '';
 
 
         const fileNames = (torrent.files || []).map(f => String(f.short_name || f.name || '').toLowerCase());
-        const isRepack = fileNames.some(n => /(^|\/)fg-(\d+|optional.*)\.bin$/.test(n) || /(^|\/)setup-?\d*\.bin$/.test(n)) || /fitgirl|dodi|elamigos|kaos/i.test(torrent.name || '');
+        const isRepack = false;
         const hasExe = fileNames.some(n => n.endsWith('.exe') && !/setup|unins|redist|quicksfv/.test(n));
         const isArchive = fileNames.length > 0 && !hasExe && fileNames.some(n => /\.(zip|rar|7z|r\d\d)$/.test(n));
 
@@ -5689,12 +4270,12 @@ function webdavFolderFor(torrent, plan) {
         }
         if ((targetDirVal === 'sd' || targetDirVal === 'internal') && isRepack) {
           targetDirVal = 'cloudinstall';
-          showToast('Repack detected — switching to Install from TorBox → MicroSD');
+          showToast('Repack detected — switching to Install from Remote Storage → MicroSD');
         }
 
         const mode = targetDirVal === 'stream' ? 'stream' : targetDirVal === 'cloudinstall' ? 'cloudinstall' : 'download';
         const usesWebdav = mode === 'stream' || mode === 'cloudinstall';
-        if (!usesWebdav && !downloadUrl) { showToast('TorBox did not return a download link for this one. Try again in a moment.'); return; }
+        if (!usesWebdav && !downloadUrl) { showToast('Remote Storage did not return a download link for this one. Try again in a moment.'); return; }
 
         const queueRes = await fetch(`/api/queue?device=${encodeURIComponent(state.deviceId)}`, {
           method: 'POST',
@@ -5741,7 +4322,7 @@ function webdavFolderFor(torrent, plan) {
 
       if (!isItemCached(torrent)) {
         const pct = Math.round((torrent.progress || 0) * 100);
-        showToast(`TorBox is still caching this (${pct}%). Send it once it reaches 100%.`);
+        showToast(`Remote Storage is still caching this (${pct}%). Send it once it reaches 100%.`);
         return;
       }
 
@@ -5759,7 +4340,7 @@ function webdavFolderFor(torrent, plan) {
       }
       const clash = canStream ? mergedFolderClash(torrent, state.torrents) : '';
       if (clash) {
-        showToast(`TorBox keeps this and "${clash}" in one folder with different files, so streaming would mix them. Remove one of them in TorBox, then send again.`);
+        showToast(`Remote Storage keeps this and "${clash}" in one folder with different files, so streaming would mix them. Remove one of them in Remote Storage, then send again.`);
         return;
       }
       // A big game streams after one question (user, 12 Oct: no confirm unless the planner says poor fit / > 25 GB)
@@ -5773,7 +4354,7 @@ function webdavFolderFor(torrent, plan) {
       try {
         const token = (state.torboxKey || '').trim();
         const isWeb = torrent._kind === 'webdl';
-        const isUsenet = torrent._kind === 'usenet';
+        
         let downloadUrl = null;
         let targetRom = null;
         if (!isWeb && torrent.files && torrent.files.length > 0) {
@@ -5783,9 +4364,7 @@ function webdavFolderFor(torrent, plan) {
         // 1. If this is a Switch game with a ROM file, request that specific ROM file directly!
         if (targetRom) {
           try {
-            const ep = isUsenet
-              ? `/usenet/requestdl?usenet_id=${encodeURIComponent(torrent.id)}&file_id=${encodeURIComponent(targetRom.id)}&redirect=false`
-              : `/torrents/requestdl?torrent_id=${encodeURIComponent(torrent.id)}&file_id=${encodeURIComponent(targetRom.id)}&redirect=false`;
+            const ep = `/games/requestdl?id=${encodeURIComponent(torrent.id)}&file_id=${encodeURIComponent(targetRom.id)}&redirect=false`;
             const dlData = await tb(ep);
             if (dlData && typeof dlData === 'string') downloadUrl = dlData;
             else if (dlData && dlData.data && typeof dlData.data === 'string') downloadUrl = dlData.data;
@@ -5797,9 +4376,7 @@ function webdavFolderFor(torrent, plan) {
           try {
             const ep = isWeb 
               ? `/webdl/requestdl?web_id=${encodeURIComponent(torrent.id)}&redirect=false`
-              : isUsenet
-              ? `/usenet/requestdl?usenet_id=${encodeURIComponent(torrent.id)}&zip=true&redirect=false`
-              : `/torrents/requestdl?torrent_id=${encodeURIComponent(torrent.id)}&zip=true&redirect=false`;
+              : `/games/requestdl?id=${encodeURIComponent(torrent.id)}&zip=true&redirect=false`;
             const dlData = await tb(ep);
             if (dlData && typeof dlData === 'string') downloadUrl = dlData;
             else if (dlData && dlData.data && typeof dlData.data === 'string') downloadUrl = dlData.data;
@@ -5811,23 +4388,21 @@ function webdavFolderFor(torrent, plan) {
           try {
             const sortedFiles = [...torrent.files].sort((a,b) => (b.size || 0) - (a.size || 0));
             const mainFile = sortedFiles[0];
-            const ep = isUsenet
-              ? `/usenet/requestdl?usenet_id=${encodeURIComponent(torrent.id)}&file_id=${encodeURIComponent(mainFile.id)}&redirect=false`
-              : `/torrents/requestdl?torrent_id=${encodeURIComponent(torrent.id)}&file_id=${encodeURIComponent(mainFile.id)}&redirect=false`;
+            const ep = `/games/requestdl?id=${encodeURIComponent(torrent.id)}&file_id=${encodeURIComponent(mainFile.id)}&redirect=false`;
             const dlData = await tb(ep);
             if (dlData && typeof dlData === 'string') downloadUrl = dlData;
             else if (dlData && dlData.data && typeof dlData.data === 'string') downloadUrl = dlData.data;
           } catch (e) {}
         }
 
-        // 4. No link resolved. Never build a fallback URL with the TorBox token in it: the job is stored in the queue and sent to the Deck.
+        // 4. No link resolved. Never build a fallback URL with the Remote Storage token in it: the job is stored in the queue and sent to the Deck.
         // Streams and cloud installs read through WebDAV and need no link; a plain download without one is refused below.
         if (!downloadUrl) downloadUrl = '';
 
         const mode = canStream ? 'stream' : (isSwitch ? 'download' : (plan?.recommendation || 'cloudinstall'));
         const cleanName = cleanGameName(torrent.name);
         const usesWebdav = mode === 'stream' || mode === 'cloudinstall';
-        if (!usesWebdav && !downloadUrl) { showToast('TorBox did not return a download link for this one. Try again in a moment.'); return; }
+        if (!usesWebdav && !downloadUrl) { showToast('Remote Storage did not return a download link for this one. Try again in a moment.'); return; }
 
         const queueRes = await fetch(`/api/queue?device=${encodeURIComponent(state.deviceId)}`, {
           method: 'POST',
@@ -6398,18 +4973,18 @@ function webdavFolderFor(torrent, plan) {
     function displayGameName(raw) {
       const original = String(raw || '').trim();
       let t = original
-        .replace(/\[[^\]]*\]|\([^)]*\)|\{[^}]*\}/g, ' ')                      // [FitGirl Repack] (v1.0, MULTi12)
+        .replace(/\[[^\]]*\]|\([^)]*\)|\{[^}]*\}/g, ' ')                      // [Tags] (v1.0)
         .replace(/[™®©]/g, '')
         .replace(/\s*\|.*$/, '')                                                // 'Hades 2 | RePack by Igruha'
         .replace(/\s+PC\s+_\s+/i, ' ')                                         // 'Cyberpunk 2077 PC _ GOG Rip' (the Steam tile's own title)
         .replace(/\s*[-\u2013]?\s*re-?pack by [\w.-]+.*$/i, '')
         .replace(/\.(nsp|xci|nsz|iso|zip|rar|7z)$/i, '')
-        .replace(/[\s._-]*(?:www[\s.])?(?:steam-?gg|steam-?rip|fitgirl-repacks|dodi-repacks|igg-games|gog-games|elamigos)[\s.](?:net|com|site|org|to|cc|games)(?=$|[\s._)\]-])/gi, ' ')   // site tags: 'Dragons Dogma 2.SteamGG.NET', '- SteamRIP.com'
+        .replace(/[\s._-]*(?:www[\s.])?(?:game-share|store-download)[\s.](?:net|com|org)(?=$|[\s._)\]-])/gi, ' ')
         .replace(/[._]?\b(build|update|patch)[ ._]?\d[\d.]*/gi, ' ')            // Build.1491.50
         .replace(/[._ ]v\.?\d+(?:[._]\d+)*[a-z]?\b/gi, ' ');                    // v2.13  .v4.04  v.1.16
       if (!/\s/.test(original) || (original.match(/[._]/g) || []).length >= 3) t = t.replace(/[._]+/g, ' ');   // scene-style dots
       t = t.replace(/\s+-\s+/g, ' - ').replace(/\s+/g, ' ').trim();
-      const tail = /(?:^|[\s-])(?:fitgirl|dodi|elamigos|steam ?rip|gog(?: rip)?|rip|insaneramzes|goldberg|tenoke|rune|flt|codex|empress|kaos|skidrow|plaza|cpy|razor1911|dinobytes|repack|scene|portable|multi\d*|eng|x64|win64|pc|nsp|xci|nsz|switch|nintendo switch)$/i;
+      const tail = /(?:^|[\s-])(?:deluxe|ultimate|complete|goty|edition|remastered|v\d+(\.\d+)*)$/i;
       for (let i = 0; i < 8 && tail.test(t); i++) t = t.replace(tail, '').replace(/[\s\-:,+]+$/, '').trim();
       t = t.replace(/\bdirectors? cut\b/i, "Director's Cut");
       const letters = t.replace(/[^A-Za-z]/g, '');
@@ -6689,7 +5264,7 @@ function webdavFolderFor(torrent, plan) {
         const label = rel.streamable ? 'Stream to Deck' : rel.kind === 'switch' ? 'Stream to Deck' : 'Install to Deck';
         open = `openLibraryGame('${jsArg(String(feat.id))}')`;
         kicker = `<span class="home-hero-kicker">${rel.streamable ? 'Ready to stream' : 'Newest in your library'}</span>`;
-        info = `<div class="home-spotlight-meta"><span>${formatBytes(feat.size || 0)}</span>${rel.kind !== 'unknown' ? `<span>${escapeHtml(rel.label)}</span>` : ''}<span>Cached in TorBox</span></div>`;
+        info = `<div class="home-spotlight-meta"><span>${formatBytes(feat.size || 0)}</span>${rel.kind !== 'unknown' ? `<span>${escapeHtml(rel.label)}</span>` : ''}<span>Cached in Remote Storage</span></div>`;
         actions = `<button type="button" class="home-spotlight-cta" onclick="event.stopPropagation(); ${go}">${label}</button>`;
       }
       el.innerHTML = `
@@ -6760,7 +5335,7 @@ function webdavFolderFor(torrent, plan) {
 
           let badgeClass = relType.streamable ? 'badge-green' : 'badge-yellow';
           let badgeText = relType.label;
-          let actionLabel = relType.streamable ? 'Stream' : relType.kind === 'switch' ? 'To EmuDeck' : 'Install';
+          let actionLabel = relType.streamable ? 'Stream' : relType.kind === 'switch' ? 'Stream' : 'Install';
           let actionFn = relType.streamable ? `sendToDeckDirect(${JSON.stringify(t.id).replace(/"/g, '&quot;')})` : relType.kind === 'switch' ? `sendToDeckDirect(${JSON.stringify(t.id).replace(/"/g, '&quot;')})` : `openInstallModal(${JSON.stringify(t.id).replace(/"/g, '&quot;')})`;
 
           if (relType.kind === 'repack') {
@@ -6769,7 +5344,7 @@ function webdavFolderFor(torrent, plan) {
             actionFn = `openInstallModal(${JSON.stringify(t.id).replace(/"/g, '&quot;')})`;
           } else if (relType.kind === 'switch') {
             badgeClass = 'badge-purple';
-            actionLabel = 'To EmuDeck';
+            actionLabel = 'Stream';
             actionFn = `sendToDeckDirect(${JSON.stringify(t.id).replace(/"/g, '&quot;')})`;
           } else if (relType.kind === 'disc') {
             badgeClass = 'badge-blue';
@@ -6798,7 +5373,7 @@ function webdavFolderFor(torrent, plan) {
       }
 
       caching.textContent = pending.length
-        ? `Still caching in TorBox: ${pending.slice(0, 3).map(t => `${displayGameName(t.name)} (${Math.round((t.progress || 0) * 100)}%)`).join(', ')}${pending.length > 3 ? ` +${pending.length - 3} more` : ''}`
+        ? `Still caching in Remote Storage: ${pending.slice(0, 3).map(t => `${displayGameName(t.name)} (${Math.round((t.progress || 0) * 100)}%)`).join(', ')}${pending.length > 3 ? ` +${pending.length - 3} more` : ''}`
         : '';
     }
 
@@ -6808,7 +5383,7 @@ function webdavFolderFor(torrent, plan) {
       if (!box || !list) return;
       // [done, label when done, what to do] (deckSeen is unknown until the first status poll: no flash of the banner, no false "done")
       const items = [
-        [!!state.torboxKey, 'TorBox API key added', 'Add your TorBox API key'],
+        [!!state.torboxKey, 'Remote Storage API key added', 'Add your Remote Storage API key'],
         [!!state.queueSecret, 'Queue password added', 'Add your queue password (the one you gave the Deck installer)'],
         [state.deckSeen === true, 'Steam Deck connected', 'Connect your Deck (run the install command once)'],
       ];
@@ -7036,14 +5611,14 @@ function webdavFolderFor(torrent, plan) {
 
     // Why a release can't run from a cloud mount, or '' when it can. File names are lowercase paths.
     function streamBlockReason(fileNames, isRepack, isArchive) {
-      if (isRepack) return `Can't stream a repack. Choose "Install to microSD from TorBox" instead.`;
-      if (isArchive) return `Can't stream a compressed archive. Choose "Install to microSD from TorBox" instead.`;
+      if (isRepack) return `Can't stream a repack. Choose "Install to microSD from Remote Storage" instead.`;
+      if (isArchive) return `Can't stream a compressed archive. Choose "Install to microSD from Remote Storage" instead.`;
       if (fileNames.some(n => /\.(nsp|xci|nsz|xcz)$/.test(n))) {
         return `This is a Nintendo Switch game, not a Windows game. It needs an emulator and can't run through Proton.`;
       }
       const installerOnly = fileNames.length > 0 &&
         !fileNames.some(n => n.endsWith('.exe') && !/(^|[\/_.-])(setup|unins\w*|redist\w*|vcredist\w*|dxsetup|dotnet\w*|quicksfv|crashreport\w*)/.test(n.split('/').pop()));
-      if (installerOnly) return `No game executable in this release; it looks like an installer (GOG/setup). Choose "Install to microSD from TorBox" instead.`;
+      if (installerOnly) return `No game executable in this release; it looks like an installer (GOG/setup). Choose "Install to microSD from Remote Storage" instead.`;
       return '';
     }
 
@@ -7094,7 +5669,7 @@ function webdavFolderFor(torrent, plan) {
         statusEl.style.background = 'rgba(255,255,255,0.05)';
         statusEl.style.borderColor = 'var(--border)';
         statusEl.style.color = 'var(--text-muted)';
-        statusEl.innerHTML = 'Checking whether TorBox already has it…';
+        statusEl.innerHTML = 'Checking whether Remote Storage already has it…';
 
         cacheDebounceTimer = setTimeout(async () => {
           try {
@@ -7110,14 +5685,14 @@ function webdavFolderFor(torrent, plan) {
                 statusEl.style.background = 'rgba(16, 185, 129, 0.15)';
                 statusEl.style.borderColor = 'rgba(16, 185, 129, 0.4)';
                 statusEl.style.color = '#34d399';
-                statusEl.innerHTML = `<b style="color:var(--ready)">TorBox already has this.</b> It is ready to send the moment you add it.`;
+                statusEl.innerHTML = `<b style="color:var(--ready)">Remote Storage already has this.</b> It is ready to send the moment you add it.`;
                 return;
               }
             }
             statusEl.style.background = 'rgba(245, 158, 11, 0.12)';
             statusEl.style.borderColor = 'rgba(245, 158, 11, 0.3)';
             statusEl.style.color = '#fbbf24';
-            statusEl.innerHTML = `<b>Not in TorBox yet.</b> TorBox downloads it first when you add it.`;
+            statusEl.innerHTML = `<b>Not in Remote Storage yet.</b> Remote Storage downloads it first when you add it.`;
           } catch {
             statusEl.style.display = 'none';
           }
