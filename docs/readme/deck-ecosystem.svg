@@ -1,0 +1,184 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f141c" />
+      <stop offset="100%" stop-color="#161c28" />
+    </linearGradient>
+    <linearGradient id="cardGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e283a" />
+      <stop offset="100%" stop-color="#141a24" />
+    </linearGradient>
+    <linearGradient id="btnGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6" />
+      <stop offset="100%" stop-color="#2563eb" />
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#3b82f6" />
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+
+  <!-- Background Canvas -->
+  <rect width="1280" height="640" fill="url(#bgGrad)"/>
+  
+  <!-- Subtle Grid Pattern -->
+  <g stroke="#ffffff" stroke-opacity="0.03" stroke-width="1">
+    <path d="M0,80 H1280 M0,160 H1280 M0,240 H1280 M0,320 H1280 M0,400 H1280 M0,480 H1280 M0,560 H1280" />
+    <path d="M80,0 V640 M160,0 V640 M240,0 V640 M320,0 V640 M400,0 V640 M480,0 V640 M560,0 V640 M640,0 V640 M720,0 V640 M800,0 V640 M880,0 V640 M960,0 V640 M1040,0 V640 M1120,0 V640 M1200,0 V640" />
+  </g>
+
+  <!-- Section Title -->
+  <text x="640" y="44" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="24" font-weight="700" fill="#f1f5f9" text-anchor="middle">SteamOS Handheld Gaming Mode &amp; Companion App</text>
+  <text x="640" y="70" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" fill="#94a3b8" text-anchor="middle">Native Quick Access Menu integration on the Steam Deck alongside the remote library web dashboard</text>
+
+  <!-- LEFT: Steam Deck Handheld Frame & Decky Loader Panel -->
+  <g transform="translate(60, 100)" filter="url(#shadow)">
+    <!-- Steam Deck Outer Bezel -->
+    <rect width="560" height="490" rx="28" fill="#1e222b" stroke="#2e3543" stroke-width="2"/>
+    
+    <!-- Screen Bezel -->
+    <rect x="24" y="24" width="512" height="442" rx="14" fill="#0b0e14" stroke="#181c24" stroke-width="1"/>
+    
+    <!-- SteamOS Top Bar -->
+    <rect x="24" y="24" width="512" height="32" fill="#131720"/>
+    <text x="42" y="45" font-family="sans-serif" font-size="12" font-weight="600" fill="#94a3b8">SteamOS 3.6 • Gaming Mode</text>
+    <text x="500" y="45" font-family="sans-serif" font-size="12" font-weight="600" fill="#10b981" text-anchor="end">94% ⚡ Wi-Fi 6</text>
+
+    <!-- Background Game Splash Simulation -->
+    <rect x="24" y="56" width="512" height="410" fill="#10141d"/>
+    <text x="140" y="230" font-family="sans-serif" font-size="32" font-weight="800" fill="#1c2433" text-anchor="middle">CYBERPUNK</text>
+    <text x="140" y="265" font-family="sans-serif" font-size="28" font-weight="800" fill="#1c2433" text-anchor="middle">2077</text>
+    
+    <!-- Decky Loader QAM Flyout Panel (Right Side of Screen) -->
+    <g transform="translate(244, 56)">
+      <!-- Panel Base -->
+      <rect width="292" height="410" fill="#18202c" stroke="#2d3748" stroke-width="1"/>
+      
+      <!-- Decky Plugin Header -->
+      <rect x="0" y="0" width="292" height="48" fill="#1e293b"/>
+      <text x="16" y="30" font-family="sans-serif" font-size="16" font-weight="700" fill="#f8fafc">🎮 DeckStream</text>
+      
+      <!-- Status Badge -->
+      <rect x="200" y="16" width="76" height="20" rx="10" fill="rgba(16, 185, 129, 0.2)" stroke="#10b981" stroke-width="1"/>
+      <text x="238" y="30" font-family="sans-serif" font-size="11" font-weight="600" fill="#10b981" text-anchor="middle">Active</text>
+      
+      <!-- Session Card -->
+      <rect x="12" y="60" width="268" height="96" rx="8" fill="#121824" stroke="#252f3f" stroke-width="1"/>
+      <text x="24" y="82" font-family="sans-serif" font-size="11" font-weight="600" fill="#64748b">ACTIVE STREAM SESSION</text>
+      <text x="24" y="104" font-family="sans-serif" font-size="15" font-weight="700" fill="#f1f5f9">Cyberpunk 2077</text>
+      <text x="24" y="126" font-family="sans-serif" font-size="12" fill="#94a3b8">Cache: 12.8 GB / 60 GB</text>
+      <text x="24" y="144" font-family="sans-serif" font-size="11" fill="#10b981">Throughput: 24.5 MB/s • Hedging: ON</text>
+      
+      <!-- Toggle 1: Deck Mode -->
+      <rect x="12" y="168" width="268" height="54" rx="8" fill="#121824" stroke="#252f3f" stroke-width="1"/>
+      <text x="24" y="190" font-family="sans-serif" font-size="13" font-weight="600" fill="#f1f5f9">Deck Mode Preset</text>
+      <text x="24" y="208" font-family="sans-serif" font-size="11" fill="#64748b">30 FPS Cap + Low Settings</text>
+      <!-- Switch Toggle ON -->
+      <rect x="220" y="184" width="46" height="22" rx="11" fill="#3b82f6"/>
+      <circle cx="254" cy="195" r="8" fill="#ffffff"/>
+
+      <!-- Toggle 2: Overnight Warmup -->
+      <rect x="12" y="232" width="268" height="54" rx="8" fill="#121824" stroke="#252f3f" stroke-width="1"/>
+      <text x="24" y="254" font-family="sans-serif" font-size="13" font-weight="600" fill="#f1f5f9">Smart Startup Warmup</text>
+      <text x="24" y="272" font-family="sans-serif" font-size="11" fill="#64748b">Prefetch while on charger</text>
+      <!-- Switch Toggle ON -->
+      <rect x="220" y="248" width="46" height="22" rx="11" fill="#10b981"/>
+      <circle cx="254" cy="259" r="8" fill="#ffffff"/>
+
+      <!-- Storage Info -->
+      <rect x="12" y="296" width="268" height="42" rx="8" fill="#121824"/>
+      <text x="24" y="322" font-family="sans-serif" font-size="12" fill="#94a3b8">MicroSD Free: <tspan fill="#f1f5f9" font-weight="600">277 GB</tspan></text>
+
+      <!-- Action Buttons -->
+      <rect x="12" y="350" width="128" height="34" rx="6" fill="#242e3f" stroke="#374357" stroke-width="1"/>
+      <text x="76" y="372" font-family="sans-serif" font-size="12" font-weight="600" fill="#cbd5e1" text-anchor="middle">Clear Cache</text>
+      
+      <rect x="152" y="350" width="128" height="34" rx="6" fill="#242e3f" stroke="#374357" stroke-width="1"/>
+      <text x="216" y="372" font-family="sans-serif" font-size="12" font-weight="600" fill="#cbd5e1" text-anchor="middle">Doctor Check</text>
+    </g>
+  </g>
+
+  <!-- RIGHT: Companion Web Dashboard Frame -->
+  <g transform="translate(660, 100)" filter="url(#shadow)">
+    <!-- Browser Window Frame -->
+    <rect width="560" height="490" rx="16" fill="#141a24" stroke="#252d3d" stroke-width="2"/>
+    
+    <!-- Browser Header / Address Bar -->
+    <rect x="0" y="0" width="560" height="44" rx="16" fill="#1c2331"/>
+    <circle cx="24" cy="22" r="6" fill="#ef4444"/>
+    <circle cx="44" cy="22" r="6" fill="#f59e0b"/>
+    <circle cx="64" cy="22" r="6" fill="#10b981"/>
+    
+    <rect x="110" y="10" width="340" height="24" rx="6" fill="#0f141c"/>
+    <text x="280" y="26" font-family="monospace" font-size="11" fill="#64748b" text-anchor="middle">https://deckstream.local/library</text>
+    
+    <!-- Companion App Nav -->
+    <rect x="0" y="44" width="560" height="46" fill="#18202d" stroke="#252f3f" stroke-width="1"/>
+    <text x="28" y="73" font-family="sans-serif" font-size="14" font-weight="700" fill="#3b82f6">🎮 DeckStream</text>
+    
+    <text x="180" y="72" font-family="sans-serif" font-size="13" font-weight="600" fill="#3b82f6">Library</text>
+    <rect x="175" y="88" width="50" height="2" fill="#3b82f6"/>
+    
+    <text x="260" y="72" font-family="sans-serif" font-size="13" fill="#94a3b8">Storage</text>
+    <text x="340" y="72" font-family="sans-serif" font-size="13" fill="#94a3b8">Handheld</text>
+    <text x="430" y="72" font-family="sans-serif" font-size="13" fill="#94a3b8">Settings</text>
+
+    <!-- Library Content Area -->
+    <g transform="translate(24, 110)">
+      <text x="0" y="14" font-family="sans-serif" font-size="16" font-weight="700" fill="#f1f5f9">Mounted Storage Library</text>
+      <text x="512" y="14" font-family="sans-serif" font-size="12" fill="#10b981" text-anchor="end">● Connected: nas.local</text>
+      
+      <!-- Game Row 1: Cyberpunk -->
+      <g transform="translate(0, 32)">
+        <rect width="512" height="66" rx="8" fill="#1a2332" stroke="#293548" stroke-width="1"/>
+        <!-- Poster Thumbnail -->
+        <rect x="12" y="10" width="46" height="46" rx="4" fill="#2d3748"/>
+        <text x="35" y="38" font-family="sans-serif" font-size="11" font-weight="700" fill="#64748b" text-anchor="middle">CP77</text>
+        <text x="70" y="30" font-family="sans-serif" font-size="14" font-weight="700" fill="#f8fafc">Cyberpunk 2077</text>
+        <text x="70" y="48" font-family="sans-serif" font-size="11" fill="#64748b">69.2 GB • Profiled (12.8 GB ready) • 1-stream mode</text>
+        
+        <rect x="382" y="18" width="118" height="30" rx="6" fill="#10b981"/>
+        <text x="441" y="37" font-family="sans-serif" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">Playing on Deck</text>
+      </g>
+
+      <!-- Game Row 2: Baldur's Gate 3 -->
+      <g transform="translate(0, 110)">
+        <rect width="512" height="66" rx="8" fill="#1a2332" stroke="#293548" stroke-width="1"/>
+        <rect x="12" y="10" width="46" height="46" rx="4" fill="#2d3748"/>
+        <text x="35" y="38" font-family="sans-serif" font-size="11" font-weight="700" fill="#64748b" text-anchor="middle">BG3</text>
+        <text x="70" y="30" font-family="sans-serif" font-size="14" font-weight="700" fill="#f8fafc">Baldur's Gate 3</text>
+        <text x="70" y="48" font-family="sans-serif" font-size="11" fill="#64748b">122.4 GB • Unpacked PC • Startup Profile (9.4 GB)</text>
+        
+        <rect x="382" y="18" width="118" height="30" rx="6" fill="url(#btnGrad)"/>
+        <text x="441" y="37" font-family="sans-serif" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">Stream to Deck</text>
+      </g>
+
+      <!-- Game Row 3: Sifu -->
+      <g transform="translate(0, 188)">
+        <rect width="512" height="66" rx="8" fill="#1a2332" stroke="#293548" stroke-width="1"/>
+        <rect x="12" y="10" width="46" height="46" rx="4" fill="#2d3748"/>
+        <text x="35" y="38" font-family="sans-serif" font-size="11" font-weight="700" fill="#64748b" text-anchor="middle">SIFU</text>
+        <text x="70" y="30" font-family="sans-serif" font-size="14" font-weight="700" fill="#f8fafc">Sifu</text>
+        <text x="70" y="48" font-family="sans-serif" font-size="11" fill="#64748b">15.8 GB • Pre-mounted • 7 min cold start</text>
+        
+        <rect x="382" y="18" width="118" height="30" rx="6" fill="url(#btnGrad)"/>
+        <text x="441" y="37" font-family="sans-serif" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">Stream to Deck</text>
+      </g>
+
+      <!-- Game Row 4: Control -->
+      <g transform="translate(0, 266)">
+        <rect width="512" height="66" rx="8" fill="#1a2332" stroke="#293548" stroke-width="1"/>
+        <rect x="12" y="10" width="46" height="46" rx="4" fill="#2d3748"/>
+        <text x="35" y="38" font-family="sans-serif" font-size="11" font-weight="700" fill="#64748b" text-anchor="middle">CTRL</text>
+        <text x="70" y="30" font-family="sans-serif" font-size="14" font-weight="700" fill="#f8fafc">Control Ultimate Edition</text>
+        <text x="70" y="48" font-family="sans-serif" font-size="11" fill="#64748b">42.1 GB • Unpacked PC • Startup Profile Ready</text>
+        
+        <rect x="382" y="18" width="118" height="30" rx="6" fill="url(#btnGrad)"/>
+        <text x="441" y="37" font-family="sans-serif" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">Stream to Deck</text>
+      </g>
+    </g>
+  </g>
+</svg>
