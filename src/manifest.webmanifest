@@ -1,0 +1,16 @@
+{
+  "name": "DeckDebrid",
+  "short_name": "DeckDebrid",
+  "description": "Control your TorBox game library and install directly to Steam Deck with Proton shortcuts & artwork.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0e141b",
+  "theme_color": "#1a9fff",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%231a9fff'/><path d='M30 45 L50 25 L70 45 L60 45 L60 70 L40 70 L40 45 Z' fill='%23ffffff'/><circle cx='50' cy='56' r='6' fill='%230e141b'/></svg>",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}
