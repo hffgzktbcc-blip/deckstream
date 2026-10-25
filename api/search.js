@@ -8,62 +8,57 @@ const MOCK_STORAGE_GAMES = [
   {
     title: 'Cyberpunk 2077 [Remote VFS]',
     size: 69 * 1024 * 1024 * 1024,
-    seeders: 42,
     cached: true,
     cachedLayout: 'folder',
     streamable: true,
     source: 'webdav',
     tag: '⚡ Pre-mounted VFS',
     hash: 'cp77' + '0'.repeat(36),
-    magnet: 'webdav://nas.local/Games/Cyberpunk%202077'
+    storageUri: 'webdav://nas.local/Games/Cyberpunk%202077'
   },
   {
     title: 'Baldurs Gate 3 [Remote VFS]',
     size: 122 * 1024 * 1024 * 1024,
-    seeders: 55,
     cached: true,
     cachedLayout: 'folder',
     streamable: true,
     source: 'webdav',
     tag: '⚡ Pre-mounted VFS',
     hash: 'bg3' + '0'.repeat(37),
-    magnet: 'webdav://nas.local/Games/Baldurs%20Gate%203'
+    storageUri: 'webdav://nas.local/Games/Baldurs%20Gate%203'
   },
   {
     title: 'Sifu [Remote VFS]',
     size: 24 * 1024 * 1024 * 1024,
-    seeders: 30,
     cached: true,
     cachedLayout: 'folder',
     streamable: true,
     source: 'webdav',
     tag: '⚡ Pre-mounted VFS',
     hash: 'sifu' + '0'.repeat(36),
-    magnet: 'webdav://nas.local/Games/Sifu'
+    storageUri: 'webdav://nas.local/Games/Sifu'
   },
   {
     title: 'Hades II [Remote VFS]',
     size: 11 * 1024 * 1024 * 1024,
-    seeders: 60,
     cached: true,
     cachedLayout: 'folder',
     streamable: true,
     source: 'webdav',
     tag: '⚡ Pre-mounted VFS',
     hash: 'hades2' + '0'.repeat(34),
-    magnet: 'webdav://nas.local/Games/Hades%20II'
+    storageUri: 'webdav://nas.local/Games/Hades%20II'
   },
   {
     title: 'Control Ultimate Edition [Remote VFS]',
     size: 42 * 1024 * 1024 * 1024,
-    seeders: 25,
     cached: true,
     cachedLayout: 'folder',
     streamable: true,
     source: 'webdav',
     tag: '⚡ Pre-mounted VFS',
     hash: 'control' + '0'.repeat(33),
-    magnet: 'webdav://nas.local/Games/Control'
+    storageUri: 'webdav://nas.local/Games/Control'
   }
 ];
 
@@ -97,7 +92,6 @@ module.exports = async (req, res) => {
       const data = await steamRes.json();
       if (Array.isArray(data.items)) {
         for (const item of data.items) {
-          // Avoid duplicate if already matched in local storage
           const cleanTitle = item.name;
           if (results.some(r => r.title.toLowerCase().includes(cleanTitle.toLowerCase()))) {
             continue;
@@ -105,15 +99,14 @@ module.exports = async (req, res) => {
 
           results.push({
             title: `${cleanTitle} [Steam Store Library]`,
-            size: 20 * 1024 * 1024 * 1024, // placeholder estimate
-            seeders: 50,
+            size: 20 * 1024 * 1024 * 1024,
             cached: true,
             cachedLayout: 'folder',
             streamable: true,
             source: 'steam',
             tag: '⚡ On-Demand VFS',
             hash: 'steam_' + item.id + '0'.repeat(Math.max(0, 40 - String(item.id).length - 6)),
-            magnet: `steam://store/${item.id}`,
+            storageUri: `steam://store/${item.id}`,
             appId: item.id
           });
         }

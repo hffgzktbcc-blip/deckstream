@@ -27,7 +27,7 @@ module.exports = async (req, res) => {
   try {
     const headers = {
       'authorization': apiKey.startsWith('Bearer ') ? apiKey : `Bearer ${apiKey}`,
-      'user-agent': 'DeckDebrid/1.0'
+      'user-agent': 'DeckStream/1.0'
     };
 
     const r = await fetch(targetUrl, { headers });

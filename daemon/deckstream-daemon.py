@@ -2879,9 +2879,7 @@ def deliver_rom_or_executable(game_name, dest_game_folder, job, server_url, devi
     """
     Finalizes an installed release folder:
     1. If Windows executables exist: creates a Proton game launcher and Steam shortcut.
-    2. If a Switch ROM exists: delivers all ROM files to EmuDeck's roms/switch directory and,
-       if an emulator binary (e.g. Eden) is present, creates an executable shell runner in
-       ~/.local/share/deckstream/runners/ and registers the Steam shortcut with custom artwork.
+    2. If Native Linux binaries exist: creates a native runner and Steam shortcut.
     3. Reports completion or failure status to the server.
     """
     exe_path = find_best_executable(dest_game_folder)

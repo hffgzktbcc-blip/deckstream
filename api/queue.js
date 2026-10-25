@@ -13,7 +13,7 @@ const MAX_HISTORY = 50;
 const DEVICE_ID_RE = /^[a-z0-9_-]{1,40}$/;
 const TOPIC_RE = /^[A-Za-z0-9_-]{1,64}$/;
 
-const PLAN_KINDS = ['plain', 'repack', 'archive', 'installer', 'switch', 'disc-image', 'linux-installer', 'not-a-game', 'suspicious', 'unsupported-hypervisor', 'unsupported-uncracked', 'needs-manual-step', 'unknown'];
+const PLAN_KINDS = ['plain', 'archive', 'installer', 'disc-image', 'linux-installer', 'not-a-game', 'suspicious', 'unknown'];
 const PLAN_RECS = ['stream', 'cloudinstall', 'download', 'unsupported'];
 // Only a few plain fields survive from the app's launch plan; the exe is a path inside the mount.
 function cleanPlan(p) {
@@ -31,24 +31,24 @@ function cleanPlan(p) {
 }
 
 async function resolveServerPlan(req, body, webdavPath) {
-  if (body.torrent && typeof body.torrent === 'object' && Array.isArray(body.torrent.files)) {
-    return cleanPlan(buildPlan(body.torrent));
+  if (body.game && typeof body.game === 'object' && Array.isArray(body.game.files)) {
+    return cleanPlan(buildPlan(body.game));
   }
   if (Array.isArray(body.files)) {
     return cleanPlan(buildPlan({ name: body.name || webdavPath, files: body.files }));
   }
-  let token = String((req.headers && req.headers['authorization']) || body.torboxKey || '').trim();
+  let token = String((req.headers && req.headers['authorization']) || body.storageKey || '').trim();
   if (token.startsWith('Bearer ')) token = token.slice(7).trim();
   if (!token || typeof fetch !== 'function') return null;
-  const rawId = String(body.torrentId ?? body.torrent_id ?? body.usenet_id ?? body.id ?? '').trim();
+  const rawId = String(body.gameId ?? body.game_id ?? body.id ?? '').trim();
   const id = /^\d{1,12}$/.test(rawId) ? rawId : '';
   const wantName = String(webdavPath || body.name || '').trim().toLowerCase();
   if (!id && !wantName) return null;
-  const base = process.env.TORBOX_API_URL || 'https://api.torbox.app/v1/api';
+  const base = process.env.STORAGE_API_URL || process.env.TORBOX_API_URL || 'http://127.0.0.1:8765/mock-storage';
   const matchItem = (data) => {
     const list = Array.isArray(data) ? data : data ? [data] : [];
     if (id) {
-      const byId = list.find((t) => String(t.id ?? t.usenetdownload_id ?? t.usenet_id ?? '') === id);
+      const byId = list.find((t) => String(t.id ?? '') === id);
       if (byId) return byId;
     }
     if (wantName) {
@@ -56,15 +56,15 @@ async function resolveServerPlan(req, body, webdavPath) {
     }
     return null;
   };
-  for (const endpoint of ['torrents/mylist', 'usenet/mylist']) {
+  for (const endpoint of ['games/mylist', 'storage/mylist']) {
     try {
       const url = id ? `${base}/${endpoint}?id=${id}&bypass_cache=true` : `${base}/${endpoint}?bypass_cache=true`;
-      const r = await fetch(url, { headers: { authorization: `Bearer ${token}`, 'user-agent': 'DeckDebrid/1.0' } });
+      const r = await fetch(url, { headers: { authorization: `Bearer ${token}`, 'user-agent': 'DeckStream/1.0' } });
       if (!r || !r.ok) continue;
       const j = await r.json().catch(() => null);
       const item = j && j.success !== false ? matchItem(j.data) : null;
       if (item && Array.isArray(item.files) && item.files.length) {
-        return cleanPlan(buildPlan(item, { isUsenet: endpoint.startsWith('usenet') }));
+        return cleanPlan(buildPlan(item));
       }
     } catch {}
   }
@@ -101,7 +101,7 @@ function buildJob(body, { mode, downloadUrl, webdavPath, plan, notifyTopic }) {
     name: String(body.name || 'Unnamed Game').trim().slice(0, 120),
     downloadUrl,
     targetDir: body.targetDir === 'sd' ? 'sd' : (body.targetDir === 'stream' ? 'stream' : 'internal'), // ~/Games, the SD card, or stream mount
-    mode, // 'download' | 'stream' (0 GB mount) | 'cloudinstall' (unpack straight from TorBox)
+    mode, // 'download' | 'stream' (0 GB mount) | 'cloudinstall' (unpack straight from Remote Storage)
     webdavPath,
     extract: body.extract !== false,
     size: Number.isFinite(Number(body.size)) ? Math.max(0, Number(body.size)) : 0,
@@ -117,7 +117,7 @@ function buildJob(body, { mode, downloadUrl, webdavPath, plan, notifyTopic }) {
 }
 
 // Stream when ready (api/_watch.js): a cached release whose files are an unpacked folder goes on the queue as a stream
-// job. Never twice: this watch's own job (fixed id) waiting, running or finished, or a stream job for the same TorBox
+// job. Never twice: this watch's own job (fixed id) waiting, running or finished, or a stream job for the same Remote Storage
 // folder waiting or running, is left alone.
 function enqueueWatchedStream(device, w) {
   const webdavPath = safeFolder(w.webdavPath);
@@ -142,7 +142,7 @@ async function runWatches(device, deviceId, ctx, force, onJob) {
   if (!(device.watches || []).length) return;
   if (!force && Date.now() - (device.watchCheckedAt || 0) < CHECK_EVERY_MS) return;
   // The Deck's poll and an open app can arrive together with the same stored copy: a lock that simply runs out lets
-  // one of them check TorBox (and queue) per minute. The app's own watch request checks at once, skipping that lock, so
+  // one of them check Remote Storage (and queue) per minute. The app's own watch request checks at once, skipping that lock, so
   // what each watch leads to (queued, told) is also claimed once per watch and its job id is fixed by the watch.
   // A failure here never fails the poll or the queue read: the watches wait for the next check.
   try {
@@ -150,10 +150,10 @@ async function runWatches(device, deviceId, ctx, force, onJob) {
     const changed = await checkWatches(device, {
       force,
       once: (key) => claim('watchonce', `${deviceId}:${key}`, Math.round(WATCH_HARD_TTL_MS / 1000)),
-      enqueueStream: (d, w) => { const job = enqueueWatchedStream(d, w); if (job && onJob) onJob(w.torrentId, job); return job; },
+      enqueueStream: (d, w) => { const job = enqueueWatchedStream(d, w); if (job && onJob) onJob(w.gameId, job); return job; },
       // The watch titles name no game, so ntfy (public topics) can carry them; the body with the name goes by web push only.
       notify: ({ title, body, tag, topic }) => sendPushNotification({ deviceId, title, body, tag, url: '/', topic: topic || device.notifyTopic,
-        ntfyTitle: title, ntfyBody: 'Stream when ready: open DeckDebrid for details.' })
+        ntfyTitle: title, ntfyBody: 'Stream when ready: open DeckStream for details.' })
     });
     if (changed) ctx.dirty = true;
   } catch (err) {
@@ -222,7 +222,7 @@ async function route(req, res, device, deviceId, ctx) {
 
     if (action === 'status') {
       // Used by mobile app to view deck status, disk space, and jobs.
-      // Download links embed the TorBox token, so never echo them back here.
+      // Download links embed the Remote Storage token, so never echo them back here.
       const redact = ({ downloadUrl, ...rest }) => rest;
       await runWatches(device, deviceId, ctx, false);
       const isOnline = Date.now() - (device.status.lastSeen || 0) < 45000;
@@ -250,15 +250,15 @@ async function route(req, res, device, deviceId, ctx) {
     const action = body.action || req.query.action;
 
     if (action === 'watch') {
-      // Stream when ready (api/_watch.js): remember a TorBox torrent and check it now; an already-cached one goes at once.
+      // Stream when ready (api/_watch.js): remember a Remote Storage game and check it now; an already-cached one goes at once.
       let token = String((req.headers && req.headers['authorization']) || '').trim();
       if (token.startsWith('Bearer ')) token = token.slice(7).trim();
       const added = addWatch(device, body, token);
       if (added.error) return res.status(400).json({ error: added.error });
       ctx.dirty = true;
       let job = null;
-      await runWatches(device, deviceId, ctx, true, (id, j) => { if (id === added.watch.torrentId) job = j; });
-      const w = (device.watches || []).find(x => x.torrentId === added.watch.torrentId);
+      await runWatches(device, deviceId, ctx, true, (id, j) => { if (id === added.watch.gameId) job = j; });
+      const w = (device.watches || []).find(x => x.gameId === added.watch.gameId);
       return res.json({
         success: true,
         state: job ? 'queued' : (w ? w.state : 'stopped'),
@@ -268,7 +268,7 @@ async function route(req, res, device, deviceId, ctx) {
     }
 
     if (action === 'unwatch') {
-      if (removeWatch(device, body.torrentId)) ctx.dirty = true;
+      if (removeWatch(device, body.gameId)) ctx.dirty = true;
       return res.json({ success: true });
     }
 
@@ -308,10 +308,10 @@ async function route(req, res, device, deviceId, ctx) {
       const mode = ['stream', 'cloudinstall'].includes(body.mode) ? body.mode : 'download';
       const webdavPath = safeFolder(body.webdavPath);
       if (mode === 'download' && !isAllowedDownloadUrl(downloadUrl)) {
-        return res.status(400).json({ error: 'downloadUrl must be an https TorBox link' });
+        return res.status(400).json({ error: 'downloadUrl must be an https Remote Storage link' });
       }
       if (mode !== 'download' && !webdavPath) {
-        return res.status(400).json({ error: 'Stream and cloud-install jobs need a valid TorBox folder name' });
+        return res.status(400).json({ error: 'Stream and cloud-install jobs need a valid Remote Storage folder name' });
       }
       let plan = cleanPlan(body.plan);
       if (mode === 'stream' && !plan) {
@@ -320,10 +320,10 @@ async function route(req, res, device, deviceId, ctx) {
       if (mode === 'stream') {
         if (!plan) {
           return res.status(400).json({
-            error: 'Stream mode requires a launch plan (or TorBox key + torrent_id to compute one server-side).'
+            error: 'Stream mode requires a launch plan (or Remote Storage key + game_id to compute one server-side).'
           });
         }
-        if (['archive', 'repack', 'installer', 'switch', 'disc-image', 'not-a-game', 'suspicious', 'unsupported-hypervisor', 'unsupported-uncracked', 'needs-manual-step'].includes(plan.kind)) {
+        if (['archive', 'installer', 'disc-image', 'not-a-game', 'suspicious'].includes(plan.kind)) {
           return res.status(400).json({
             error: `Stream mode requires an extracted, ready-to-play folder. Release kind "${plan.kind}" cannot be streamed directly; install or cloud-install instead.`
           });

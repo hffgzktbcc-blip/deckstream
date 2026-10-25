@@ -65,7 +65,7 @@ const fixedCovers = (id) => [
 ];
 
 async function fetchShelf(shelf) {
-  const r = await fetch(STEAM_SEARCH_URL + shelf.filter, { headers: { 'User-Agent': 'DeckDebrid/1.0' }, signal: AbortSignal.timeout(6000) });
+  const r = await fetch(STEAM_SEARCH_URL + shelf.filter, { headers: { 'User-Agent': 'DeckStream/1.0' }, signal: AbortSignal.timeout(6000) });
   if (!r.ok) throw new Error(`Steam search ${r.status}`);
   const data = await r.json();
   const seen = new Set();
@@ -92,7 +92,7 @@ async function resolveCovers(appIds) {
   for (let i = 0; i < todo.length; i += 50) batches.push(todo.slice(i, i + 50));
   await Promise.allSettled(batches.map(async (batch) => {
     const input = { ids: batch.map(appid => ({ appid })), context: { language: 'english', country_code: 'US', steam_realm: 1 }, data_request: { include_assets: true } };
-    const r = await fetch(`${STEAM_ITEMS_URL}?input_json=${encodeURIComponent(JSON.stringify(input))}`, { headers: { 'User-Agent': 'DeckDebrid/1.0' }, signal: AbortSignal.timeout(5000) });
+    const r = await fetch(`${STEAM_ITEMS_URL}?input_json=${encodeURIComponent(JSON.stringify(input))}`, { headers: { 'User-Agent': 'DeckStream/1.0' }, signal: AbortSignal.timeout(5000) });
     if (!r.ok) throw new Error(`GetItems ${r.status}`);
     const d = await r.json();
     for (const item of (d && d.response && d.response.store_items) || []) {
@@ -179,11 +179,11 @@ function storageNeeded(req) {
 async function fetchDetails(appId) {
   const input = { ids: [{ appid: appId }], context: { language: 'english', country_code: 'US', steam_realm: 1 }, data_request: { include_assets: true, include_platforms: true } };
   const [details, items, reviews] = await Promise.allSettled([
-    fetch(`${STEAM_APPDETAILS_URL}?appids=${appId}&l=english&cc=US`, { headers: { 'User-Agent': 'DeckDebrid/1.0' }, signal: AbortSignal.timeout(6000) })
+    fetch(`${STEAM_APPDETAILS_URL}?appids=${appId}&l=english&cc=US`, { headers: { 'User-Agent': 'DeckStream/1.0' }, signal: AbortSignal.timeout(6000) })
       .then(r => { if (!r.ok) throw new Error(`appdetails ${r.status}`); return r.json(); }),
-    fetch(`${STEAM_ITEMS_URL}?input_json=${encodeURIComponent(JSON.stringify(input))}`, { headers: { 'User-Agent': 'DeckDebrid/1.0' }, signal: AbortSignal.timeout(5000) })
+    fetch(`${STEAM_ITEMS_URL}?input_json=${encodeURIComponent(JSON.stringify(input))}`, { headers: { 'User-Agent': 'DeckStream/1.0' }, signal: AbortSignal.timeout(5000) })
       .then(r => { if (!r.ok) throw new Error(`GetItems ${r.status}`); return r.json(); }),
-    fetch(`${STEAM_REVIEWS_URL}${appId}?json=1&language=all&purchase_type=all&num_per_page=0&filter=summary`, { headers: { 'User-Agent': 'DeckDebrid/1.0' }, signal: AbortSignal.timeout(5000) })
+    fetch(`${STEAM_REVIEWS_URL}${appId}?json=1&language=all&purchase_type=all&num_per_page=0&filter=summary`, { headers: { 'User-Agent': 'DeckStream/1.0' }, signal: AbortSignal.timeout(5000) })
       .then(r => { if (!r.ok) throw new Error(`appreviews ${r.status}`); return r.json(); }),
   ]);
   if (details.status !== 'fulfilled') throw new Error('Steam store unavailable');
@@ -314,7 +314,7 @@ module.exports = async (req, res) => {
     if (!query) return res.status(400).json({ error: 'Query parameter "q" required' });
     try {
       const sRes = await fetch(`${STEAM_SUGGEST_URL}?term=${encodeURIComponent(query)}&f=games&cc=US&l=english`, {
-        headers: { 'User-Agent': 'DeckDebrid/1.0' },
+        headers: { 'User-Agent': 'DeckStream/1.0' },
         signal: AbortSignal.timeout(6000)
       });
       if (!sRes.ok) return res.status(502).json({ error: 'Steam search suggestion unavailable' });
@@ -342,7 +342,7 @@ module.exports = async (req, res) => {
   try {
     if (!featuredCache.data || featuredCache.expires < Date.now()) {
       const fRes = await fetch(STEAM_FEATURED_URL, {
-        headers: { 'User-Agent': 'DeckDebrid/1.0' },
+        headers: { 'User-Agent': 'DeckStream/1.0' },
         signal: AbortSignal.timeout(7000)
       });
       if (fRes.ok) {

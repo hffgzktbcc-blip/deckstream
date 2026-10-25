@@ -24,8 +24,6 @@ function mockLibrary() {
     active: false,
     progress: 1,
     download_state: 'cached',
-    seeds: 25,
-    peers: 4,
     created_at: '2026-10-01T10:00:00Z',
     updated_at: '2026-10-25T11:00:00Z'
   };
@@ -35,7 +33,7 @@ function mockLibrary() {
       ...base,
       id: 101,
       hash: 'cp77' + '0'.repeat(36),
-      name: 'Cyberpunk.2077.Ultimate.Edition.v2.13-GOG',
+      name: 'Cyberpunk.2077.Ultimate.Edition.v2.13',
       size: 69 * GB,
       files: [
         f(1, 'Cyberpunk 2077/bin/x64/Cyberpunk2077.exe', 85 * MB),
@@ -114,11 +112,11 @@ function startMockStorage() {
     if (p === 'user/me') {
       return send(200, { success: true, data: { email: 'gamer@deckstream.local', plan: 2, is_subscribed: true } });
     }
-    if (p === 'torrents/mylist' || p === 'storage/mylist') {
+    if (p === 'games/mylist' || p === 'storage/mylist' || p === 'torrents/mylist') {
       const id = u.searchParams.get('id');
       return send(200, { success: true, data: id ? (lib.find((t) => String(t.id) === id) || null) : lib });
     }
-    if (p === 'torrents/checkcached' || p === 'storage/checkcached') {
+    if (p === 'games/checkcached' || p === 'storage/checkcached' || p === 'torrents/checkcached') {
       return send(200, { success: true, data: {} });
     }
     return send(404, { success: false, detail: 'endpoint not found: ' + p });
@@ -158,12 +156,12 @@ function readBody(req) {
 
 function start(opts = {}) {
   process.env.DECKSTREAM_SECRET = process.env.DECKSTREAM_SECRET || 'test-secret-123';
-  process.env.DECKDEBRID_SECRET = process.env.DECKSTREAM_SECRET; // backward compatibility
   const mock = startMockStorage();
 
   return new Promise((resolve) => {
     mock.listen(0, HOST, () => {
-      process.env.TORBOX_API_URL = `http://${HOST}:${mock.address().port}/v1/api`;
+      process.env.STORAGE_API_URL = `http://${HOST}:${mock.address().port}/v1/api`;
+      process.env.TORBOX_API_URL = process.env.STORAGE_API_URL;
       const server = http.createServer(async (req, res) => {
         const u = new URL(req.url, `http://${HOST}`);
         try {
@@ -186,6 +184,14 @@ function start(opts = {}) {
 
           const m = u.pathname.match(/^\/api\/([a-z0-9_-]+)$/);
           if (m && !m[1].startsWith('_') && fs.existsSync(path.join(ROOT, 'api', m[1] + '.js'))) {
+            // Default dev secret for seamless local usage
+            if (!req.headers['x-deckstream-secret']) {
+              req.headers['x-deckstream-secret'] = process.env.DECKSTREAM_SECRET;
+            }
+            if (!req.headers['authorization']) {
+              req.headers['authorization'] = 'Bearer mock-storage-key';
+            }
+
             const handler = require(path.join(ROOT, 'api', m[1] + '.js'));
             req.query = Object.fromEntries(u.searchParams);
             const ctype = String(req.headers['content-type'] || '');

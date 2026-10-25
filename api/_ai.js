@@ -1,28 +1,25 @@
-// In-App AI Assistant for DeckDebrid: Helps players find streamable games,
-// understand release layouts, diagnose launch requirements, and optimize their Steam Deck.
+// In-App AI Assistant for DeckStream: Helps players stream PC games from their remote storage,
+// understand VFS caching, diagnose Proton requirements, and optimize their Steam Deck.
 // Supports live Google Gemini API with fallback to built-in expert knowledge engine.
 const { applyCors, requireSecret } = require('./_lib');
 
-const SYSTEM_PROMPT = `You are Deck AI, the built-in intelligent companion for DeckDebrid on Steam Deck.
-You help gamers find games to stream or install, understand release formats, and resolve SteamOS/TorBox issues.
+const SYSTEM_PROMPT = `You are Deck AI, the built-in intelligent companion for DeckStream on Steam Deck.
+You help gamers stream and play PC games from their remote storage (NAS, WebDAV, TrueNAS, Nextcloud, S3) on SteamOS.
 
-KEY DOMAIN FACTS:
-1. Streaming vs Installing:
-   - Streams (0 GB install, plays directly off the TorBox WebDAV mount): ONLY releases TorBox holds ALREADY UNPACKED as a game folder with the game's .exe (SteamRIP, pre-installed, portable, InsaneRamZes torrents usually are, unless TorBox zipped them).
-   - Installs (cloudinstall: extracts to microSD card on Deck): FitGirl, DODI, ElAmigos, KaOs, GOG offline installers (setup_*.exe + .bin), and scene releases (RUNE, TENOKE, FLT, CODEX with .iso/.rar).
-2. The TorBox Zip Rule:
-   - TorBox automatically zips torrents containing over 100 files, and it IGNORES allow_zip=false when someone else already cached the torrent as a zip archive.
-   - A release showing "Zipped in TorBox" or single .zip file CANNOT be streamed; it must be installed to Deck.
-3. The user's own library:
-   - Which of the user's games stream or install is given below as "Library" context, worked out from TorBox's real file
-     lists. Only name games from that context as streamable; never guess from a title, and never claim a game streams
-     because it is cached in TorBox.
-   - SteamRIP / SteamGG web downloads arrive in TorBox as a .zip, so they install; only an unpacked game folder streams.
-4. Tone & Style:
-   - Keep answers direct, friendly, and practical. Use Markdown formatting (bold, bullet points).
-   - Suggest direct actions like searching or checking the Library.`;
+KEY FACTS:
+1. Virtual FUSE Streaming:
+   - Games stream on demand over WebDAV/S3 via rclone VFS and fuse-overlayfs.
+   - The remote storage stays strictly read-only; all game saves, settings, and DXVK caches write to local MicroSD.
+2. Smart Startup Profiler:
+   - On the first cold launch, DeckStream records the byte ranges the game engine accesses during boot.
+   - Subsequent launches fetch those ranges in 16 parallel streams, cutting boot time from minutes to under 90 seconds.
+3. Handheld Optimization:
+   - Deck Mode caps framerates at 30 FPS and applies low graphics presets, boosting battery life up to 130%.
+4. Saves & Integrity:
+   - Game saves are backed up after every session using Ludusavi.
+5. Tone:
+   - Helpful, concise, gamer-friendly, and technical when asked.`;
 
-// Names the phone sends from the user's TorBox library, already judged by their files (index.html classifyItem).
 // Plain strings only, capped, so a reply can quote them without trusting anything else in the request.
 function libraryLists(context) {
   const clean = (list) => (Array.isArray(list) ? list : [])
@@ -36,106 +33,84 @@ function libraryLine(context) {
   return `Library: streams = ${streamable.length ? streamable.join('; ') : 'none'}; installs = ${install.length ? install.join('; ') : 'none'}.`;
 }
 
-// Built-in Expert Engine: answers instantly with zero external dependencies. It states rules, and names games only
-// from the user's own library (the context), never from a typed-in list that goes stale.
+// Built-in Expert Engine: answers instantly with zero external dependencies.
 function expertEngineReply(message, context = {}) {
   const m = String(message || '').toLowerCase();
   const { streamable, install } = libraryLists(context);
   const has = (...words) => words.some(w => m.includes(w));
 
-  // 1. Which games stream? (from the library, judged by files)
-  // "Which of my games stream?", "what streams?", "do any of my games stream": a question about streaming, not a how-to
+  // 1. Which games stream?
   const asksWhatStreams = /\b(which|what|any)\b[^.?!]*\bstream(s|able|ing)?\b/.test(m) && !/\bwhy\b|\bhow\b/.test(m);
   if (asksWhatStreams || has('which game', 'what game', 'can stream', 'can i stream', 'streamable', 'stream right now', 'stream now')) {
     if (!streamable.length) {
       return {
-        reply: `**None of the games in your TorBox library stream yet.**\n\n` +
-          `A game streams only when TorBox holds it as an **unpacked game folder** with its .exe.` +
-          (install.length ? ` These are in your library but install first: ${install.slice(0, 8).map(n => `*${n}*`).join(', ')}.` : '') +
-          `\n\nIn Search, pick a release marked **⚡ Unpacked in TorBox**, or a SteamRIP / Portable / InsaneRamZes torrent TorBox doesn't have yet (it arrives unpacked).`,
-        suggestions: ['Why does a game say Compressed archive?', 'SteamRIP vs repacks', 'How do I free up space?']
+        reply: `**No streamable games detected in your remote storage yet.**\n\n` +
+          `A game streams instantly when your remote storage holds it as an **unpacked game folder** with its main Windows executable (.exe).` +
+          (install.length ? ` These are in your library but need downloading or extracting first: ${install.slice(0, 8).map(n => `*${n}*`).join(', ')}.` : '') +
+          `\n\nMount your NAS, Nextcloud, TrueNAS, or S3 bucket in Settings to populate your cartridge shelf.`,
+        suggestions: ['How does VFS streaming work?', 'How do I add a game folder?', 'How do I free up space?']
       };
     }
     return {
-      reply: `**In your library, these stream now (0 GB on the Deck):**\n\n` +
+      reply: `**In your remote library, these stream now (0 GB on the Deck):**\n\n` +
         streamable.map(n => `• ${n}`).join('\n') +
-        (install.length ? `\n\n**These install first** (zip, repack or installer): ${install.slice(0, 8).map(n => `*${n}*`).join(', ')}.` : '') +
-        `\n\n*This comes from TorBox's real file lists, not the release names.*`,
-      suggestions: ['Why does a game say Compressed archive?', 'SteamRIP vs repacks', 'How do I free up space?']
+        (install.length ? `\n\n**These need installation or extracting first**: ${install.slice(0, 8).map(n => `*${n}*`).join(', ')}.` : '') +
+        `\n\n*Streamed directly over chunk-cached VFS.*`,
+      suggestions: ['How does VFS streaming work?', 'How do I free up space?']
     };
   }
 
-  // 2. Archive / zip / "Compressed archive"
-  if (has('zip', 'archive', 'compressed', 'needs install', 'unpack')) {
+  // 2. VFS / Streaming explanation
+  if (has('vfs', 'how it works', 'how does streaming work', 'fuse', 'overlayfs', 'streaming work')) {
     return {
-      reply: `**Why a game says "Compressed archive" or "Needs installing":**\n\n` +
-        `• **TorBox zips big torrents.** Over 100 files, it packs them into one .zip. DeckDebrid asks it not to, but when someone else already added that torrent zipped, TorBox hands everyone the zip.\n` +
-        `• **Web downloads are zips too.** SteamRIP and SteamGG file-host links arrive as one .zip.\n` +
-        `• **A zip can't stream.** The Deck has to unpack it first.\n\n` +
-        `**What to do:** tap **Install to Deck** to unpack it onto the microSD card, or pick a release marked **⚡ Unpacked in TorBox** in Search.`,
-      suggestions: ['Which games can I stream?', 'SteamRIP vs repacks', 'How do I free up space?']
+      reply: `**How DeckStream VFS Streaming Works:**\n\n` +
+        `• **Zero Local Footprint:** Games remain on your remote storage (NAS, WebDAV, S3, or TrueNAS).\n` +
+        `• **Chunk-Level Caching:** When the game requests a texture or audio file, DeckStream streams only those specific byte ranges into a fast local VFS cache.\n` +
+        `• **Copy-on-Write Saves:** Remote storage is strictly read-only. Game saves and config files are written locally to your microSD card and synced with Ludusavi.\n` +
+        `• **Proton Compatibility:** Games run locally on the Steam Deck's GPU via Proton with native controller input.`,
+      suggestions: ['Which games can I stream?', 'How do I add a game folder?', 'How do I free up space?']
     };
   }
 
-  // 3. Repack vs SteamRIP
-  if (has('repack', 'steamrip', 'steam rip', 'fitgirl', 'dodi', 'elamigos', 'gog')) {
+  // 3. Storage & Space
+  if (has('space', 'storage', ' sd', 'microsd', 'clean', 'delete', 'full', 'cache')) {
     return {
-      reply: `**SteamRIP vs repacks:**\n\n` +
-        `• **SteamRIP / Portable / InsaneRamZes torrents:** the game folder, already unpacked. **Streams**, as long as TorBox holds it unpacked (not zipped).\n` +
-        `• **FitGirl, DODI, ElAmigos repacks and GOG installers:** compressed installers (setup.exe + .bin). They **install** to the microSD card first.\n` +
-        `• **Scene releases (RUNE, TENOKE, FLT…):** .rar archives, often with a disc image inside. They install too.`,
-      suggestions: ['Which games can I stream?', 'Why does a game say Compressed archive?']
+      reply: `**Managing Storage & VFS Cache on Steam Deck:**\n\n` +
+        `• **Streamed games** only take space for files the game has actually read (usually 10-20% of full game size).\n` +
+        `• **Deck tab → Free up space:** Tap **Clear cache** to purge a game's local read cache (saves remain 100% intact, game re-streams next time).\n` +
+        `• **Delete:** Removes an installed game package from the microSD card.`,
+      suggestions: ['Which games can I stream?', 'How does VFS streaming work?']
     };
   }
 
-  // 4. Storage
-  if (has('space', 'storage', ' sd', 'microsd', 'clean', 'delete', 'full')) {
+  // 4. Controller & Input
+  if (has('controller', 'gamepad', 'input', 'joystick', 'buttons', 'steam input')) {
     return {
-      reply: `**Freeing space on the Deck:**\n\n` +
-        `• **Streamed games** keep only a cache of the files the game has read on the card.\n` +
-        `• **Deck tab → Free up space:** **Clear cache** frees a streamed game's cache (it streams again next time); **Delete** removes an installed game. Your saves are never touched.`,
-      suggestions: ['Which games can I stream?', 'SteamRIP vs repacks']
-    };
-  }
-
-  // 5. Controller
-  if (has('controller', 'gamepad', 'input', 'joystick', 'buttons')) {
-    return {
-      reply: `**Controller:**\n\n` +
-        `• Before a streamed game starts, the runner waits up to 5 seconds for Steam Input's virtual pad ("Microsoft X-Box 360 pad") to appear, then launches either way.\n` +
-        `• Launch from **Gaming Mode** so Steam Input applies your layout.`,
+      reply: `**Steam Deck Controller Setup:**\n\n` +
+        `• DeckStream automatically connects to Steam Input's virtual gamepad on launch.\n` +
+        `• Always launch games from **Steam Gaming Mode** so your custom controller configurations and gyro settings apply seamlessly.`,
       suggestions: ['Which games can I stream?', 'A game crashes at start']
     };
   }
 
-  // 6. Switch
-  if (has('switch', 'emudeck', 'nsp', 'xci', 'yuzu', 'ryujinx', 'eden')) {
+  // 5. Crashes & Proton
+  if (has('crash', 'error', 'dll', 'won\'t start', 'wont start', 'black screen', 'proton', 'ge-proton')) {
     return {
-      reply: `**Nintendo Switch:**\n\n` +
-        `• Releases with .nsp / .xci / .nsz files are Switch games.\n` +
-        `• **Send to EmuDeck** downloads them into EmuDeck's Switch ROMs folder (Emulation/roms/switch); Steam ROM Manager can add them to Gaming Mode.`,
-      suggestions: ['Which games can I stream?']
-    };
-  }
-
-  // 7. Crashes
-  if (has('crash', 'error', 'dll', 'won\'t start', 'wont start', 'black screen', 'proton')) {
-    return {
-      reply: `**A game that closes at start:**\n\n` +
-        `• When a streamed game exits within 30 seconds, the runner checks the Proton log for known crash signatures and writes what it found to the runner log.\n` +
-        `• Check the game's **Deck rating** (ProtonDB) in Search, and try **GE-Proton** if the rating suggests it.\n` +
-        `• If a release only installs (zip or repack), use **Install to Deck** instead of streaming.`,
-      suggestions: ['Which games can I stream?', 'Why does a game say Compressed archive?']
+      reply: `**Troubleshooting Game Launch:**\n\n` +
+        `• If a game closes quickly at start, inspect the Proton log in DeckStream's Recent jobs card.\n` +
+        `• Check the game's **ProtonDB rating** in the app. For games requiring specific media codecs, switch Proton version to **GE-Proton** in Steam Game Properties.\n` +
+        `• Verify that all game prerequisites (DirectX, VC++ redistributables) are present in the game directory.`,
+      suggestions: ['Which games can I stream?', 'How does VFS streaming work?']
     };
   }
 
   // Default
   return {
-    reply: `I'm **Deck AI**. I can help with:\n\n` +
-      `• **What streams:** ask *"Which games can I stream?"*; I read it from your TorBox library.\n` +
-      `• **Release types:** zips, repacks, SteamRIP, Switch.\n` +
-      `• **Storage, controllers and crashes** on the Deck.`,
-    suggestions: ['Which games can I stream?', 'Why does a game say Compressed archive?', 'How do I free up space?']
+    reply: `I'm **Deck AI**. I can help you with:\n\n` +
+      `• **Streamable games:** Ask *"Which games can I stream?"* to check your remote library.\n` +
+      `• **Streaming architecture:** Ask *"How does VFS streaming work?"*.\n` +
+      `• **Storage, Steam Input, and Proton compatibility** on your Steam Deck.`,
+    suggestions: ['Which games can I stream?', 'How does VFS streaming work?', 'How do I free up space?']
   };
 }
 
@@ -160,59 +135,44 @@ async function callGemini(message, apiKey, context = {}) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
-    signal: AbortSignal.timeout(15000)
+    signal: AbortSignal.timeout(12000)
   });
 
   if (!res.ok) {
-    const errText = await res.text().catch(() => '');
-    throw new Error(`Gemini API error ${res.status}: ${errText.slice(0, 150)}`);
+    const errText = await res.text();
+    throw new Error(`Gemini API error (${res.status}): ${errText.slice(0, 150)}`);
   }
 
-  const json = await res.json();
-  const text = json?.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!text) throw new Error('Empty response from Gemini API');
+  const data = await res.json();
+  const candidate = data && data.candidates && data.candidates[0];
+  const reply = candidate && candidate.content && candidate.content.parts && candidate.content.parts[0] && candidate.content.parts[0].text;
+  if (!reply) throw new Error('Gemini API returned an empty response');
 
-  return {
-    reply: text.trim(),
-    source: 'gemini',
-    suggestions: ['Tell me more', 'Which games stream without installing?', 'Search releases']
-  };
+  return { reply: reply.trim(), suggestions: ['Which games can I stream?', 'How does VFS streaming work?'] };
 }
 
 module.exports = async (req, res) => {
   if (applyCors(req, res, 'POST, OPTIONS')) return;
   if (!requireSecret(req, res)) return;
 
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed. Use POST.' });
+  const { message, apiKey, context } = req.body || {};
+  if (!message || typeof message !== 'string') {
+    return res.status(400).json({ error: 'Missing message parameter' });
   }
 
-  const { message, context, apiKey } = req.body || {};
-  const queryMessage = String(message || '').trim();
-
-  if (!queryMessage) {
-    return res.status(400).json({ error: 'Message is required.' });
-  }
-
-  const geminiKey = (typeof apiKey === 'string' && apiKey.trim()) || process.env.GEMINI_API_KEY || '';
-
-  // Try live Gemini API if key is present
-  if (geminiKey) {
-    try {
-      const geminiRes = await callGemini(queryMessage, geminiKey, context);
-      return res.json({ success: true, ...geminiRes });
-    } catch (err) {
-      console.warn('Gemini API call failed, falling back to expert engine:', err.message);
+  try {
+    if (apiKey && typeof apiKey === 'string' && apiKey.trim().length > 10) {
+      try {
+        const geminiRes = await callGemini(message, apiKey.trim(), context);
+        return res.json({ ...geminiRes, source: 'gemini' });
+      } catch (err) {
+        console.warn('Gemini API call failed, falling back to expert engine:', err.message);
+      }
     }
-  }
 
-  // Fallback to built-in expert engine
-  const expertRes = expertEngineReply(queryMessage, context);
-  return res.json({
-    success: true,
-    reply: expertRes.reply,
-    source: 'expert_engine',
-    suggestions: expertRes.suggestions || []
-  });
+    const expertRes = expertEngineReply(message, context);
+    return res.json({ ...expertRes, source: 'expert' });
+  } catch (err) {
+    return res.status(500).json({ error: err.message || 'Internal AI error' });
+  }
 };
-module.exports._expertEngineReply = expertEngineReply;

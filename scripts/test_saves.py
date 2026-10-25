@@ -38,11 +38,11 @@ def last_calls():
 sys.path.insert(0, str(ROOT / "daemon")); os.environ["HOME"] = str(home)
 import importlib; saves = importlib.import_module("saves")
 cases = {
-    "Ghost.of.Tsushima.Directors.Cut-InsaneRamZes": ["Ghost of Tsushima Directors Cut", "Ghost of Tsushima"],
-    "ELDEN.RING.Deluxe.Edition.Steam.Rip-InsaneRamZes": ["ELDEN RING Deluxe Edition", "ELDEN RING"],
-    "Cyberpunk 2077 [v 1.03] (2020) PC | GOG-Rip": ["Cyberpunk 2077"],
+    "Ghost.of.Tsushima.Directors.Cut": ["Ghost of Tsushima Directors Cut", "Ghost of Tsushima"],
+    "ELDEN.RING.Deluxe.Edition": ["ELDEN RING Deluxe Edition", "ELDEN RING"],
+    "Cyberpunk 2077 [v 1.03] (2020) PC": ["Cyberpunk 2077"],
     "Marvel's Spider-Man": ["Marvel's Spider-Man"],
-    "Hades II v1.2.3-FLT": ["Hades II"],
+    "Hades II v1.2.3": ["Hades II"],
 }
 for name, want in cases.items():
     got = saves.title_candidates(name)

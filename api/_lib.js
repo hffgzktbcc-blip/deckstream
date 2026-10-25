@@ -12,7 +12,7 @@ function applyCors(req, res, methods = 'GET, POST, OPTIONS') {
     res.setHeader('access-control-allow-origin', origin);
     res.setHeader('vary', 'Origin');
     res.setHeader('access-control-allow-methods', methods);
-    res.setHeader('access-control-allow-headers', 'content-type, authorization, x-deckstream-secret, x-deckdebrid-secret, x-device-id');
+    res.setHeader('access-control-allow-headers', 'content-type, authorization, x-deckstream-secret, x-deckstream-secret, x-device-id');
   }
   res.setHeader('x-content-type-options', 'nosniff');
   if (req.method === 'OPTIONS') {
@@ -25,14 +25,14 @@ function applyCors(req, res, methods = 'GET, POST, OPTIONS') {
 // Constant-time check of the shared DECKSTREAM_SECRET. Returns true when the request may proceed;
 // otherwise it has already sent the error response.
 function requireSecret(req, res) {
-  const secret = process.env.DECKSTREAM_SECRET || process.env.DECKDEBRID_SECRET || '';
+  const secret = process.env.DECKSTREAM_SECRET || process.env.DECKSTREAM_SECRET || '';
   if (!secret) {
     res.status(503).json({ error: 'Disabled: set DECKSTREAM_SECRET in environment' });
     return false;
   }
   // Hash both sides so length differences don't leak through timingSafeEqual.
   const digest = (s) => crypto.createHash('sha256').update(String(s)).digest();
-  const given = req.headers['x-deckstream-secret'] || req.headers['x-deckdebrid-secret'] || '';
+  const given = req.headers['x-deckstream-secret'] || req.headers['x-deckstream-secret'] || '';
   if (!crypto.timingSafeEqual(digest(given), digest(secret))) {
     res.status(401).json({ error: 'Queue password missing or wrong' });
     return false;
@@ -78,8 +78,8 @@ async function assertPublicHttpUrl(raw) {
   return u;
 }
 
-// Hosts a download job may fetch from. TorBox serves files from api.torbox.app and its CDN.
-const DEFAULT_DOWNLOAD_HOSTS = ['torbox.app', 'tb-cdn.io', 'tb-cdn.to'];   // TorBox CDN links moved to *.tb-cdn.to in 2026 (e.g. nexus-210.zafr.tb-cdn.to)
+// Hosts a download job may fetch from.
+const DEFAULT_DOWNLOAD_HOSTS = ['nas.local', 'storage.local', 's3.amazonaws.com'];
 function downloadHosts() {
   const extra = (process.env.ALLOWED_DOWNLOAD_HOSTS || '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
   return [...DEFAULT_DOWNLOAD_HOSTS, ...extra];

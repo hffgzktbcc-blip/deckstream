@@ -19,9 +19,9 @@ const NTFY_TOPIC_RE = /^[a-zA-Z0-9_-]{24,64}$/; // >= 24 chars for unguessable p
 // Internal notification dispatcher callable by api/status.js or HTTP POST
 // ntfyTitle/ntfyBody: wording for ntfy that names no game (ntfy topics are public); defaults to the ready message.
 async function sendPushNotification({ deviceId, title, body, tag, url, topic, ntfyTitle, ntfyBody }) {
-  const safeTitle = String(title || 'DeckDebrid').slice(0, 100);
+  const safeTitle = String(title || 'DeckStream').slice(0, 100);
   const safeBody = String(body || '').slice(0, 300);
-  const safeTag = String(tag || 'deckdebrid-status').slice(0, 50);
+  const safeTag = String(tag || 'deckstream-status').slice(0, 50);
   const rawUrl = String(url || '/').slice(0, 200);
   const safeUrl = (rawUrl.startsWith('/') && !rawUrl.startsWith('//')) ? rawUrl : '/';
 
@@ -32,7 +32,7 @@ async function sendPushNotification({ deviceId, title, body, tag, url, topic, nt
   const sub = await loadDoc('push', deviceId);
   const vapidPublic = process.env.VAPID_PUBLIC_KEY || '';
   const vapidPrivate = process.env.VAPID_PRIVATE_KEY || '';
-  const vapidSubject = process.env.VAPID_SUBJECT || 'mailto:deckdebrid@example.com';
+  const vapidSubject = process.env.VAPID_SUBJECT || 'mailto:deckstream@example.com';
 
   if (sub && sub.endpoint && webpush && vapidPublic && vapidPrivate) {
     try {
