@@ -16,9 +16,14 @@
 You choose a title from your library. The Deck fetches only the small fraction of blocks the game needs to start, boots natively through **Proton**, and streams the remaining assets seamlessly in the background while you play.
 
 <p align="center">
-  <img src="docs/readme/deck-ecosystem.svg" alt="DeckStream ecosystem: SteamOS Gaming Mode with Decky Loader QAM panel alongside the responsive library manager." width="100%">
+  <img src="docs/readme/deck-ecosystem.svg" alt="DeckStream ecosystem: SteamOS Gaming Mode with Decky Loader QAM panel alongside the cartridge shelf companion." width="100%">
 </p>
-<p align="center"><sub>The DeckStream ecosystem: SteamOS Gaming Mode Decky Loader Quick Access Panel alongside the companion web manager.</sub></p>
+<p align="center"><sub>The DeckStream ecosystem: SteamOS Gaming Mode Decky Loader Quick Access Panel alongside the signature cartridge-shelf companion app.</sub></p>
+
+<p align="center">
+  <img src="docs/readme/screens.png" alt="The companion app: Home with the next game ready to play, the cartridge shelf library, search results, and the Send to Deck sheet" width="100%">
+</p>
+<p align="center"><sub>The companion app with the signature cartridge-shelf design system: physical cartridge notches, printed paper labels, horizontal shelves, and live ProtonDB ratings.</sub></p>
 
 ---
 

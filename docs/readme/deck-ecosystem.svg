@@ -23,8 +23,8 @@
   </g>
 
   <!-- Section Title -->
-  <text x="640" y="46" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="24" font-weight="800" fill="#f8fafc" text-anchor="middle">SteamOS Handheld Gaming Mode &amp; Companion App</text>
-  <text x="640" y="74" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" fill="#94a3b8" text-anchor="middle">Native Quick Access Menu integration on the Steam Deck alongside the remote library web dashboard</text>
+  <text x="640" y="46" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="24" font-weight="800" fill="#f8fafc" text-anchor="middle">SteamOS Handheld Gaming Mode &amp; Cartridge Shelf Companion</text>
+  <text x="640" y="74" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" fill="#94a3b8" text-anchor="middle">Native Quick Access Menu on the Steam Deck alongside the signature cartridge-shelf web app</text>
 
   <!-- LEFT: Steam Deck Handheld Frame & Decky Loader Panel -->
   <g transform="translate(60, 105)" filter="url(#shadow)">
@@ -39,14 +39,13 @@
     <text x="42" y="46" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#94a3b8">SteamOS 3.6 • Gaming Mode</text>
     <text x="500" y="46" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#10b981" text-anchor="end">94% ⚡ Wi-Fi 6</text>
 
-    <!-- Background Game Splash Simulation (Left portion of Deck screen) -->
+    <!-- Background Game Splash Simulation -->
     <rect x="24" y="58" width="512" height="423" fill="#0d1118"/>
     <text x="135" y="235" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="30" font-weight="900" fill="#1c2436" text-anchor="middle">CYBERPUNK</text>
     <text x="135" y="268" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="28" font-weight="900" fill="#1c2436" text-anchor="middle">2077</text>
     
-    <!-- Decky Loader QAM Flyout Panel (Right Side of Handheld Screen) -->
+    <!-- Decky Loader QAM Flyout Panel -->
     <g transform="translate(236, 58)">
-      <!-- Panel Base -->
       <rect width="300" height="423" fill="#161c26" stroke="#2d3748" stroke-width="1"/>
       
       <!-- Decky Plugin Header -->
@@ -73,7 +72,6 @@
       <rect x="12" y="170" width="276" height="56" rx="8" fill="#10151f" stroke="#232d3d" stroke-width="1"/>
       <text x="22" y="193" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600" fill="#f1f5f9">Deck Mode Preset</text>
       <text x="22" y="211" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" fill="#64748b">30 FPS Cap + Low Settings</text>
-      <!-- Switch Toggle ON -->
       <rect x="224" y="186" width="46" height="22" rx="11" fill="#3b82f6"/>
       <circle cx="258" cy="197" r="8" fill="#ffffff"/>
 
@@ -81,7 +79,6 @@
       <rect x="12" y="234" width="276" height="56" rx="8" fill="#10151f" stroke="#232d3d" stroke-width="1"/>
       <text x="22" y="257" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600" fill="#f1f5f9">Smart Startup Warmup</text>
       <text x="22" y="275" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" fill="#64748b">Prefetch while on charger</text>
-      <!-- Switch Toggle ON -->
       <rect x="224" y="250" width="46" height="22" rx="11" fill="#10b981"/>
       <circle cx="258" cy="261" r="8" fill="#ffffff"/>
 
@@ -98,84 +95,157 @@
     </g>
   </g>
 
-  <!-- RIGHT: Companion Web Dashboard Frame -->
+  <!-- RIGHT: REAL CARTRIDGE-SHELF COMPANION APP FRAME -->
   <g transform="translate(660, 105)" filter="url(#shadow)">
-    <!-- Browser Window Frame -->
-    <rect width="560" height="505" rx="16" fill="#121722" stroke="#252d3d" stroke-width="2"/>
+    <!-- Phone / PWA Frame -->
+    <rect width="560" height="505" rx="20" fill="#15181d" stroke="#303641" stroke-width="2"/>
     
-    <!-- Browser Header / Address Bar -->
-    <rect x="0" y="0" width="560" height="44" rx="16" fill="#1a2230"/>
-    <circle cx="24" cy="22" r="6" fill="#ef4444"/>
-    <circle cx="44" cy="22" r="6" fill="#f59e0b"/>
-    <circle cx="64" cy="22" r="6" fill="#10b981"/>
-    
-    <rect x="110" y="10" width="340" height="24" rx="6" fill="#0d1118"/>
-    <text x="280" y="26" font-family="monospace" font-size="11" fill="#64748b" text-anchor="middle">https://deckstream.local/library</text>
-    
-    <!-- Companion App Nav -->
-    <rect x="0" y="44" width="560" height="46" fill="#161d28" stroke="#232d3d" stroke-width="1"/>
-    <text x="28" y="73" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="700" fill="#3b82f6">🎮 DeckStream</text>
-    
-    <text x="180" y="72" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600" fill="#3b82f6">Library</text>
-    <rect x="175" y="88" width="50" height="2" fill="#3b82f6"/>
-    
-    <text x="260" y="72" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" fill="#94a3b8">Storage</text>
-    <text x="340" y="72" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" fill="#94a3b8">Handheld</text>
-    <text x="430" y="72" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" fill="#94a3b8">Settings</text>
+    <!-- Graphite Instrument Top Bar -->
+    <rect x="0" y="0" width="560" height="48" rx="20" fill="#1c2027"/>
+    <rect x="0" y="32" width="560" height="16" fill="#1c2027"/>
+    <line x1="0" y1="48" x2="560" y2="48" stroke="#303641" stroke-width="1"/>
 
-    <!-- Library Content Area -->
-    <g transform="translate(24, 110)">
-      <text x="0" y="14" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="700" fill="#f1f5f9">Mounted Storage Library</text>
-      <text x="512" y="14" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" fill="#10b981" text-anchor="end">● Connected: nas.local</text>
+    <text x="24" y="31" font-family="'Barlow Condensed', sans-serif" font-size="18" font-weight="700" fill="#5ab0ff" letter-spacing="1">DECKSTREAM</text>
+    
+    <!-- Status Badges on Top Bar -->
+    <g transform="translate(360, 14)">
+      <rect width="84" height="20" rx="10" fill="rgba(63,214,164,0.15)" stroke="#3fd6a4" stroke-width="1"/>
+      <text x="42" y="14" font-family="sans-serif" font-size="10" font-weight="700" fill="#3fd6a4" text-anchor="middle">DECK ONLINE</text>
+    </g>
+    <g transform="translate(454, 14)">
+      <rect width="88" height="20" rx="10" fill="#242932" stroke="#303641" stroke-width="1"/>
+      <text x="44" y="14" font-family="sans-serif" font-size="10" font-weight="600" fill="#a0a8b6" text-anchor="middle">STORAGE OK</text>
+    </g>
+
+    <!-- App Body Content Area -->
+    <!-- 1. FEATURED HERO CARTRIDGE SPOTLIGHT -->
+    <g transform="translate(24, 62)">
+      <!-- Spotlight Container -->
+      <rect width="512" height="168" rx="12" fill="#1c2027" stroke="#303641" stroke-width="1"/>
       
-      <!-- Game Row 1: Cyberpunk -->
-      <g transform="translate(0, 32)">
-        <rect width="512" height="68" rx="8" fill="#171f2c" stroke="#263346" stroke-width="1"/>
-        <!-- Poster Thumbnail -->
-        <rect x="12" y="11" width="46" height="46" rx="4" fill="#2d3748"/>
-        <text x="35" y="39" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="800" fill="#94a3b8" text-anchor="middle">CP77</text>
-        <text x="70" y="30" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="700" fill="#f8fafc">Cyberpunk 2077</text>
-        <text x="70" y="50" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" fill="#64748b">69.2 GB • 12.8 GB ready • Active VFS</text>
+      <!-- Physical Cartridge on Left with Angled Notch -->
+      <g transform="translate(18, 14)">
+        <!-- Cartridge Body with Notch -->
+        <polygon points="0,0 78,0 94,16 94,140 0,140" fill="#242932" stroke="#303641" stroke-width="1"/>
+        <!-- Cartridge Grip Ridges -->
+        <rect x="4" y="0" width="3" height="8" fill="#0f1115" opacity="0.6"/>
+        <rect x="10" y="0" width="3" height="8" fill="#0f1115" opacity="0.6"/>
+        <rect x="16" y="0" width="3" height="8" fill="#0f1115" opacity="0.6"/>
+        <rect x="22" y="0" width="3" height="8" fill="#0f1115" opacity="0.6"/>
         
-        <rect x="382" y="19" width="118" height="30" rx="6" fill="#10b981"/>
-        <text x="441" y="38" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">Playing on Deck</text>
+        <!-- Printed Paper Label (Warm Cream #ece7da) -->
+        <rect x="8" y="24" width="78" height="106" rx="4" fill="#ece7da"/>
+        <!-- Colored Header Stripe -->
+        <path d="M8 24 h78 v16 H8 Z" fill="#2563eb"/>
+        <text x="47" y="36" font-family="'Barlow Condensed', sans-serif" font-size="9" font-weight="800" fill="#ffffff" text-anchor="middle">STREAM</text>
+        
+        <!-- Game Title on Paper Label -->
+        <text x="47" y="66" font-family="'Barlow Condensed', sans-serif" font-size="15" font-weight="900" fill="#1c1f25" text-anchor="middle">CYBERPUNK</text>
+        <text x="47" y="82" font-family="'Barlow Condensed', sans-serif" font-size="15" font-weight="900" fill="#1c1f25" text-anchor="middle">2077</text>
+        
+        <line x1="16" y1="94" x2="78" y2="94" stroke="#c9c2b0" stroke-width="1.5"/>
+        <text x="47" y="112" font-family="sans-serif" font-size="8" font-weight="700" fill="#7a7466" text-anchor="middle">ACTION RPG</text>
       </g>
 
-      <!-- Game Row 2: Baldur's Gate 3 -->
-      <g transform="translate(0, 112)">
-        <rect width="512" height="68" rx="8" fill="#171f2c" stroke="#263346" stroke-width="1"/>
-        <rect x="12" y="11" width="46" height="46" rx="4" fill="#2d3748"/>
-        <text x="35" y="39" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="800" fill="#94a3b8" text-anchor="middle">BG3</text>
-        <text x="70" y="30" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="700" fill="#f8fafc">Baldur's Gate 3</text>
-        <text x="70" y="50" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" fill="#64748b">122.4 GB • Startup Profile (9.4 GB)</text>
+      <!-- Spotlight Meta on Right -->
+      <g transform="translate(132, 20)">
+        <text x="0" y="16" font-family="'Barlow Condensed', sans-serif" font-size="11" font-weight="700" fill="#5ab0ff" letter-spacing="1">NEXT READY TO PLAY</text>
+        <text x="0" y="42" font-family="'Barlow Condensed', sans-serif" font-size="22" font-weight="800" fill="#e8ebf0">Cyberpunk 2077</text>
         
-        <rect x="382" y="19" width="118" height="30" rx="6" fill="url(#btnGrad)"/>
-        <text x="441" y="38" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">Stream to Deck</text>
+        <!-- ProtonDB Tier & VFS Ready Badges -->
+        <g transform="translate(0, 54)">
+          <rect width="104" height="20" rx="4" fill="rgba(241,182,71,0.15)" stroke="#f1b647" stroke-width="1"/>
+          <text x="52" y="14" font-family="sans-serif" font-size="10" font-weight="700" fill="#f1b647" text-anchor="middle">🥇 ProtonDB Gold</text>
+          
+          <rect x="112" y="0" width="116" height="20" rx="4" fill="rgba(63,214,164,0.15)" stroke="#3fd6a4" stroke-width="1"/>
+          <text x="170" y="14" font-family="sans-serif" font-size="10" font-weight="700" fill="#3fd6a4" text-anchor="middle">⚡ Profiled (9s Boot)</text>
+        </g>
+        
+        <text x="0" y="96" font-family="sans-serif" font-size="11.5" fill="#a0a8b6">69.2 GB on remote storage • 12.8 GB cached on MicroSD</text>
+
+        <!-- Big Signal Action Button -->
+        <rect x="0" y="108" width="160" height="32" rx="6" fill="#5ab0ff"/>
+        <text x="80" y="129" font-family="'Barlow', sans-serif" font-size="13" font-weight="700" fill="#07192b" text-anchor="middle">Stream to Deck</text>
+      </g>
+    </g>
+
+    <!-- 2. CARTRIDGE SHELF SECTION -->
+    <g transform="translate(24, 246)">
+      <text x="0" y="16" font-family="'Barlow Condensed', sans-serif" font-size="15" font-weight="700" fill="#e8ebf0" letter-spacing="0.5">REMOTE STORAGE CARTRIDGES</text>
+      <text x="512" y="16" font-family="sans-serif" font-size="11" fill="#5ab0ff" text-anchor="end">See all (6)</text>
+      
+      <!-- Cartridge 1: Hades II -->
+      <g transform="translate(0, 30)">
+        <polygon points="0,0 92,0 108,16 108,124 0,124" fill="#242932" stroke="#303641" stroke-width="1"/>
+        <rect x="6" y="0" width="3" height="6" fill="#0f1115" opacity="0.6"/>
+        <rect x="12" y="0" width="3" height="6" fill="#0f1115" opacity="0.6"/>
+        <!-- Cream Label -->
+        <rect x="8" y="18" width="92" height="98" rx="4" fill="#ece7da"/>
+        <path d="M8 18 h92 v14 H8 Z" fill="#9333ea"/>
+        <text x="54" y="29" font-family="'Barlow Condensed', sans-serif" font-size="9" font-weight="800" fill="#ffffff" text-anchor="middle">READY</text>
+        <text x="54" y="56" font-family="'Barlow Condensed', sans-serif" font-size="16" font-weight="900" fill="#1c1f25" text-anchor="middle">HADES II</text>
+        <line x1="20" y1="72" x2="88" y2="72" stroke="#c9c2b0" stroke-width="1.5"/>
+        <text x="54" y="88" font-family="sans-serif" font-size="8" font-weight="700" fill="#7a7466" text-anchor="middle">ROGUELIKE</text>
+        <text x="54" y="102" font-family="sans-serif" font-size="8" font-weight="800" fill="#10b981" text-anchor="middle">11 GB VFS</text>
       </g>
 
-      <!-- Game Row 3: Sifu -->
-      <g transform="translate(0, 192)">
-        <rect width="512" height="68" rx="8" fill="#171f2c" stroke="#263346" stroke-width="1"/>
-        <rect x="12" y="11" width="46" height="46" rx="4" fill="#2d3748"/>
-        <text x="35" y="39" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="800" fill="#94a3b8" text-anchor="middle">SIFU</text>
-        <text x="70" y="30" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="700" fill="#f8fafc">Sifu</text>
-        <text x="70" y="50" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" fill="#64748b">15.8 GB • 7 min cold • Zero wait warm</text>
-        
-        <rect x="382" y="19" width="118" height="30" rx="6" fill="url(#btnGrad)"/>
-        <text x="441" y="38" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">Stream to Deck</text>
+      <!-- Cartridge 2: Sifu -->
+      <g transform="translate(132, 30)">
+        <polygon points="0,0 92,0 108,16 108,124 0,124" fill="#242932" stroke="#303641" stroke-width="1"/>
+        <rect x="6" y="0" width="3" height="6" fill="#0f1115" opacity="0.6"/>
+        <rect x="12" y="0" width="3" height="6" fill="#0f1115" opacity="0.6"/>
+        <rect x="8" y="18" width="92" height="98" rx="4" fill="#ece7da"/>
+        <path d="M8 18 h92 v14 H8 Z" fill="#059669"/>
+        <text x="54" y="29" font-family="'Barlow Condensed', sans-serif" font-size="9" font-weight="800" fill="#ffffff" text-anchor="middle">READY</text>
+        <text x="54" y="56" font-family="'Barlow Condensed', sans-serif" font-size="18" font-weight="900" fill="#1c1f25" text-anchor="middle">SIFU</text>
+        <line x1="20" y1="72" x2="88" y2="72" stroke="#c9c2b0" stroke-width="1.5"/>
+        <text x="54" y="88" font-family="sans-serif" font-size="8" font-weight="700" fill="#7a7466" text-anchor="middle">MARTIAL ARTS</text>
+        <text x="54" y="102" font-family="sans-serif" font-size="8" font-weight="800" fill="#10b981" text-anchor="middle">24 GB VFS</text>
       </g>
 
-      <!-- Game Row 4: Control -->
-      <g transform="translate(0, 272)">
-        <rect width="512" height="68" rx="8" fill="#171f2c" stroke="#263346" stroke-width="1"/>
-        <rect x="12" y="11" width="46" height="46" rx="4" fill="#2d3748"/>
-        <text x="35" y="39" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="800" fill="#94a3b8" text-anchor="middle">CTRL</text>
-        <text x="70" y="30" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="700" fill="#f8fafc">Control Ultimate Edition</text>
-        <text x="70" y="50" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" fill="#64748b">42.1 GB • Unpacked PC ready</text>
-        
-        <rect x="382" y="19" width="118" height="30" rx="6" fill="url(#btnGrad)"/>
-        <text x="441" y="38" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">Stream to Deck</text>
+      <!-- Cartridge 3: Baldur's Gate 3 -->
+      <g transform="translate(264, 30)">
+        <polygon points="0,0 92,0 108,16 108,124 0,124" fill="#242932" stroke="#303641" stroke-width="1"/>
+        <rect x="6" y="0" width="3" height="6" fill="#0f1115" opacity="0.6"/>
+        <rect x="12" y="0" width="3" height="6" fill="#0f1115" opacity="0.6"/>
+        <rect x="8" y="18" width="92" height="98" rx="4" fill="#ece7da"/>
+        <path d="M8 18 h92 v14 H8 Z" fill="#d97706"/>
+        <text x="54" y="29" font-family="'Barlow Condensed', sans-serif" font-size="9" font-weight="800" fill="#ffffff" text-anchor="middle">PROFILED</text>
+        <text x="54" y="52" font-family="'Barlow Condensed', sans-serif" font-size="14" font-weight="900" fill="#1c1f25" text-anchor="middle">BALDUR'S</text>
+        <text x="54" y="66" font-family="'Barlow Condensed', sans-serif" font-size="14" font-weight="900" fill="#1c1f25" text-anchor="middle">GATE 3</text>
+        <line x1="20" y1="74" x2="88" y2="74" stroke="#c9c2b0" stroke-width="1.5"/>
+        <text x="54" y="88" font-family="sans-serif" font-size="8" font-weight="700" fill="#7a7466" text-anchor="middle">CRPG</text>
+        <text x="54" y="102" font-family="sans-serif" font-size="8" font-weight="800" fill="#3b82f6" text-anchor="middle">122 GB VFS</text>
       </g>
+
+      <!-- Cartridge 4: Control -->
+      <g transform="translate(396, 30)">
+        <polygon points="0,0 92,0 108,16 108,124 0,124" fill="#242932" stroke="#303641" stroke-width="1"/>
+        <rect x="6" y="0" width="3" height="6" fill="#0f1115" opacity="0.6"/>
+        <rect x="12" y="0" width="3" height="6" fill="#0f1115" opacity="0.6"/>
+        <rect x="8" y="18" width="92" height="98" rx="4" fill="#ece7da"/>
+        <path d="M8 18 h92 v14 H8 Z" fill="#dc2626"/>
+        <text x="54" y="29" font-family="'Barlow Condensed', sans-serif" font-size="9" font-weight="800" fill="#ffffff" text-anchor="middle">READY</text>
+        <text x="54" y="56" font-family="'Barlow Condensed', sans-serif" font-size="16" font-weight="900" fill="#1c1f25" text-anchor="middle">CONTROL</text>
+        <line x1="20" y1="72" x2="88" y2="72" stroke="#c9c2b0" stroke-width="1.5"/>
+        <text x="54" y="88" font-family="sans-serif" font-size="8" font-weight="700" fill="#7a7466" text-anchor="middle">ADVENTURE</text>
+        <text x="54" y="102" font-family="sans-serif" font-size="8" font-weight="800" fill="#10b981" text-anchor="middle">42 GB VFS</text>
+      </g>
+    </g>
+
+    <!-- Bottom Navigation Bar -->
+    <g transform="translate(0, 455)">
+      <rect width="560" height="50" rx="0" fill="#1c2027"/>
+      <line x1="0" y1="0" x2="560" y2="0" stroke="#303641" stroke-width="1"/>
+      
+      <!-- Nav Items -->
+      <text x="56" y="30" font-family="'Barlow', sans-serif" font-size="12" font-weight="700" fill="#5ab0ff" text-anchor="middle">Home</text>
+      <circle cx="56" cy="40" r="2" fill="#5ab0ff"/>
+
+      <text x="168" y="30" font-family="'Barlow', sans-serif" font-size="12" font-weight="500" fill="#a0a8b6" text-anchor="middle">Library</text>
+      <text x="280" y="30" font-family="'Barlow', sans-serif" font-size="12" font-weight="500" fill="#a0a8b6" text-anchor="middle">Search</text>
+      <text x="392" y="30" font-family="'Barlow', sans-serif" font-size="12" font-weight="500" fill="#a0a8b6" text-anchor="middle">Deck</text>
+      <text x="504" y="30" font-family="'Barlow', sans-serif" font-size="12" font-weight="500" fill="#a0a8b6" text-anchor="middle">Settings</text>
     </g>
   </g>
 </svg>
