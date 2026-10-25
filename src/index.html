@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DeckStream - Handheld Game Streamer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-left">
+      <div class="logo">🎮 DeckStream</div>
+      <div class="tagline">On-demand remote game streaming runtime</div>
+    </div>
+    <div class="header-right">
+      <div id="device-status" class="status-badge offline">Deck Offline</div>
+    </div>
+  </header>
+
+  <nav class="app-nav">
+    <button class="nav-btn active" onclick="switchTab('library')">Library</button>
+    <button class="nav-btn" onclick="switchTab('storage')">Storage</button>
+    <button class="nav-btn" onclick="switchTab('handheld')">Handheld</button>
+    <button class="nav-btn" onclick="switchTab('settings')">Settings</button>
+  </nav>
+
+  <main class="app-content">
+    <!-- Library Tab -->
+    <section id="tab-library" class="tab-pane active">
+      <div class="section-header">
+        <h2>Remote Games</h2>
+        <button class="btn btn-primary" onclick="refreshLibrary()">Scan Storage</button>
+      </div>
+      <div id="library-grid" class="game-grid">
+        <div class="empty-state">
+          <p>No games detected in remote storage.</p>
+          <p class="subtext">Configure your WebDAV or remote storage connection in the Storage tab.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Storage Tab -->
+    <section id="tab-storage" class="tab-pane">
+      <div class="section-header">
+        <h2>Remote Storage Configuration</h2>
+      </div>
+      <div class="card form-card">
+        <div class="form-group">
+          <label for="storage-type">Storage Provider</label>
+          <select id="storage-type" class="form-control">
+            <option value="webdav">WebDAV / Nextcloud</option>
+            <option value="sftp">SFTP</option>
+            <option value="s3">S3 / MinIO Compatible</option>
+            <option value="smb">SMB / Samba (Local NAS)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="storage-url">Storage Endpoint URL</label>
+          <input type="text" id="storage-url" class="form-control" placeholder="https://nas.local/remote.php/webdav/Games">
+        </div>
+        <div class="form-group">
+          <label for="storage-user">Username</label>
+          <input type="text" id="storage-user" class="form-control" placeholder="deckuser">
+        </div>
+        <div class="form-group">
+          <label for="storage-pass">Password or Access Token</label>
+          <input type="password" id="storage-pass" class="form-control" placeholder="••••••••••••">
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-secondary" onclick="testConnection()">Test Connection</button>
+          <button class="btn btn-primary" onclick="saveStorageConfig()">Save Settings</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Handheld Tab -->
+    <section id="tab-handheld" class="tab-pane">
+      <div class="section-header">
+        <h2>Device Telemetry</h2>
+      </div>
+      <div class="card telemetry-card">
+        <div class="telemetry-item">
+          <span class="label">Device Name:</span>
+          <span id="tel-device" class="value">steamdeck</span>
+        </div>
+        <div class="telemetry-item">
+          <span class="label">Daemon Status:</span>
+          <span id="tel-daemon" class="value">Checking...</span>
+        </div>
+        <div class="telemetry-item">
+          <span class="label">Storage Cache Used:</span>
+          <span id="tel-cache" class="value">0 GB</span>
+        </div>
+        <div class="telemetry-item">
+          <span class="label">MicroSD Free Space:</span>
+          <span id="tel-free" class="value">Unknown</span>
+        </div>
+        <div class="telemetry-item">
+          <span class="label">Active Stream Session:</span>
+          <span id="tel-active" class="value">None</span>
+        </div>
+        <hr>
+        <div class="toggle-group">
+          <label for="toggle-warmup">Overnight Game Warm-up (Prefetches startup blocks while charging)</label>
+          <input type="checkbox" id="toggle-warmup" onchange="toggleWarmup(this.checked)">
+        </div>
+      </div>
+    </section>
+
+    <!-- Settings Tab -->
+    <section id="tab-settings" class="tab-pane">
+      <div class="section-header">
+        <h2>Daemon Settings</h2>
+      </div>
+      <div class="card form-card">
+        <div class="form-group">
+          <label for="cfg-device-id">Device Identifier</label>
+          <input type="text" id="cfg-device-id" class="form-control" value="deck-main">
+        </div>
+        <div class="form-group">
+          <label for="cfg-cache-max">Max Rolling Cache Size (GB)</label>
+          <input type="number" id="cfg-cache-max" class="form-control" value="60">
+        </div>
+        <div class="form-group">
+          <label for="cfg-fps-cap">Default Handheld FPS Cap</label>
+          <select id="cfg-fps-cap" class="form-control">
+            <option value="0">Uncapped / System Default</option>
+            <option value="30">30 FPS (Battery Saving)</option>
+            <option value="45">45 FPS (Smooth 90Hz OLED)</option>
+            <option value="60">60 FPS</option>
+          </select>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-primary" onclick="saveSettings()">Save Preferences</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

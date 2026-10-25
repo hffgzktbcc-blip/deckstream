@@ -1,0 +1,90 @@
+{
+  "version": "vc4ab3bbcc7",
+  "files": {
+    "deckstream-daemon.py": {
+      "sha256": "cd9d97df78920bfcffb7d85d2650b773292a9666168dde443bb697440eeb6413",
+      "mode": "755",
+      "bytes": 161513
+    },
+    "stream-runner.sh": {
+      "sha256": "7cde2e4d0f29edbf3b13f82dc426801938754df808eeab683b46c65f98a40648",
+      "mode": "755",
+      "bytes": 54866
+    },
+    "startup_profile.py": {
+      "sha256": "51022593768e5dae6f84b79acd189871f5241921f19821fbe23484a7f199efd3",
+      "mode": "755",
+      "bytes": 70983
+    },
+    "demand_gate.py": {
+      "sha256": "b0f8119166ecef7e0272a502417da86b566628c757553b12030c77ec739907fa",
+      "mode": "755",
+      "bytes": 8035
+    },
+    "hedge_proxy.py": {
+      "sha256": "540fd5be4fe4b3680d32eb5ab06802f43d5a8c8e40e62bc5c55e3394d2d45015",
+      "mode": "755",
+      "bytes": 13626
+    },
+    "saves.py": {
+      "sha256": "2d2cb04737f361cdf85d7593ca1b4e5ec7311e8f4f623ee37b19c9fd04e17b16",
+      "mode": "755",
+      "bytes": 21567
+    },
+    "proton_matcher.py": {
+      "sha256": "6b8cab03d7fa73254e1354543f3c29db2388dbea14246a3af180fb0eba74ab54",
+      "mode": "755",
+      "bytes": 7343
+    },
+    "doctor.py": {
+      "sha256": "f3334670fafa088d92d2c50d472a7a5030c1351b99da40d2b151ff9000634408",
+      "mode": "755",
+      "bytes": 21977
+    },
+    "language_fix.py": {
+      "sha256": "3be9e1da47d66d90d4c1c956bd5bd209097844b4ac03e7ff6a208700374f8336",
+      "mode": "755",
+      "bytes": 4434
+    },
+    "umu_gameid.py": {
+      "sha256": "fbded1e3ab62c777197712fbcbdaab6e87921ce978c936dbb635b21418798edf",
+      "mode": "755",
+      "bytes": 5216
+    },
+    "deck_preset.py": {
+      "sha256": "fb276775ff1a0689a9d14960096b55ebf83502bf4c3b7eac41e15379a13782c0",
+      "mode": "755",
+      "bytes": 3950
+    },
+    "parallel_download.py": {
+      "sha256": "50cc4862cdcd49741887cdb2a914377fdcf2052ce431445d0b70a20e3bfabfff",
+      "mode": "644",
+      "bytes": 7457
+    },
+    "parallel_unzip.py": {
+      "sha256": "60501f0b936f194cc9feaff5426188bcc2448073e18966535b3f35e08ebb9568",
+      "mode": "755",
+      "bytes": 4761
+    },
+    "suspend-resume-hook.sh": {
+      "sha256": "08ee629a984c437346472f8921170c396fd0843a1f2ddcfc93e3bc064f890406",
+      "mode": "755",
+      "bytes": 4800
+    },
+    "focus_game.sh": {
+      "sha256": "5cd9d6d397fde2613f59f91fd272b06e9dd6f5b1be755a9eda1f4b3211af6c2a",
+      "mode": "755",
+      "bytes": 2703
+    },
+    "game-launcher.sh": {
+      "sha256": "88c0403f1a046aa75b9840840258577ce656b8336530eb80c2d631b33329482d",
+      "mode": "755",
+      "bytes": 9801
+    },
+    "install.sh": {
+      "sha256": "daf14d7e9d93b4983abec251bdb8e1ded45a3051a373649ed587e6d8bd07bd5f",
+      "mode": "755",
+      "bytes": 20038
+    }
+  }
+}

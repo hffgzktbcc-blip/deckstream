@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+
+# Node / Web
+node_modules/
+dist/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment & Private Config
+.env
+.env.local
+*.env
+*.key
+*.sig
+*.token
+*.pem
+credentials.json
+config.local.*
+
+# Runtime & State Files
+*.log
+*.pid
+.state/
+state/
+tmp/
+cache/
+
+# OS Specific
+.DS_Store
+Thumbs.db
