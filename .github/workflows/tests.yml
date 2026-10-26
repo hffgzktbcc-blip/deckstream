@@ -10,19 +10,29 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.12'
 
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libfuse-dev
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
 
-      - name: Run DeckStream test suite
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Install the browser test's Chromium
         run: |
-          bash scripts/run_all_tests.sh
+          npm i --no-save playwright@1.63.0
+          npx playwright install --with-deps chromium
+
+      - name: Run the DeckStream test suite
+        run: bash scripts/run_all_tests.sh
+
+      - name: The committed Decky zip matches its source
+        run: |
+          bash scripts/build_decky.sh
+          git diff --exit-code decky/DeckStream.zip

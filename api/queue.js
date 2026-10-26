@@ -40,11 +40,11 @@ async function resolveServerPlan(req, body, webdavPath) {
   let token = String((req.headers && req.headers['authorization']) || body.storageKey || '').trim();
   if (token.startsWith('Bearer ')) token = token.slice(7).trim();
   if (!token || typeof fetch !== 'function') return null;
-  const rawId = String(body.gameId ?? body.game_id ?? body.id ?? '').trim();
+  const rawId = String(body.storageId ?? body.gameId ?? body.game_id ?? body.id ?? '').trim();
   const id = /^\d{1,12}$/.test(rawId) ? rawId : '';
   const wantName = String(webdavPath || body.name || '').trim().toLowerCase();
   if (!id && !wantName) return null;
-  const base = process.env.STORAGE_API_URL || process.env.TORBOX_API_URL || 'http://127.0.0.1:8765/mock-storage';
+  const base = require('./storage').storageBase();
   const matchItem = (data) => {
     const list = Array.isArray(data) ? data : data ? [data] : [];
     if (id) {
@@ -99,6 +99,7 @@ function buildJob(body, { mode, downloadUrl, webdavPath, plan, notifyTopic }) {
   return {
     id: 'job_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
     name: String(body.name || 'Unnamed Game').trim().slice(0, 120),
+    storageId: /^\d{1,12}$/.test(String(body.storageId ?? body.gameId ?? '')) ? String(body.storageId ?? body.gameId) : '',
     downloadUrl,
     targetDir: body.targetDir === 'sd' ? 'sd' : (body.targetDir === 'stream' ? 'stream' : 'internal'), // ~/Games, the SD card, or stream mount
     mode, // 'download' | 'stream' (0 GB mount) | 'cloudinstall' (unpack straight from Remote Storage)
@@ -257,8 +258,8 @@ async function route(req, res, device, deviceId, ctx) {
       if (added.error) return res.status(400).json({ error: added.error });
       ctx.dirty = true;
       let job = null;
-      await runWatches(device, deviceId, ctx, true, (id, j) => { if (id === added.watch.gameId) job = j; });
-      const w = (device.watches || []).find(x => x.gameId === added.watch.gameId);
+      await runWatches(device, deviceId, ctx, true, (id, j) => { if (id === added.watch.storageId) job = j; });
+      const w = (device.watches || []).find(x => x.storageId === added.watch.storageId);
       return res.json({
         success: true,
         state: job ? 'queued' : (w ? w.state : 'stopped'),
@@ -268,7 +269,7 @@ async function route(req, res, device, deviceId, ctx) {
     }
 
     if (action === 'unwatch') {
-      if (removeWatch(device, body.gameId)) ctx.dirty = true;
+      if (removeWatch(device, body.storageId || body.gameId)) ctx.dirty = true;
       return res.json({ success: true });
     }
 
@@ -308,7 +309,7 @@ async function route(req, res, device, deviceId, ctx) {
       const mode = ['stream', 'cloudinstall'].includes(body.mode) ? body.mode : 'download';
       const webdavPath = safeFolder(body.webdavPath);
       if (mode === 'download' && !isAllowedDownloadUrl(downloadUrl)) {
-        return res.status(400).json({ error: 'downloadUrl must be an https Remote Storage link' });
+        return res.status(400).json({ error: 'downloadUrl must be a link from your storage server (STORAGE_API_URL host or ALLOWED_DOWNLOAD_HOSTS)' });
       }
       if (mode !== 'download' && !webdavPath) {
         return res.status(400).json({ error: 'Stream and cloud-install jobs need a valid Remote Storage folder name' });

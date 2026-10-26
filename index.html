@@ -380,14 +380,14 @@
     .storage-fill.warn { background: var(--busy); }
 
     /* ---------- Library list rows ---------- */
-    .torrent-item {
+    .lib-item {
       background: var(--graphite);
       border: 1px solid var(--seam);
       border-radius: var(--r-control);
       padding: 13px 14px;
       margin-bottom: 10px;
     }
-    .torrent-header {
+    .lib-header {
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
@@ -395,7 +395,7 @@
       gap: 12px;
       margin-bottom: 8px;
     }
-    .torrent-title { flex: 1 1 8em; min-width: 0; font-size: 0.98rem; font-weight: 600; line-height: 1.3; overflow-wrap: break-word; }
+    .lib-title { flex: 1 1 8em; min-width: 0; font-size: 0.98rem; font-weight: 600; line-height: 1.3; overflow-wrap: break-word; }
     .release-name {
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
       font-size: 0.77rem;
@@ -522,7 +522,7 @@
     .genre-tile img { width: 100%; aspect-ratio: 2 / 3; object-fit: cover; border-radius: var(--r-cart); background: var(--shell);
       clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%); }
     .genre-tile-name { font-size: .8rem; line-height: 1.2; color: var(--dim); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .torrent-meta {
+    .lib-meta {
       display: flex;
       flex-wrap: wrap;
       gap: 4px 12px;
@@ -530,7 +530,7 @@
       color: var(--dim);
       margin-bottom: 12px;
     }
-    .torrent-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .lib-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
     /* ---------- Shelves ---------- */
     .netflix-shelf-header {
@@ -669,7 +669,6 @@
     .lib-cover-state { font-size: .74rem; font-weight: 600; color: var(--ready); }
     .lib-cover[data-state="caching"] .lib-cover-state { color: var(--busy); }
     .lib-cover[data-state="install"] .lib-cover-state, .lib-cover[data-state="other"] .lib-cover-state { color: var(--dim); }
-    .lib-cover[data-state="switch"] .lib-cover-state { color: #b79cff; }
     .lib-cover-name { font-size: .84rem; line-height: 1.2; color: var(--ink); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     @media (hover: hover) { .lib-cover:hover .lib-cover-art { transform: translateY(-3px); } }
     .lib-cover:active .lib-cover-art { transform: translateY(1px); }
@@ -1243,8 +1242,8 @@
 
         <details id="setupInstall" style="margin-bottom:12px;"><summary style="cursor:pointer; font-weight:600; font-size:0.92rem; color:var(--signal);">Show the Deck install command</summary>
         <div style="margin:8px 0 0;">
-          <div class="hint" style="margin-bottom:2px;">On the Deck, switch to Desktop Mode, open Konsole and paste this once. It installs DeckStream and keeps it updated.</div>
-          <code id="installerCmdText" class="code-box" style="display:block; user-select:all;">curl -sSL https://deckstream.vercel.app/daemon/install.sh | bash -s -- https://deckstream.vercel.app deck-main</code>
+          <div class="hint" style="margin-bottom:2px;">On the Deck, switch to Desktop Mode, open Konsole and paste this once. It installs DeckStream; paste it again to update.</div>
+          <code id="installerCmdText" class="code-box" style="display:block; user-select:all;">curl -sSL https://YOUR-SITE/daemon/install.sh | bash -s -- https://YOUR-SITE deck-main</code>
           <button class="btn btn-secondary btn-sm" onclick="copyInstallerCmd()">Copy command</button>
         </div>
         </details>
@@ -1311,24 +1310,16 @@
 
 
       <details class="add-box" id="addGameBox">
-        <summary>Mount a game folder or scan storage</summary>
+        <summary>Add a game folder from your storage server</summary>
       <div class="card">
-        <div class="card-title">Remote Storage Directory</div>
+        <div class="card-title">Game folder</div>
         <div class="input-group">
-          <input type="text" id="storagePathInput" placeholder="Enter remote game folder name or WebDAV URL" aria-label="Game directory or URL" autocomplete="off" autocorrect="off" autocapitalize="off" onkeydown="if(event.key==='Enter') addStoragePath()">
+          <input type="text" id="storagePathInput" placeholder="Name of a folder in your games directory" aria-label="Game folder name" autocomplete="off" autocorrect="off" autocapitalize="off" onkeydown="if(event.key==='Enter') addStoragePath()">
           <button class="btn" onclick="addStoragePath()">
-            <span>Mount &amp; Stream</span>
+            <span>Add</span>
           </button>
         </div>
-        <div class="hint">Mounts over high-performance WebDAV with chunk-level VFS caching. Games launch natively via Proton with local Copy-on-Write saves.</div>
-        <div class="group-rule">
-          <div class="group-title">Supported storage protocols</div>
-          <div style="display:flex; gap:6px; flex-wrap:wrap;">
-            <span class="badge badge-blue">WebDAV (Nextcloud / TrueNAS)</span>
-            <span class="badge badge-green">S3 / MinIO Object Storage</span>
-            <span class="badge badge-yellow">Local LAN Share (SMB/NFS)</span>
-          </div>
-        </div>
+        <div class="hint">Every folder in your storage server's games directory shows up in the Library by itself; this checks one by name. The Deck reads games over WebDAV (for example <code>rclone serve webdav</code> on a NAS). See docs/STORAGE_API.md.</div>
       </div>
       </details>
 
@@ -1345,13 +1336,13 @@
               <button class="library-toggle-btn" id="viewModeGridBtn" onclick="setLibraryViewMode('grid')">Cards</button>
               <button class="library-toggle-btn" id="viewModeListBtn" onclick="setLibraryViewMode('list')">List</button>
             </div>
-            <button class="btn btn-secondary btn-sm" onclick="loadTorrents(true)" aria-label="Refresh the library">Refresh</button>
+            <button class="btn btn-secondary btn-sm" onclick="loadLibrary(true)" aria-label="Refresh the library">Refresh</button>
           </div>
         </div>
 
         <div id="libSummary" class="lib-summary" hidden></div>
         <div class="lib-tools">
-          <input type="search" id="libSearchInput" placeholder="Find a game in your library" aria-label="Find a game in your library" oninput="filterLocalTorrents()">
+          <input type="search" id="libSearchInput" placeholder="Find a game in your library" aria-label="Find a game in your library" oninput="filterLibrary()">
           <select id="libSortSelect" aria-label="Sort the library" onchange="setLibrarySort(this.value)">
             <option value="recent">Newest first</option>
             <option value="name">By name</option>
@@ -1360,22 +1351,21 @@
         </div>
 
         <div id="libFilterRow" class="chip-row">
-          <button class="btn btn-sm" id="filter-all" onclick="setTorrentFilter('all')">All</button>
-          <button class="btn btn-secondary btn-sm" id="filter-cached" onclick="setTorrentFilter('cached')">Ready</button>
-          <button class="btn btn-secondary btn-sm" id="filter-downloading" onclick="setTorrentFilter('downloading')">Still caching</button>
-          <button class="btn btn-secondary btn-sm" id="filter-verified" onclick="setTorrentFilter('verified')">Verified</button>
+          <button class="btn btn-sm" id="filter-all" onclick="setLibraryFilter('all')">All</button>
+          <button class="btn btn-secondary btn-sm" id="filter-cached" onclick="setLibraryFilter('cached')">Ready</button>
+          <button class="btn btn-secondary btn-sm" id="filter-downloading" onclick="setLibraryFilter('downloading')">Still caching</button>
           <button class="btn btn-secondary btn-sm" id="toggleMediaFilterBtn" aria-pressed="true" style="margin-left:6px; border-style:dashed;" onclick="toggleMediaFilter()">Showing games only</button>
         </div>
 
         <div id="filterSummaryBar" class="hint" style="margin-bottom: 10px; display: none;"></div>
 
-        <div id="torrentListLoading" style="text-align: center; padding: 24px; color: var(--text-muted); display: none;">
+        <div id="libraryListLoading" style="text-align: center; padding: 24px; color: var(--text-muted); display: none;">
           <span class="spin"></span> Loading your library…
         </div>
-        <div id="torrentListEmpty" style="text-align: center; padding: 30px 12px; color: var(--text-muted);">
+        <div id="libraryListEmpty" style="text-align: center; padding: 30px 12px; color: var(--text-muted);">
           Your remote storage library is empty. Mount a game folder above or browse popular titles on Home.
         </div>
-        <div id="torrentListContainer"></div>
+        <div id="libraryListContainer"></div>
       </div>
     </div>
 
@@ -1408,22 +1398,16 @@
         <div class="chip-row" role="group" aria-label="Where to search">
           <button class="btn btn-sm" id="src-all" onclick="setSearchSource('all')">Everywhere</button>
           <button class="btn btn-secondary btn-sm" id="src-directstream" onclick="setSearchSource('directstream')">⚡ Streamable only</button>
-          <button class="btn btn-secondary btn-sm" id="src-verified" onclick="setSearchSource('verified')">Deck Verified</button>
-          <button class="btn btn-secondary btn-sm" id="src-action" onclick="setSearchSource('action')">Action RPG</button>
-          <button class="btn btn-secondary btn-sm" id="src-indie" onclick="setSearchSource('indie')">Indie</button>
         </div>
 
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px 12px;">
-          <div class="hint" style="flex:1 1 220px;">“⚡ Streamable only” filters to unpacked releases that play directly from the cloud without downloading or installing to the Deck.</div>
-          <button class="btn btn-secondary btn-sm" onclick="switchTab('settings'); setTimeout(() => (document.getElementById('sourcesDetails') || {}).open = true, document.getElementById('sourcesCard')?.scrollIntoView({behavior:'smooth'}), 150);">
-            Manage sources
-          </button>
+          <div class="hint" style="flex:1 1 220px;">Searches your own library and the Steam store. “⚡ Streamable only” shows game folders that play without installing.</div>
         </div>
       </div>
 
       <div class="card" id="searchResultsCard" style="display:none;">
         <div class="card-title">
-          <span>Releases</span>
+          <span>Results</span>
           <span id="searchCountBadge" class="badge badge-blue">0</span>
         </div>
         <div id="searchLoading" style="text-align: center; padding: 24px; color: var(--text-muted); display: none;">
@@ -1438,7 +1422,7 @@
       <section id="genreBrowse" class="genre-browse" aria-labelledby="genreBrowseTitle">
         <div id="genreList">
           <h2 class="genre-browse-title" id="genreBrowseTitle">Browse by genre</h2>
-          <p class="hint" style="margin:0 0 10px;">Steam's best sellers in each genre. Tap a game to find its releases.</p>
+          <p class="hint" style="margin:0 0 10px;">Steam's best sellers in each genre. Tap a game to check your library for it.</p>
           <div id="genreRows" class="genre-rows"></div>
         </div>
         <div id="genreView" hidden>
@@ -1540,28 +1524,104 @@
         <div class="card-title">Connection</div>
 
         <div class="field">
-          <label class="field-label" for="cfgTorboxKey">Remote Storage Key (WebDAV / S3 / Local)</label>
+          <label class="field-label" for="cfgStorageKey">Storage server key</label>
           <div class="input-group">
-            <input type="password" id="cfgTorboxKey" placeholder="Enter remote storage key or token" autocomplete="off">
-            <button class="btn btn-secondary btn-sm" type="button" onclick="toggleSecretVisibility('cfgTorboxKey')">Show</button>
+            <input type="password" id="cfgStorageKey" placeholder="The key your storage server expects" autocomplete="off">
+            <button class="btn btn-secondary btn-sm" type="button" onclick="toggleSecretVisibility('cfgStorageKey')">Show</button>
           </div>
-          <div class="hint">Credentials for your personal WebDAV or S3 game storage server.</div>
+          <div class="hint" style="margin-top:5px;">Sent to your own storage server (STORAGE_API_URL) as a Bearer token. See docs/STORAGE_API.md.</div>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="cfgQueueSecret">Queue password</label>
+          <input type="password" id="cfgQueueSecret" placeholder="The one you gave the Deck installer" autocomplete="off">
+          <div class="hint" style="margin-top:5px;">Lets this phone send games to your Deck. Without it nothing reaches the Deck.</div>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="cfgDeviceId">Deck name</label>
+          <input type="text" id="cfgDeviceId" placeholder="deck-main" value="deck-main" autocomplete="off" autocapitalize="off">
+          <div class="hint" style="margin-top:5px;">Must match the name in the install command. Leave it as is if you have one Deck.</div>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="cfgSteamGridKey">SteamGridDB key (optional, for cover art)</label>
+          <div style="display:flex; gap:8px;">
+            <input type="password" id="cfgSteamGridKey" placeholder="Free key from steamgriddb.com" style="flex:1;" autocomplete="off">
+            <button class="btn btn-secondary btn-sm" onclick="testSteamGridConnection()" style="white-space:nowrap;">Test</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="cfgGeminiKey">Google Gemini API key (optional, for Deck AI)</label>
+          <input type="password" id="cfgGeminiKey" placeholder="From ai.google.dev (optional)" autocomplete="off">
+          <div class="hint" style="margin-top:5px;">Deck AI has a built-in expert engine that works offline. Add a Gemini key to unlock extended reasoning for open-ended queries.</div>
+        </div>
+
+        <button class="btn btn-full" onclick="saveSettings()">Save</button>
+        <div class="hint" style="text-align:center; margin-top:6px;">Changes also save on their own as you type.</div>
       </div>
 
-      <details class="card">
-        <summary class="card-title" style="cursor:pointer;">Advanced: kernel tweaks (not recommended)</summary>
-        <div class="hint" style="margin: 0 0 8px;">
-          Changes system settings with <b>sudo</b> and keeps them across reboots (BBR, socket buffers, <code>vm.swappiness=1</code>, extra kernel modules).
-          Our measurements found <b>no download speed-up</b> from these: the limit is your internet line and Remote Storage's response time.
-          A very low swappiness can hurt a 16 GB Deck. You do not need this for DeckStream to work.
+      <div class="card">
+        <div class="card-title">Install on the Deck</div>
+        <div class="hint">On the Deck, switch to Desktop Mode, open <b>Konsole</b> and paste this once. It installs DeckStream and starts it in the background.</div>
+        <div class="code-box" id="setupCommandBox">
+          curl -sSL <span id="setupUrlHost"></span>/daemon/install.sh | bash -s -- <span id="setupUrlHost2"></span> <span id="setupDeviceIdDisplay">deck-main</span>
         </div>
-        <div class="code-box" id="boostCommandBox">
-          curl -sSL <span id="setupUrlHostBoost"></span>/daemon/deck-boost.sh | sudo bash
-        </div>
-        <button class="btn btn-secondary btn-full btn-sm" onclick="copyBoostCommand()">
+        <button class="btn btn-secondary btn-full btn-sm" onclick="copySetupCommand()">
           Copy command
         </button>
-      </details>
+      </div>
+
+
+      <div class="card" id="warmupCard">
+        <div class="card-title">On the Deck</div>
+        <label class="field" style="display:flex; align-items:center; gap:10px; min-height:44px; cursor:pointer; margin-bottom:4px;">
+          <input type="checkbox" id="cfgWarmup" style="width:20px; height:20px;" onchange="setWarmup(this.checked)">
+          <span><b>Overnight warm-up</b> <span id="warmupState" style="color:var(--text-muted);"></span></span>
+        </label>
+        <div class="hint">While the Deck is charging and idle, it fills your recently played stream games so they start fast.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Notifications</div>
+        <div class="hint" style="margin-bottom:12px;">Get told on this phone when a game is added and when it's ready on the Deck.</div>
+        <button class="btn btn-secondary btn-full btn-sm" style="margin-bottom: 14px;" onclick="requestNotificationPermission()">
+          Allow notifications in this browser
+        </button>
+        <div class="field" style="margin-bottom: 6px;">
+          <label class="field-label" for="cfgNotifyTopic">ntfy topic (for lock-screen alerts)</label>
+          <div style="display: flex; gap: 6px;">
+            <input type="text" id="cfgNotifyTopic" placeholder="At least 24 characters" style="flex: 1;" autocomplete="off" autocapitalize="off">
+            <button class="btn btn-secondary btn-sm" onclick="generateSecureTopic()" title="Make a random private topic">New</button>
+          </div>
+          <div class="hint" style="margin-top:5px;">Install the free <b>ntfy</b> app and subscribe to this topic. A long random topic keeps it private.</div>
+        </div>
+        <button class="btn btn-secondary btn-full btn-sm" style="margin-top: 8px;" onclick="sendTestNotification()">
+          Send a test notification
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Privacy & Passcode Lock</div>
+        <div class="field">
+          <label class="field-label" for="cfgAppPin">App passcode (optional)</label>
+          <input type="password" id="cfgAppPin" placeholder="Leave empty for no lock" autocomplete="off">
+          <div class="hint" style="margin-top:5px;">Asks for the passcode before anyone sees your library on this phone.</div>
+        </div>
+        <label class="field" style="display:flex; align-items:center; gap:10px; min-height:44px; cursor:pointer;">
+          <input type="checkbox" id="cfgWelcome" style="width:20px; height:20px; flex-shrink:0;" onchange="try { localStorage.setItem('deck_welcome', this.checked ? 'on' : 'off'); } catch (_) {}">
+          <span>Show the welcome screen when I open the app</span>
+        </label>
+        <label class="field" style="display:flex; align-items:center; gap:10px; min-height:44px; cursor:pointer;">
+          <input type="checkbox" id="cfgIntro" style="width:20px; height:20px; flex-shrink:0;" onchange="try { localStorage.setItem('deck_intro', this.checked ? 'on' : 'off'); } catch (_) {}">
+          <span>Play the start-up screen when I open the app (the welcome shows when this is off)</span>
+        </label>
+        <button class="btn btn-secondary btn-full btn-sm" onclick="lockAppNow()">
+          Lock now
+        </button>
+      </div>
+
     </div>
   </div>
 
@@ -1610,7 +1670,7 @@
   </div>
 
   <!-- Steam Game Details Modal -->
-  <!-- Game page: what a game is, then the releases you can get for it. Opened from any game tile; the phone's back closes it. -->
+  <!-- Game page: what a game is, then the copies in your library. Opened from any game tile; the phone's back closes it. -->
   <section id="gamePage" class="game-page" hidden aria-labelledby="gpTitle" role="dialog" aria-modal="true">
     <button type="button" class="gp-back" onclick="history.state && history.state.gamePage ? history.back() : closeGamePage()" aria-label="Back"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
     <div class="gp-hero" id="gpHero"></div>
@@ -1625,7 +1685,7 @@
         </div>
       </div>
       <div class="gp-actions">
-        <button type="button" class="btn gp-primary" id="gpPrimary">Search releases</button>
+        <button type="button" class="btn gp-primary" id="gpPrimary">Find in your library</button>
         <a class="btn btn-secondary" id="gpSteam" href="https://store.steampowered.com/" target="_blank" rel="noopener noreferrer">Steam page</a>
       </div>
       <div class="gp-owned" id="gpOwned"></div>
@@ -1639,10 +1699,10 @@
         </aside>
         <div id="gpReleasesBox">
           <div class="gp-releases-head">
-            <h2 class="gp-section-title" style="margin:0;">Releases</h2>
+            <h2 class="gp-section-title" style="margin:0;">In your library</h2>
             <button type="button" class="shelf-nav-btn" id="gpOpenSearch">Open in Search</button>
           </div>
-          <div class="gp-releases-note" id="gpReleasesNote">What remote storage has ready comes first.</div>
+          <div class="gp-releases-note" id="gpReleasesNote">Copies in your storage server, ready ones first.</div>
           <div id="gpReleases"></div>
         </div>
         <div id="gpShotsBox" hidden>
@@ -1668,13 +1728,13 @@
 
       <!-- What DeckStream thinks of this release (from /api/plan), shown BEFORE choosing, so a wrong choice is not bounced back after tapping Start -->
       <div id="modalPlanBox" style="font-size: 0.9rem; line-height: 1.45; padding: 10px 12px; border-radius: var(--r-control); margin-bottom: 14px; background: var(--graphite); border: 1px solid var(--seam); color: var(--text-muted);">
-        Checking what this release is…
+        Checking what this game is…
       </div>
 
       <div style="margin-bottom: 14px;">
         <label class="field-label" for="modalTargetDir">How it gets onto the Deck</label>
         <select id="modalTargetDir" onchange="updateInstallButton()">
-          <option value="cloudinstall">Install to microSD from Remote Storage (repacks and zips)</option>
+          <option value="cloudinstall">Install to the Deck (installers and archives)</option>
           <option value="stream">Stream from the cloud, no download (pre-installed only)</option>
           <option value="sd">Download to the microSD card</option>
           <option value="internal">Download to the internal drive</option>
@@ -1793,7 +1853,7 @@
     // State
     const state = {
       deviceId: localStorage.getItem('deck_device_id') || 'deck-main',
-      torboxKey: localStorage.getItem('torbox_api_key') || (location.hostname === '127.0.0.1' || location.hostname === 'localhost' ? 'mock-storage-key' : ''),
+      storageKey: localStorage.getItem('storage_api_key') || (location.hostname === '127.0.0.1' || location.hostname === 'localhost' ? 'mock-storage-key' : ''),
       steamGridKey: localStorage.getItem('steamgriddb_key') || '',
       notifyTopic: localStorage.getItem('deck_notify_topic') || 'deckstream-deck-main',
       appPin: localStorage.getItem('deck_app_pin') || '',
@@ -1805,8 +1865,8 @@
       lastCompletedJobId: null,
       currentJobModal: null,
       selectedArtwork: null,
-      torrents: [],
-      torrentFilter: 'all',
+      libraryItems: [],
+      libraryFilter: 'all',
       currentSearchResults: [],
       queueSecret: localStorage.getItem('deck_queue_secret') || (location.hostname === '127.0.0.1' || location.hostname === 'localhost' ? 'test-secret-123' : ''),
       geminiKey: localStorage.getItem('deck_gemini_key') || '',
@@ -1996,13 +2056,13 @@
     // installs first. The Discover shelf and the chat read this instead of a typed-in list that goes stale.
     function libraryStreamLists() {
       const streamable = [], install = [], seen = new Set();
-      for (const t of (typeof state !== 'undefined' && state.torrents) || []) {
+      for (const t of (typeof state !== 'undefined' && state.libraryItems) || []) {
         if (!t || !Array.isArray(t.files) || !t.files.length || !isItemCached(t)) continue;
         const name = displayGameName(t.name || '');
         const key = normTitle(name);
         const rel = classifyItem(t);
         if (rel.streamable === true) { if (!seen.has(key)) { seen.add(key); streamable.push({ name, item: t }); } }
-        else if (rel.kind !== 'switch' && rel.kind !== 'media') install.push({ name, item: t });
+        else if (rel.kind !== 'media') install.push({ name, item: t });
       }
       const installOnly = install.filter(x => !seen.has(normTitle(x.name)));
       return { streamable: streamable.map(x => x.name), install: [...new Set(installOnly.map(x => x.name))], _items: streamable.map(x => x.item) };
@@ -2164,7 +2224,7 @@
       const topic = (document.getElementById('cfgNotifyTopic')?.value || state.notifyTopic || '').trim();
       showToast('Sending test notification...');
       try {
-        const secret = state.queueSecret || state.torboxKey || '';
+        const secret = state.queueSecret || state.storageKey || '';
         const res = await fetch(`/api/push?device=${encodeURIComponent(state.deviceId)}`, {
           method: 'POST',
           headers: {
@@ -2216,7 +2276,7 @@
       listEl.innerHTML = '<div style="text-align:center; padding:16px; color:var(--text-muted);"><span class="spin"></span> Loading…</div>';
 
       try {
-        const secret = state.queueSecret || state.torboxKey || '';
+        const secret = state.queueSecret || state.storageKey || '';
         const res = await fetch(`/api/launch?device=${encodeURIComponent(state.deviceId)}`, {
           headers: { 'x-deckstream-secret': secret }
         });
@@ -2278,7 +2338,7 @@
       dxvk: "graphics driver (Vulkan) did not start", vkd3d: "DirectX 12 layer is missing", oom: "ran out of memory",
       access_violation: "the game crashed on start", d3d11: "the display could not be set up",
       prefix_timeout: "the Windows layer timed out", anticheat: "anti-cheat is not supported here",
-      steam_api: "the Steam API is missing (this release needs a manual step)", unknown_early: "no clear cause in the log"
+      steam_api: "the Steam API is missing (this game needs a manual step)", unknown_early: "no clear cause in the log"
     };
     function exitLine(l) {
       if (!l || !EXIT_REASON_TEXT[l.exit_reason]) return '';
@@ -2343,7 +2403,7 @@
       if (tabEl) tabEl.classList.add('active');
       if (btnEl) btnEl.classList.add('active');
 
-      if (name === 'cloud') loadTorrents(true);
+      if (name === 'cloud') loadLibrary(true);
       if (name === 'queue') pollDeckStatus();
     }
 
@@ -2508,7 +2568,7 @@
       }
     }
 
-    // ---- Game page: tap any game to see what it is, then the releases you can get for it ----
+    // ---- Game page: tap any game to see what it is, then the copies in your library ----
     const gameDetailsCache = {};
     let gamePageSeq = 0;
     let gameReleasesObserver = null;
@@ -2520,18 +2580,18 @@
     function libraryItemForTitle(title) {
       const want = normTitle(title || '');
       if (!want) return null;
-      const list = Array.isArray(state.torrents) ? state.torrents : [];
+      const list = Array.isArray(state.libraryItems) ? state.libraryItems : [];
       return list.find(t => normTitle(displayGameName(t.name || '')) === want) || null;
     }
 
     // The one action a library item offers, by what it is: stream or install.
     function libraryPrimaryAction(t) {
       const id = Number(t.id);
-      if (!isItemCached(t)) return { label: 'Syncing with remote storage…', cls: 'btn btn-secondary', run: () => loadTorrents(true) };
+      if (!isItemCached(t)) return { label: 'Syncing with remote storage…', cls: 'btn btn-secondary', run: () => loadLibrary(true) };
       const rel = classifyItem(t);
       if (rel.streamable) return { label: 'Stream to Deck', cls: 'btn', run: () => sendToDeckDirect(id) };
       
-      if (rel.kind === 'repack' || (rel.kind === 'plain' && rel.recommendation === 'cloudinstall') || rel.kind === 'archive' || rel.kind === 'installer') {
+      if (rel.kind === 'archive' || rel.kind === 'installer') {
         return { label: 'Install to Deck', cls: 'btn', run: () => openInstallModal(id) };
       }
       if (rel.kind === 'disc') return { label: 'Disc image options', cls: 'btn btn-secondary', run: () => openInstallModal(id) };
@@ -2560,12 +2620,12 @@
     }
 
     function openLibraryGame(id) {
-      const t = (state.torrents || []).find(x => String(x.id) === String(id));
+      const t = (state.libraryItems || []).find(x => String(x.id) === String(id));
       if (t) openGamePage({ title: displayGameName(t.name || ''), libraryItem: t });
     }
 
     // game: { title, appId?, capsule?, capsuleFallbacks?, libraryItem? }. A Steam app id brings the store details; without
-    // one the title is looked up on Steam first. The page works without either: cover, title and releases always show.
+    // one the title is looked up on Steam first. The page works without either: cover, title and library copies always show.
     async function openGamePage(game) {
       const title = String((game && game.title) || '').trim();
       if (!title) return;
@@ -2584,7 +2644,7 @@
       $('gpAboutBox').hidden = true;
       $('gpReleases').innerHTML = '';
       $('gpReleases').dataset.loaded = '';
-      $('gpReleasesNote').textContent = 'What remote storage has ready comes first.';
+      $('gpReleasesNote').textContent = 'Copies in your storage server, ready ones first.';
       $('gpHero').style.backgroundImage = '';
       document.getElementById('gpAbout').classList.add('folded');
 
@@ -2607,7 +2667,7 @@
         primary.onclick = act.run;
         $('gpOwned').textContent = isItemCached(owned) ? 'In your Remote Storage library and ready.' : 'In your Remote Storage library, still caching.';
       } else {
-        primary.textContent = 'Search releases';
+        primary.textContent = 'Find in your library';
         primary.className = 'btn gp-primary';
         primary.onclick = () => { $('gpReleasesBox').scrollIntoView({ behavior: 'smooth', block: 'start' }); loadGameReleases(title, seq); };
         $('gpOwned').textContent = '';
@@ -2621,7 +2681,7 @@
       if (!(history.state && history.state.gamePage)) { try { history.pushState({ gamePage: true }, ''); } catch (_) {} }
       page.querySelector('.gp-back').focus({ preventScroll: true });
 
-      // Releases load when their section comes into view (or on "Find a release"), not on every open.
+      // Releases load when their section comes into view (or on "Find in your library"), not on every open.
       if (gameReleasesObserver) gameReleasesObserver.disconnect();
       if ('IntersectionObserver' in window) {
         gameReleasesObserver = new IntersectionObserver((entries) => {
@@ -2738,25 +2798,25 @@
       if (seq !== gamePageSeq || box.dataset.loaded) return;
       box.dataset.loaded = 'loading';
       if (!state.queueSecret) {
-        box.innerHTML = `<div class="hint">Add your queue password in Settings to find releases. <button class="btn btn-secondary btn-sm" onclick="closeGamePage(); switchTab('settings')">Open Settings</button></div>`;
+        box.innerHTML = `<div class="hint">Add your queue password in Settings to see your copies. <button class="btn btn-secondary btn-sm" onclick="closeGamePage(); switchTab('settings')">Open Settings</button></div>`;
         return;
       }
       box.innerHTML = '<div class="gp-skeleton"></div><div class="gp-skeleton"></div><div class="gp-skeleton"></div>';
       try {
-        const res = await fetch(`/api/search?q=${encodeURIComponent(title)}&source=all`, { headers: searchRequestHeaders(), signal: AbortSignal.timeout(30000) });
+        const res = await fetch(`/api/search?q=${encodeURIComponent(title)}`, { headers: searchRequestHeaders(), signal: AbortSignal.timeout(30000) });
         if (seq !== gamePageSeq) return;
         if (!res.ok) throw new Error(res.status === 401 ? 'Your queue password was not accepted. Check it in Settings.' : `Search didn't answer (HTTP ${res.status}).`);
         const data = await res.json();
         if (seq !== gamePageSeq) return;
-        const results = orderSearchResults(normalizeSearchResults(data && data.results));
+        const results = orderSearchResults(normalizeSearchResults(data).filter(r => r.source === 'library'));
         box.dataset.loaded = 'done';
         if (!results.length) {
           note.textContent = '';
-          box.innerHTML = ownedCopyBannerHtml(title) + `<div class="hint">No releases of ${escapeHtml(title)} turned up. Try a shorter name in Search, or paste a link in Library.</div>`;
+          box.innerHTML = ownedCopyBannerHtml(title) + `<div class="hint">${escapeHtml(title)} is not in your library. Put its game folder on your storage server, then refresh the Library.</div>`;
           return;
         }
         const shown = results.slice(0, 8);
-        note.textContent = results.length > shown.length ? `The best ${shown.length} of ${results.length}. Open in Search for all of them and filters.` : 'What remote storage has ready comes first.';
+        note.textContent = results.length > shown.length ? `${shown.length} of ${results.length}. Open in Search for all of them.` : 'Games that stream come first.';
         box.innerHTML = ownedCopyBannerHtml(title) + shown.map((r, idx) => searchGroupHead(shown, idx) + (() => {
           try { return searchResultCardHtml(r, idx, 'gp'); } catch (err) { return ''; }
         })()).join('');
@@ -2793,17 +2853,7 @@
     });
 
     // ---- Search page: grouped results, recent searches, browse by genre ----
-    // A search result that is already in your Remote Storage library has a real file list: judge it by its files, not its title
-    // (an InsaneRamZes "Portable" title can be split archives inside). null when the release isn't in the library.
-    function ownedReleaseVerdict(r) {
-      if (typeof state === 'undefined' || typeof classifyItem !== 'function' || !r || !r.infohash) return null;
-      const h = String(r.infohash).toUpperCase();
-      const own = (state.torrents || []).find(t => t && t.hash && String(t.hash).toUpperCase() === h && Array.isArray(t.files) && t.files.length);
-      return own ? classifyItem(own) : null;
-    }
-
-    // Copies of a game already in the Remote Storage library whose files stream (a real game folder, not Remote Storage's zip). Search and
-    // the game page put them first, so an unpacked copy that works is never passed over for a zipped duplicate.
+    // Copies of a game already in your library whose files stream (a plain game folder). The game page puts them first.
     function ownedStreamCopies(title) {
       if (typeof state === 'undefined' || typeof classifyItem !== 'function') return [];
       const ROMAN = { ii: '2', iii: '3', iv: '4', v: '5', vi: '6', vii: '7', viii: '8', ix: '9', x: '10' };
@@ -2812,7 +2862,7 @@
         .filter(Boolean).map(w => ROMAN[w] || w);
       const want = words(typeof displayGameName === 'function' ? displayGameName(title) : title);
       if (!want.length) return [];
-      return (state.torrents || []).filter((t) => {
+      return (state.libraryItems || []).filter((t) => {
         if (!t || !Array.isArray(t.files) || !t.files.length || (typeof isItemCached === 'function' && !isItemCached(t))) return false;
         const have = new Set(words(typeof displayGameName === 'function' ? displayGameName(t.name) : t.name));
         return want.every(w => have.has(w)) && classifyItem(t).streamable === true;
@@ -2823,41 +2873,38 @@
       const own = ownedStreamCopies(title);
       if (!own.length) return '';
       return own.slice(0, 3).map(t => `
-        <div class="torrent-item" style="border-color:var(--ready);">
-          <div class="torrent-header">
-            <div class="torrent-title">Already in your Library, unpacked</div>
+        <div class="lib-item" style="border-color:var(--ready);">
+          <div class="lib-header">
+            <div class="lib-title">Already in your library</div>
             <span class="badge badge-green">⚡ Streams</span>
           </div>
           <div class="release-name" title="${escapeHtml(t.name || '')}">${escapeHtml(t.name || '')}</div>
-          <div class="torrent-meta"><span style="color:var(--ink);">${t.size ? formatBytes(t.size) : ''}</span><span>A real game folder in Remote Storage: play this one, not a zipped copy</span></div>
-          <div class="torrent-actions" style="margin-top:10px;">
+          <div class="lib-meta"><span style="color:var(--ink);">${t.size ? formatBytes(t.size) : ''}</span><span>A game folder on your storage server: streams without installing</span></div>
+          <div class="lib-actions" style="margin-top:10px;">
             <button class="btn btn-sm" onclick="sendToDeckDirect(${Number(t.id)})">Stream to Deck</button>
           </div>
         </div>`).join('');
     }
 
+    // Library games first (streams, then installs), then Steam store titles (info only).
     function searchResultGroup(r) {
-      function searchResultGroup(r) {
-      if (!r) return 'other';
-      if (r.streamable) return 'cloud';
-      return 'install';
+      if (!r) return 'steam';
+      if (r.source === 'library') return r.streamable ? 'cloud' : 'install';
+      return 'steam';
     }
-    const rank = { cloud: 0, streamsoon: 1, install: 2, notyet: 3, other: 4 };
+
+    function orderSearchResults(list) {
+      const rank = { cloud: 0, install: 1, steam: 2 };
       return list.map((r, i) => ({ ...r, _group: searchResultGroup(r), _i: i }))
-        .sort((a, b) => rank[a._group] - rank[b._group]
-          || (a._group === 'notyet' || a._group === 'streamsoon' ? (b.seeders || 0) - (a.seeders || 0) : 0)
-          || a._i - b._i);
+        .sort((a, b) => rank[a._group] - rank[b._group] || a._i - b._i);
     }
 
     function searchGroupHead(list, idx) {
       const g = list[idx] && list[idx]._group;
       if (!g || (idx > 0 && list[idx - 1]._group === g)) return '';
-      const names = { cloud: ['Plays from the cloud', 'Ready in Remote Storage: streams to the Deck, nothing to install'],
-        streamsoon: ['Streams once in Remote Storage', 'Pre-installed releases: Remote Storage fetches them, then they stream; nothing to install'],
-        install: ['Install on the Deck', 'Ready in Remote Storage: repacks, GOG and scene releases install on the Deck once'],
-        
-        notyet: ['Not in Remote Storage yet', 'Remote Storage fetches these first; most seeders on top'],
-        other: ['Other files', 'Disc images and media'] };
+      const names = { cloud: ['Streams from your storage', 'A game folder in your library: plays on the Deck without installing'],
+        install: ['Install on the Deck', 'In your library as an installer or archive: installed on the Deck once'],
+        steam: ['On the Steam store', 'Details only. Add the game folder to your storage server to play it'] };
       const n = list.filter(r => r._group === g).length;
       return `<div class="result-group"><span class="result-group-name">${names[g][0]}</span><span class="lib-group-count">${n}</span><span class="result-group-hint">${names[g][1]}</span></div>`;
     }
@@ -2993,7 +3040,7 @@
     // ==========================================
     // CLASSIFIER: ONLY SHOW PC GAMES
     // ==========================================
-    function isGameTorrent(t) {
+    function isGameItem(t) {
       if (!t) return false;
       const name = (t.name || '').toLowerCase();
       if (/\.(mkv|mp4|avi|mov|ts|m4b|mp3|epub|pdf)$/i.test(name)) return false;
@@ -3011,29 +3058,19 @@
         btn.textContent = state.gamesOnlyFilter ? 'Showing games only' : 'Showing everything';
         btn.setAttribute('aria-pressed', String(state.gamesOnlyFilter));
       }
-      filterLocalTorrents();
+      filterLibrary();
     }
 
     // ==========================================
-    // TORBOX API CLIENT & ROUTING (DEBRID VAULT PARITY)
+    // STORAGE API CLIENT
+    // Every call goes through the same-origin relay (api/storage.js), which forwards to STORAGE_API_URL.
+    // The browser never talks to the storage server directly, so there are no CORS problems and no key in a URL.
     // ==========================================
-    const TORBOX_DIRECT = 'https://api.torbox.app/v1/api';
-    let tbBase = null;
-
-    async function tb(path, opts = {}) {
-      if (!state.torboxKey) throw new Error('Connect Remote Storage in Settings first.');
-      const cleanKey = state.torboxKey.trim();
+    async function storageApi(path, opts = {}) {
+      if (!state.storageKey) throw new Error('Connect Remote Storage in Settings first.');
+      const cleanKey = state.storageKey.trim();
       const pClean = path.replace(/^\/+/, '');
-
-      // Try routes in order of highest reliability:
-      // 1. Same-origin serverless proxy (/api/torbox) - Eliminates Safari CORS / Load failed completely!
-      // 2. Same-origin edge rewrite (/torbox/v1/api)
-      // 3. Direct Remote Storage API
-      const candidates = [
-        `/api/torbox?p=${encodeURIComponent(pClean)}`,
-        `${location.origin}/torbox/v1/api/${pClean}`,
-        `${TORBOX_DIRECT}/${pClean}`
-      ];
+      const candidates = [`/api/storage?p=${encodeURIComponent(pClean)}`];
 
       let r = null, d = null, lastErr = null;
       for (const url of candidates) {
@@ -3050,12 +3087,9 @@
             ...opts,
             headers: reqHeaders
           });
-          // If serverless proxy rejected with 401/403/503 (e.g. missing/wrong queue password or serverless error),
-          // fallback to next candidate instead of falsely claiming Remote Storage rejected the API key!
-          if (url.startsWith('/api/') && (r.status === 401 || r.status === 403 || r.status === 503)) {
-            lastErr = new Error('Serverless proxy requires queue password');
-            r = null;
-            continue;
+          if (r.status === 401 && url.startsWith('/api/')) {
+            const j = await r.clone().json().catch(() => null);
+            if (j && /queue password/i.test(j.error || '')) throw new Error('Your queue password was not accepted. Check it in Settings.');
           }
           d = await r.json().catch(() => null);
           if (d !== null || r.status === 204) break;
@@ -3073,12 +3107,30 @@
       return d.data !== undefined ? d.data : d;
     }
 
+    // What a library game is, judged by its file list (the same rules as api/_plan.js, which has the final say when the
+    // install sheet opens). Only a plain game folder with the game's own .exe streams; installers, archives and disc
+    // images are installed on the Deck first.
+    function classifyItem(item) {
+      const files = item && Array.isArray(item.files)
+        ? item.files.map(f => String((f && (f.name || f.short_name)) || '').toLowerCase()).filter(Boolean) : [];
+      if (!files.length) return { kind: 'unknown', label: 'Checking', streamable: false };
+      const base = (n) => n.split('/').pop();
+      if (files.every(n => /\.(flac|mp3|ogg|wav|m4a|m4b|aac|mkv|mp4|avi|txt|nfo|jpe?g|png|pdf)$/.test(n))) return { kind: 'media', label: 'Not a game', streamable: false };
+      if (files.some(n => /\.(iso|mdf|mds|cue|nrg)$/.test(n))) return { kind: 'disc', label: 'Disc image', streamable: false };
+      const exes = files.filter(n => n.endsWith('.exe'));
+      const helper = (n) => /^(setup|unins|redist|vcredist|dxsetup|dotnet|crashreport|quicksfv)/.test(base(n));
+      if (exes.some(n => !helper(n))) return { kind: 'plain', label: 'Streams', streamable: true };
+      if (files.some(n => /\.(zip|rar|7z|tar|gz|xz)$/.test(n))) return { kind: 'archive', label: 'Archive', streamable: false };
+      if (exes.length) return { kind: 'installer', label: 'Installer', streamable: false };
+      return { kind: 'unknown', label: 'Options', streamable: false };
+    }
+
     function isItemCached(t) {
       if (!t) return false;
       if (t.download_finished === true || t.download_present === true || t.cached === true || t.finished === true) return true;
       if (typeof t.progress === 'number' && (t.progress >= 1 || t.progress === 100)) return true;
       const stateStr = String(t.download_state || '').toLowerCase();
-      if (/completed|cached|downloaded|uploading|seeding/i.test(stateStr)) return true;
+      if (/completed|cached|downloaded|ready/i.test(stateStr)) return true;
       return false;
     }
 
@@ -3091,14 +3143,14 @@
       return /duplicate|already (exists|have|added|in your)/i.test(s);
     }
 
-    async function addTorrent(inputStr) {
+    async function addLibraryFolder(inputStr) {
       const path = String(inputStr || '').trim();
       if (!path) throw new Error('Please enter a game directory or storage path');
       showToast('Mounting ' + path + '…');
       try {
-        const res = await tb('games/mount', { method: 'POST', body: JSON.stringify({ path }) });
+        const res = await storageApi('games/mount', { method: 'POST', body: JSON.stringify({ path }) });
         showToast('Game mounted: ' + path);
-        await loadTorrents(true);
+        await loadLibrary(true);
         return res;
       } catch (err) {
         showToast('Mount failed: ' + err.message);
@@ -3110,16 +3162,16 @@
       const el = document.getElementById('storagePathInput');
       const val = el ? el.value.trim() : '';
       if (!val) return showToast('Please enter a game directory name');
-      addTorrent(val).then(() => { if (el) el.value = ''; }).catch(() => {});
+      addLibraryFolder(val).then(() => { if (el) el.value = ''; }).catch(() => {});
     };
 
-    function startTorrentsPolling(durationSec = 35) {
+    function startLibraryPolling(durationSec = 35) {
       clearInterval(pollInterval);
       let elapsed = 0;
-      loadTorrents(true);
+      loadLibrary(true);
       pollInterval = setInterval(async () => {
         elapsed += 2.5;
-        await loadTorrents(true);
+        await loadLibrary(true);
         if (elapsed >= durationSec) {
           clearInterval(pollInterval);
         }
@@ -3138,31 +3190,31 @@
     }
     // end add box
 
-    async function loadTorrents(bypassCache = true) {
-      if (!state.torboxKey) {
-        document.getElementById('torrentListEmpty').style.display = 'block';
-        document.getElementById('torrentListEmpty').innerHTML = 'Add your Remote Storage API key in <a href="javascript:void(0)" onclick="switchTab(\'settings\')" style="color:var(--accent);">Settings</a>.';
+    async function loadLibrary(bypassCache = true) {
+      if (!state.storageKey) {
+        document.getElementById('libraryListEmpty').style.display = 'block';
+        document.getElementById('libraryListEmpty').innerHTML = 'Add your Remote Storage API key in <a href="javascript:void(0)" onclick="switchTab(\'settings\')" style="color:var(--accent);">Settings</a>.';
         return;
       }
 
-      const loader = document.getElementById('torrentListLoading');
-      const container = document.getElementById('torrentListContainer');
-      const empty = document.getElementById('torrentListEmpty');
+      const loader = document.getElementById('libraryListLoading');
+      const container = document.getElementById('libraryListContainer');
+      const empty = document.getElementById('libraryListEmpty');
 
-      if (!state.torrents || state.torrents.length === 0) {
+      if (!state.libraryItems || state.libraryItems.length === 0) {
         loader.style.display = 'block';
       }
       empty.style.display = 'none';
 
       try {
         const queryParam = bypassCache ? '?bypass_cache=true' : '';
-        const res = await tb('games/mylist' + queryParam);
+        const res = await storageApi('games/mylist' + queryParam);
         const list = Array.isArray(res) ? res : (res && res.data ? res.data : []);
         const allItems = Array.isArray(list) ? list.map(x => ({ ...x, _kind: 'storage' })) : [];
         // Notify if an item transitioned to cached
-        if (state.torrents && state.torrents.length > 0) {
+        if (state.libraryItems && state.libraryItems.length > 0) {
           allItems.forEach(newItem => {
-            const oldItem = state.torrents.find(o => String(o.id) === String(newItem.id));
+            const oldItem = state.libraryItems.find(o => String(o.id) === String(newItem.id));
             if (oldItem && !isItemCached(oldItem) && isItemCached(newItem)) {
               playSuccessChime();
               showToast(`${newItem.name || 'A game'} is ready in Remote Storage`);
@@ -3179,30 +3231,29 @@
         loader.style.display = 'none';
 
         // Retain optimistic temp items that have not yet synced into mylist
-        const pendingOptimistic = (state.torrents || []).filter(t => t._optimistic && !allItems.some(real => (real.name && real.name === t.name) || (real.hash && t.hash && real.hash.toUpperCase() === t.hash.toUpperCase())));
+        const pendingOptimistic = (state.libraryItems || []).filter(t => t._optimistic && !allItems.some(real => (real.name && real.name === t.name) || (real.hash && t.hash && real.hash.toUpperCase() === t.hash.toUpperCase())));
 
-        state.torrents = [...pendingOptimistic, ...allItems];
-        filterLocalTorrents();
+        state.libraryItems = [...pendingOptimistic, ...allItems];
+        filterLibrary();
         renderHomeLibrary();
-        checkPendingStreams(allItems).catch(() => {});
-        settleAddBox(state.torrents.length);
+        settleAddBox(state.libraryItems.length);
       } catch (err) {
         loader.style.display = 'none';
         empty.style.display = 'block';
-        empty.innerHTML = `Couldn't load your Remote Storage library: ${escapeHtml(err.message)}<br><button class="btn btn-sm btn-secondary" style="margin-top:10px;" onclick="loadTorrents(true)">Try again</button>`;
+        empty.innerHTML = `Couldn't load your Remote Storage library: ${escapeHtml(err.message)}<br><button class="btn btn-sm btn-secondary" style="margin-top:10px;" onclick="loadLibrary(true)">Try again</button>`;
       }
     }
 
-    function filterLocalTorrents() {
+    function filterLibrary() {
       const filterText = (document.getElementById('libSearchInput')?.value || '').trim().toLowerCase();
       
-      let baseList = state.torrents || [];
+      let baseList = state.libraryItems || [];
       let nonGameCount = 0;
 
       if (state.gamesOnlyFilter) {
         const gamesList = [];
         baseList.forEach(t => {
-          if (isGameTorrent(t)) {
+          if (isGameItem(t)) {
             gamesList.push(t);
           } else {
             nonGameCount++;
@@ -3229,18 +3280,18 @@
         baseList = baseList.filter(t => (t.name || '').toLowerCase().includes(filterText));
       }
 
-      renderTorrents(baseList);
+      renderLibrary(baseList);
     }
 
-    function setTorrentFilter(filter) {
-      state.torrentFilter = filter;
-      ['all', 'cached', 'downloading', 'switch'].forEach(f => {
+    function setLibraryFilter(filter) {
+      state.libraryFilter = filter;
+      ['all', 'cached', 'downloading'].forEach(f => {
         const btn = document.getElementById('filter-' + f);
         if (btn) {
           btn.className = (f === filter) ? 'btn btn-sm' : 'btn btn-secondary btn-sm';
         }
       });
-      filterLocalTorrents();
+      filterLibrary();
     }
 
     let libraryViewMode = (() => { try { return localStorage.getItem('deck_lib_view') || 'covers'; } catch (_) { return 'covers'; } })();
@@ -3258,13 +3309,13 @@
     function setLibraryViewMode(mode) {
       libraryViewMode = ['covers', 'grid', 'list'].includes(mode) ? mode : 'covers';
       try { localStorage.setItem('deck_lib_view', libraryViewMode); } catch (_) {}
-      filterLocalTorrents();
+      filterLibrary();
     }
 
     function setLibrarySort(sort) {
       state.librarySort = ['recent', 'name', 'size'].includes(sort) ? sort : 'recent';
       try { localStorage.setItem('deck_lib_sort', state.librarySort); } catch (_) {}
-      filterLocalTorrents();
+      filterLibrary();
     }
 
     // One line over the list: how many games, how many play now, and what they take in Remote Storage.
@@ -3287,7 +3338,7 @@
       if (typeof t.progress === 'number') pct = Math.round(t.progress <= 1 && t.progress > 0 ? t.progress * 100 : (t.progress > 1 ? t.progress : (cached ? 100 : 0)));
       pct = Math.max(0, Math.min(100, pct));
       const group = libraryGroupFor(t);
-      const stateWord = t._optimistic === true ? 'Adding' : (!cached ? `Caching ${pct}%` : ({ ready: 'Ready', install: 'Install', switch: 'Switch', other: 'File' })[group] || 'Ready');
+      const stateWord = t._optimistic === true ? 'Adding' : (!cached ? `Caching ${pct}%` : ({ ready: 'Ready', install: 'Install', other: 'File' })[group] || 'Ready');
       return `
         <button type="button" class="lib-cover" data-state="${cached ? group : 'caching'}" onclick="openLibraryGame('${jsArg(String(t.id))}')" aria-label="${escapeHtml(name)}, ${escapeHtml(stateWord)}">
           <span class="lib-cover-art">
@@ -3307,12 +3358,10 @@
 
     function libraryGroupFor(t) {
       if (!isItemCached(t)) return 'caching';
-      // 'Ready to play' means it STREAMS: only pre-installed releases (or the planner's 'plain'+'stream'). Cached in Remote Storage
-      // is not enough: repacks, GOG, scene releases and anything unrecognised go to 'Needs installing' (AGENTS.md §0).
-      const rel = typeof classifyItem === 'function' ? classifyItem(t) : classifyReleaseTitle(t.name || '');
+      // 'Ready to play' means it STREAMS: a plain game folder with its .exe. Installers (for example GOG offline installers),
+      // archives and anything unrecognised go to 'Needs installing'.
+      const rel = classifyItem(t);
       const kind = rel.kind;
-      const switchFiles = Array.isArray(t.files) && t.files.some(f => /\.(nsp|xci|nsz|xcz)$/i.test((f && (f.name || f.short_name)) || ''));
-      if (kind === 'switch' || switchFiles) return 'switch';
       const files = Array.isArray(t.files) ? t.files.map(f => (f && (f.name || f.short_name)) || '') : [];
       const mediaOnly = files.length > 0 && files.every(n => /\.(flac|mp3|ogg|wav|m4a|m4b|aac|mkv|mp4|avi|txt|nfo|jpg|png|pdf)$/i.test(n));
       if (kind === 'disc' || kind === 'media' || mediaOnly) return 'other';
@@ -3324,15 +3373,14 @@
       try { folded = JSON.parse(localStorage.getItem('deck_lib_folded') || '[]'); } catch (_) {}
       folded = folded.includes(key) ? folded.filter(k => k !== key) : folded.concat(key);
       try { localStorage.setItem('deck_lib_folded', JSON.stringify(folded)); } catch (_) {}
-      if (!skipRender && typeof filterLocalTorrents === 'function') filterLocalTorrents();
+      if (!skipRender && typeof filterLibrary === 'function') filterLibrary();
     }
 
     function libraryGroupsHtml(list, card) {
       const LIBRARY_GROUPS = [
         { key: 'ready', name: 'Ready to play', hint: 'Pre-installed: streams to the Deck' },
-        { key: 'install', name: 'Needs installing', hint: 'Repacks, GOG and scene releases: installed on the Deck once' },
-        { key: 'verified', name: 'Verified', hint: 'Deck Verified' },
-        { key: 'caching', name: 'Still caching', hint: 'Remote Storage is still fetching these' },
+        { key: 'install', name: 'Needs installing', hint: 'Installers and archives: installed on the Deck once' },
+                { key: 'caching', name: 'Still caching', hint: 'Remote Storage is still fetching these' },
         { key: 'other', name: 'Other files', hint: 'Disc images, media and the rest' },
       ];
       let folded = [];
@@ -3341,7 +3389,7 @@
       const order = state.librarySort === 'name' ? (a, b) => String(a.name || '').localeCompare(String(b.name || ''), undefined, { sensitivity: 'base', numeric: true })
         : state.librarySort === 'size' ? (a, b) => (Number(b.size) || 0) - (Number(a.size) || 0)
         : (a, b) => when(b) - when(a);
-      if (state.torrentFilter !== 'all' || state.libraryQuery) return list.slice().sort(order).map(card).join('');
+      if (state.libraryFilter !== 'all' || state.libraryQuery) return list.slice().sort(order).map(card).join('');
       const buckets = {};
       for (const t of list) (buckets[libraryGroupFor(t)] = buckets[libraryGroupFor(t)] || []).push(t);
       return LIBRARY_GROUPS.filter(g => buckets[g.key] && buckets[g.key].length).map(g => {
@@ -3359,26 +3407,17 @@
       }).join('');
     }
 
-    function renderTorrents(list) {
+    function renderLibrary(list) {
       try { renderStreamableShelf(); } catch (e) {}   // the Discover shelf follows the library
       let filtered = list || [];
-      if (state.torrentFilter === 'cached') {
+      if (state.libraryFilter === 'cached') {
         filtered = filtered.filter(t => isItemCached(t));
-      } else if (state.torrentFilter === 'downloading') {
+      } else if (state.libraryFilter === 'downloading') {
         filtered = filtered.filter(t => !isItemCached(t));
-      } else if (state.torrentFilter === 'switch') {
-        filtered = filtered.filter(t => {
-          const rel = classifyReleaseTitle(t.name || '');
-          if (rel.kind === 'switch') return true;
-          if (t.files && Array.isArray(t.files)) {
-            return t.files.some(f => /\.(nsp|xci|nsz|xcz)$/i.test(f.name || f.short_name || ''));
-          }
-          return false;
-        });
       }
 
-      const container = document.getElementById('torrentListContainer');
-      const empty = document.getElementById('torrentListEmpty');
+      const container = document.getElementById('libraryListContainer');
+      const empty = document.getElementById('libraryListEmpty');
       const countBadge = document.getElementById('libCountBadge');
       if (countBadge) countBadge.textContent = filtered.length;
       syncLibraryControls();
@@ -3426,10 +3465,6 @@
               primaryBtnLabel = 'Stream to Deck';
               primaryBtnClass = 'btn btn-sm';
               primaryBtnAction = `sendToDeckDirect(${t.id})`;
-            } else if (relType.kind === 'switch') {
-              primaryBtnLabel = 'Stream to Deck';
-              primaryBtnClass = 'btn btn-sm';
-              primaryBtnAction = `sendToDeckDirect(${t.id})`;
             } else {
               primaryBtnLabel = 'Install to Deck';
               primaryBtnClass = 'btn btn-sm';
@@ -3440,7 +3475,7 @@
           return `
             <div class="lib-game-card ${isOptimistic ? 'shimmer-card' : ''}">
               <div class="lib-card-hero">
-                <img src="${heroArt}" data-art-norm="${normTitle(t.name)}" data-art-format="hero" data-gamename="${escapeHtml(displayGameName(t.name))}" alt="${escapeHtml(t.name || 'Game')}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=getDynamicGamePlaceholder(this.dataset.gamename || 'Game', 'hero')">
+                <img src="${findMatchingHeroArt(t.name)}" data-art-norm="${normTitle(t.name)}" data-art-format="hero" data-gamename="${escapeHtml(displayGameName(t.name))}" alt="${escapeHtml(t.name || 'Game')}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=getDynamicGamePlaceholder(this.dataset.gamename || 'Game', 'hero')">
                 <div class="lib-card-hero-overlay"></div>
                 <span class="badge ${badgeClass} lib-card-badge">${badgeText}</span>
               </div>
@@ -3459,20 +3494,19 @@
                     <div style="width:${isOptimistic ? 50 : pct}%; background:var(--busy); height:100%; transition:width 0.3s ease;"></div>
                   </div>
                 ` : ''}
-                <div class="torrent-actions" style="margin-top: 8px;">
+                <div class="lib-actions" style="margin-top: 8px;">
                   ${isCached ? `
                     <div style="display:flex; gap:6px; width:100%;">
                       <button class="${primaryBtnClass}" style="flex:1;" onclick="${primaryBtnAction}">
                         ${primaryBtnLabel}
                       </button>
                       <button class="btn btn-secondary btn-sm" title="Install options" aria-label="Install options" style="padding:6px 11px;" onclick="openInstallModal(${t.id})"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></button>
-                      <button class="btn btn-secondary btn-sm" title="Copy direct download link" aria-label="Copy direct download link" style="padding:6px 11px;" onclick="copyTorrentDirectLink(${t.id}, '${t._kind || 'torrent'}')"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1"/><path d="M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1"/></svg></button>
                     </div>
                   ` : `
-                    <button class="btn btn-secondary btn-sm btn-full" onclick="showToast('Remote Storage is syncing this game.')">
-                      Syncing · ${pct}%
+                    <button class="btn btn-secondary btn-sm btn-full" onclick="streamWhenReady(${JSON.stringify(t.id).replace(/"/g, '&quot;')})">
+                      Stream when ready
                     </button>
-                    <button class="btn btn-secondary btn-sm btn-full" onclick="loadTorrents(true)">
+                    <button class="btn btn-secondary btn-sm btn-full" onclick="loadLibrary(true)">
                       Check again
                     </button>
                   `}
@@ -3512,16 +3546,12 @@
           badgeText = relType.label;
           if (relType.streamable) {
             statusDesc = 'Ready to stream. Launches directly on the Deck with 0 GB disk usage.';
-          } else if (relType.kind === 'repack') {
-            statusDesc = 'A repack. The Deck installs it to the microSD card or internal drive.';
-          } else if (relType.kind === 'switch') {
-            statusDesc = 'Ready to stream to Steam Deck via Proton.';
+          } else if (relType.kind === 'installer' || relType.kind === 'archive') {
+            statusDesc = 'An installer or archive. The Deck installs it to the microSD card or internal drive.';
           } else if (relType.kind === 'disc') {
             statusDesc = 'A disc image (.iso). It needs mounting or extracting before you can play.';
           } else if (relType.kind === 'media') {
             statusDesc = 'Music or video, not a game.';
-          } else if (false) {
-            statusDesc = 'Unpacked in the cloud. It streams to the Deck without a download.';
           } else {
             statusDesc = 'Ready. Install it to the Deck.';
           }
@@ -3532,15 +3562,11 @@
         } else if (isError) {
           badgeClass = 'badge-red';
           badgeText = 'Failed';
-          statusDesc = escapeHtml(t.error || t.detail || 'Remote Storage could not download this. Remove it and try another release.');
-        } else if (isMeta) {
+          statusDesc = escapeHtml(t.error || t.detail || 'Your storage server reported an error for this game.');
+        } else if (isMeta || isStalled) {
           badgeClass = 'badge-yellow';
-          badgeText = 'Finding peers';
-          statusDesc = `Getting the file list (${t.seeds || t.seeders || 0} seeds so far)`;
-        } else if (isStalled) {
-          badgeClass = 'badge-yellow';
-          badgeText = `Stalled · ${pct}%`;
-          statusDesc = 'Nobody is sharing it right now. It continues when a seed appears.';
+          badgeText = isStalled ? `Paused · ${pct}%` : 'Preparing';
+          statusDesc = 'Your storage server is still preparing this game.';
         } else {
           const speedStr = t.download_speed ? formatBytes(t.download_speed) + '/s' : '';
           const etaStr = t.eta ? ` · about ${Math.max(1, Math.round(t.eta / 60))} min left` : '';
@@ -3557,10 +3583,6 @@
             primaryBtnLabel = 'Stream to Deck';
             primaryBtnClass = 'btn btn-sm';
             primaryBtnAction = `sendToDeckDirect(${t.id})`;
-          } else if (relType.kind === 'switch') {
-            primaryBtnLabel = 'Stream to Deck';
-            primaryBtnClass = 'btn btn-sm';
-            primaryBtnAction = `sendToDeckDirect(${t.id})`;
           } else {
             primaryBtnLabel = 'Install to Deck';
             primaryBtnClass = 'btn btn-sm';
@@ -3572,18 +3594,18 @@
         const capsuleArt = resolveGameArt(t.name, 'capsule');
 
         return `
-          <div class="torrent-item ${isOptimistic ? 'shimmer-card' : ''}">
+          <div class="lib-item ${isOptimistic ? 'shimmer-card' : ''}">
             <div style="display:flex; gap:12px; align-items:flex-start;">
               <img src="${capsuleArt}" data-art-norm="${normTitle(t.name)}" data-art-format="capsule" data-gamename="${escapeHtml(cleanName)}" alt="${escapeHtml(cleanName)}" style="width:48px; height:72px; object-fit:cover; border-radius:6px; flex-shrink:0; background:var(--graphite); border:1px solid var(--seam);" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=getDynamicGamePlaceholder(this.dataset.gamename || 'Game', 'capsule')">
               <div style="flex:1; min-width:0;">
-                <div class="torrent-header">
+                <div class="lib-header">
                   <div>
-                    <div class="torrent-title">${escapeHtml(cleanName)}</div>
+                    <div class="lib-title">${escapeHtml(cleanName)}</div>
                     <div style="font-size:0.8rem; color:var(--faint); overflow-wrap:anywhere; margin-top:2px;">${escapeHtml(t.name || '')}</div>
                   </div>
                   <span class="badge ${badgeClass}">${badgeText}</span>
                 </div>
-                <div class="torrent-meta">
+                <div class="lib-meta">
                   <span style="color:var(--ink);">${formatBytes(t.size)}</span>
                   <span>Remote VFS</span>
                   <span>${(t.files && t.files.length) || 1} files</span>
@@ -3596,18 +3618,17 @@
                 <div style="width:${isOptimistic ? 50 : pct}%; background:var(--busy); height:100%; transition:width 0.3s ease;"></div>
               </div>
             ` : ''}
-            <div class="torrent-actions" style="margin-top:8px;">
+            <div class="lib-actions" style="margin-top:8px;">
               ${isCached ? `
                 <button class="${primaryBtnClass}" onclick="${primaryBtnAction}">
                   ${primaryBtnLabel}
                 </button>
                 <button class="btn btn-secondary btn-sm" title="Install options" aria-label="Install options" style="padding:6px 11px;" onclick="openInstallModal(${t.id})"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></button>
-                <button class="btn btn-secondary btn-sm" title="Copy direct download link" aria-label="Copy direct download link" style="padding:6px 11px;" onclick="copyTorrentDirectLink(${t.id}, '${t._kind || 'torrent'}')"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1"/><path d="M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1"/></svg></button>
               ` : `
-                <button class="btn btn-secondary btn-sm" onclick="showToast('Remote Storage is syncing this game.')">
-                  Syncing · ${pct}%
+                <button class="btn btn-secondary btn-sm" onclick="streamWhenReady(${JSON.stringify(t.id).replace(/"/g, '&quot;')})">
+                  Stream when ready
                 </button>
-                <button class="btn btn-secondary btn-sm" onclick="loadTorrents(true)">
+                <button class="btn btn-secondary btn-sm" onclick="loadLibrary(true)">
                   Check again
                 </button>
               `}
@@ -3617,12 +3638,11 @@
       });
     }
 
-    async function copyTorrentDirectLink() {}
     
     async function addSearchResultDirect(title) {
       showToast('Adding ' + title + ' to library…');
       try {
-        await addTorrent(title);
+        await addLibraryFolder(title);
         showToast('Added ' + title);
       } catch (err) {
         showToast('Error: ' + err.message);
@@ -3630,9 +3650,10 @@
     }
 
     let searchSource = 'all';
+    let searchSeq = 0;
     function setSearchSource(src) {
       searchSource = src;
-      ['all', 'directstream', 'verified', 'action', 'indie'].forEach(s => {
+      ['all', 'directstream'].forEach(s => {
         const btn = document.getElementById('src-' + s);
         if (btn) btn.className = (s === src) ? 'btn btn-sm' : 'btn btn-secondary btn-sm';
       });
@@ -3648,13 +3669,13 @@
         title: r.title.trim(),
         size: Number(r.size) || 0,
         cached: r.cached === true,
-        streamable: r.streamable === true || r.cachedLayout === 'folder'
+        streamable: r.source === 'library' && r.streamable === true
       }));
     }
 
     function searchRequestHeaders() {
       const headers = {};
-      const tok = state.torboxKey ? state.torboxKey.trim() : '';
+      const tok = state.storageKey ? state.storageKey.trim() : '';
       if (tok) headers['authorization'] = `Bearer ${tok}`;
       if (state.queueSecret) headers['x-deckstream-secret'] = state.queueSecret.trim();
       return headers;
@@ -3663,8 +3684,14 @@
     function searchResultCardHtml(r, idx, idPrefix = '') {
       const properName = escapeHtml(displayGameName(r.title));
       const itemArt = resolveGameArt(r.title, 'capsule');
-      const isSteam = r.source === 'steam' || Boolean(r.appId);
-      const badge = isSteam ? '<span class="badge badge-blue">Steam Storefront</span>' : '<span class="badge badge-green">⚡ Streamable VFS</span>';
+      const isLib = r.source === 'library';
+      const badge = !isLib ? '<span class="badge badge-blue">Steam store</span>'
+        : r.streamable ? '<span class="badge badge-green">⚡ Streams</span>'
+        : `<span class="badge badge-yellow">${r.cached ? 'Install first' : 'Still preparing'}</span>`;
+      const libId = isLib ? JSON.stringify(r.id).replace(/"/g, '&quot;') : '';
+      const action = !isLib ? ''
+        : r.streamable ? `<button class="btn btn-sm" onclick="sendToDeckDirect(${libId})">Stream to Deck</button>`
+        : `<button class="btn btn-sm" onclick="openInstallModal(${libId})">Install to Deck</button>`;
 
       return `
         <div class="game-item">
@@ -3673,13 +3700,14 @@
             <div style="flex:1; min-width:0;">
               <div class="game-header">
                 <div class="game-title" style="font-size:1.05rem; font-weight:600; line-height:1.2;">
-                  <span onclick="openGamePage({ title: '${jsArg(properName)}', appId: ${Number(r.appId) || 0} })" style="cursor:pointer;" class="hover-underline">${properName}</span>
+                  <span onclick="openGamePage({ title: decodeURIComponent('${jsArg(properName)}'), appId: ${Number(r.appId) || 0} })" style="cursor:pointer;" class="hover-underline">${properName}</span>
                 </div>
               </div>
               <div style="margin:4px 0 6px;">${badge}</div>
               <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-                <button class="btn btn-sm" onclick="openGamePage({ title: '${jsArg(properName)}', appId: ${Number(r.appId) || 0} })">
-                  <span>View Details</span>
+                ${action}
+                <button class="btn btn-sm ${isLib ? 'btn-secondary' : ''}" onclick="openGamePage({ title: decodeURIComponent('${jsArg(properName)}'), appId: ${Number(r.appId) || 0} })">
+                  <span>Details</span>
                 </button>
               </div>
             </div>
@@ -3708,14 +3736,17 @@
       if (container) container.innerHTML = '';
 
       try {
-        const res = await fetch(`/api/search?q=${encodeURIComponent(q)}&source=${encodeURIComponent(searchSource)}`, {
+        if (state.storageKey && !(state.libraryItems || []).length) await loadLibrary(true).catch(() => {});
+        const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`, {
           headers: searchRequestHeaders()
         });
         if (seq !== searchSeq) return;
         if (loader) loader.style.display = 'none';
         if (!res.ok) throw new Error(`Search failed: HTTP ${res.status}`);
         const list = await res.json();
-        const results = normalizeSearchResults(list);
+        let results = orderSearchResults(normalizeSearchResults(list));
+        if (searchSource === 'directstream') results = results.filter(r => r.source === 'library' && r.streamable);
+        rememberSearch(q);
         if (countBadge) countBadge.textContent = results.length;
         if (!results.length) {
           if (empty) {
@@ -3725,7 +3756,7 @@
           return;
         }
         if (container) {
-          container.innerHTML = results.map((r, i) => searchResultCardHtml(r, i)).join('');
+          container.innerHTML = results.map((r, i) => searchGroupHead(results, i) + searchResultCardHtml(r, i)).join('');
         }
       } catch (err) {
         if (loader) loader.style.display = 'none';
@@ -3778,35 +3809,35 @@
     // ==========================================
     // STEAM DECK INSTALL MODAL & QUEUE
     // ==========================================
-    async function openInstallModal(torrentId) {
-      const torrent = state.torrents.find(t => t.id === torrentId);
-      if (!torrent) return;
+    async function openInstallModal(storageId) {
+      const libItem = state.libraryItems.find(t => t.id === storageId);
+      if (!libItem) return;
 
-      const isCached = isItemCached(torrent);
+      const isCached = isItemCached(libItem);
       if (!isCached) {
-        const pct = Math.round((torrent.progress || 0) * 100);
+        const pct = Math.round((libItem.progress || 0) * 100);
         showToast(`Remote Storage is still caching this (${pct}%). Send it once it reaches 100%.`);
         return;
       }
 
-      state.currentJobModal = torrent;
+      state.currentJobModal = libItem;
       state.selectedArtwork = null;
       state.modalPlan = null;
 
-      document.getElementById('modalGameTitle').textContent = torrent.name;
-      document.getElementById('modalGameSize').textContent = `Size: ${formatBytes(torrent.size)}`;
+      document.getElementById('modalGameTitle').textContent = libItem.name;
+      document.getElementById('modalGameSize').textContent = `Size: ${formatBytes(libItem.size)}`;
       const sel = document.getElementById('modalTargetDir');
       sel.value = 'cloudinstall';
       Array.from(sel.options).forEach(o => { o.disabled = false; });
       setConfirmEnabled(true);
       updateInstallButton();
-      loadPlanForModal(torrent);
+      loadPlanForModal(libItem);
 
       const artGrid = document.getElementById('modalArtGrid');
       artGrid.innerHTML = '<div style="grid-column: span 3; font-size:0.8rem; color:var(--text-muted); text-align:center;">Fetching SteamGridDB artwork...</div>';
       document.getElementById('installModal').classList.add('open');
 
-      fetchArtworkForModal(cleanGameName(torrent.name));
+      fetchArtworkForModal(cleanGameName(libItem.name));
     }
 
     function closeInstallModal() {
@@ -3919,7 +3950,7 @@
             context: {
               currentTab: state.currentTab || 'discover',
               query: document.getElementById('gameSearchInput')?.value || '',
-              libraryCount: (state.torrents || []).length,
+              libraryCount: (state.libraryItems || []).length,
               ...libraryStreamLists()
             }
           }),
@@ -3983,8 +4014,7 @@
     function updateInstallButton() {
       const v = document.getElementById('modalTargetDir').value;
       const btn = document.getElementById('modalConfirmBtn');
-      const isSwitch = state.modalPlan && state.modalPlan.kind === 'switch';
-      if (btn) btn.textContent = isSwitch ? 'Stream to Deck' : (MODE_BUTTON_LABELS[v] || 'Send to Deck');
+      if (btn) btn.textContent = MODE_BUTTON_LABELS[v] || 'Send to Deck';
     }
 
     function setConfirmEnabled(on) {
@@ -3996,44 +4026,40 @@
     }
 
     // Headers for /api/queue. The Remote Storage key lets the SERVER work out what a release is when the page could not (the server refuses
-    // stream jobs it cannot classify); the page used to send neither the key nor the torrent id.
+    // stream jobs it cannot classify); the page used to send neither the key nor the libItem id.
     function queueHeaders() {
       const h = { 'content-type': 'application/json' };
-      if (state.torboxKey) h['authorization'] = 'Bearer ' + state.torboxKey.trim();
+      if (state.storageKey) h['authorization'] = 'Bearer ' + state.storageKey.trim();
       if (state.queueSecret) h['x-deckstream-secret'] = state.queueSecret.trim();
       return h;
     }
     // The server's wording for "no plan" is for developers; say what the person can do.
     function friendlyQueueError(msg) {
       const m = String(msg || '');
-      if (/launch plan/i.test(m)) return "Couldn't check what this release is yet. Open Install Options, or try again in a moment.";
+      if (/launch plan/i.test(m)) return "Couldn't check what this game is yet. Open Install Options, or try again in a moment.";
       return m;
     }
 
-    // `modalBound` (default true): the Install Options sheet asks about ITS torrent, so a lookup that outlives its sheet is dropped.
+    // `modalBound` (default true): the Install Options sheet asks about ITS libItem, so a lookup that outlives its sheet is dropped.
     // The one-tap paths (Library 'Send to Deck', Search 'Instant Stream') have no sheet open and pass { modalBound: false };
     // before this option they got null without a single /api/plan request, and since the server began refusing plan-less
     // stream jobs every one-tap send failed.
-    async function fetchPlan(torrent, { modalBound = true } = {}) {
-      if (!torrent) return null;
-      const param = false ? `game_id=${encodeURIComponent(torrent.id)}`
-        : torrent._kind === 'webdl' ? `webdl_id=${encodeURIComponent(torrent.id)}`
-        : `torrent_id=${encodeURIComponent(torrent.id)}`;
-      // Adopt OpenGameInstaller's resilient 8-try 2.5s polling loop when Remote Storage is still indexing (HTTP 404)
+    async function fetchPlan(libItem, { modalBound = true } = {}) {
+      if (!libItem) return null;
+      const param = `game_id=${encodeURIComponent(libItem.id)}`;
+      // The storage server may still be indexing a new folder (HTTP 404): try a few times.
       const PLAN_TRIES = 8;
       const PLAN_WAIT_MS = 2500;
       const box = document.getElementById('modalPlanBox');
       for (let i = 0; i < PLAN_TRIES; i++) {
-        if (modalBound && state.currentJobModal !== torrent) return null;
+        if (modalBound && state.currentJobModal !== libItem) return null;
         if (i > 0) {
-          if (box && modalBound) box.innerHTML = `Checking what this release is (indexing files in Remote Storage, attempt ${i + 1}/${PLAN_TRIES})…`;
+          if (box && modalBound) box.innerHTML = `Checking what this game is (indexing files in Remote Storage, attempt ${i + 1}/${PLAN_TRIES})…`;
           await new Promise(r => setTimeout(r, PLAN_WAIT_MS));
-          if (modalBound && state.currentJobModal !== torrent) return null;
+          if (modalBound && state.currentJobModal !== libItem) return null;
         }
         try {
-          const pr = await fetch(`/api/plan?${param}`, {
-            headers: { 'Authorization': 'Bearer ' + (state.torboxKey || '').trim() }
-          });
+          const pr = await fetch(`/api/plan?${param}`, { headers: queueHeaders() });
           if (pr.ok) {
             const data = await pr.json();
             if (data.plan) return data.plan;
@@ -4046,15 +4072,15 @@
 
     // Fetch the plan as soon as the sheet opens: pre-select the recommended mode, explain why, grey out what cannot work,
     // and block releases that must not be run. Previously this only happened after tapping Start.
-    async function loadPlanForModal(torrent) {
+    async function loadPlanForModal(libItem) {
       const box = document.getElementById('modalPlanBox');
       const sel = document.getElementById('modalTargetDir');
-      const plan = await fetchPlan(torrent);
-      if (state.currentJobModal !== torrent) return;          // the sheet was closed or another game opened
+      const plan = await fetchPlan(libItem);
+      if (state.currentJobModal !== libItem) return;          // the sheet was closed or another game opened
       state.modalPlan = plan;
       if (!plan) {
         box.style.color = 'var(--text-muted)';
-        box.innerHTML = 'Could not check this release automatically. <b>Install</b> works for every kind of release; <b>Stream</b> only for ready-to-play folders.';
+        box.innerHTML = 'Could not check this game automatically. <b>Install</b> works for every kind of game; <b>Stream</b> only for ready-to-play folders.';
         return;
       }
       const fitText = { good: '<span style="color:var(--ready);">Streams well</span>', fair: '<span style="color:var(--busy);">Streams, with a slow first launch</span>', poor: '<span style="color:var(--busy);">Streams, with a long first launch</span>' }[plan.streamFit] || '';
@@ -4081,14 +4107,8 @@
       const streamOpt = Array.from(sel.options).find(o => o.value === 'stream');
       if (streamOpt) streamOpt.disabled = plan.kind !== 'plain';
       const sdOpt = Array.from(sel.options).find(o => o.value === 'sd');
-      if (sdOpt) {
-        sdOpt.textContent = plan.kind === 'switch'
-          ? 'Stream to Deck on the microSD card'
-          : 'Download to the microSD card';
-      }
-      if (plan.kind === 'switch') {
-        sel.value = 'sd';
-      } else if (plan.recommendation === 'stream' || plan.recommendation === 'cloudinstall') {
+      if (sdOpt) sdOpt.textContent = 'Download to the microSD card';
+      if (plan.recommendation === 'stream' || plan.recommendation === 'cloudinstall') {
         sel.value = plan.recommendation;
       }
       if (blocked) {
@@ -4099,37 +4119,41 @@
       updateInstallButton();
     }
 
-    // Remote Storage's WebDAV shows each torrent under the root folder INSIDE the torrent, which can differ from the
-// torrent's display name (e.g. name "Cyberpunk 2077 [v 1.03] (2020) PC | GOG-Rip", folder
-// "Cyberpunk.2077.GOG.Rip-InsaneRamZes"). Stream and cloud-install mount that folder, so use the real one.
-// Remote Storage's WebDAV names a folder after the first folder in a torrent's file paths, so two library items with the same top
-// folder share ONE folder there. If they hold the same file names with different sizes (two versions of a game), a stream
-// mixes them (18 Oct: Spider-Man Remastered, InsaneRamZes + a rutor copy, c000007b at start). Returns the other item's
-// name, or ''.
-function mergedFolderClash(torrent, library) {
+    // WebDAV serves each game under its top folder. Two library games whose files share one top folder (two versions of
+    // the same game) would be mixed by a stream, so that is refused. Returns the other game's name, or ''.
+function mergedFolderClash(libItem, library) {
   const top = (f) => String((f && (f.name || f.short_name)) || '').split('/')[0];
-  const files = (torrent && torrent.files) || [];
+  const files = (libItem && libItem.files) || [];
   const mine = top(files[0]);
   if (!mine || !files.every(f => top(f) === mine)) return '';
   const sizes = new Map(files.map(f => [String(f.name || ''), Number(f.size) || 0]));
   for (const other of library || []) {
-    if (!other || String(other.id) === String(torrent.id) || !Array.isArray(other.files) || !other.files.length) continue;
+    if (!other || String(other.id) === String(libItem.id) || !Array.isArray(other.files) || !other.files.length) continue;
     if (top(other.files[0]) !== mine) continue;
     if (other.files.some(f => sizes.has(String(f.name || '')) && sizes.get(String(f.name || '')) !== (Number(f.size) || 0))) {
-      return String(other.name || 'another release');
+      return String(other.name || 'another game');
     }
   }
   return '';
 }
 
-function webdavFolderFor(torrent, plan) {
+function webdavFolderFor(libItem, plan) {
   if (plan && plan.webdavFolder) return String(plan.webdavFolder);
-  const names = (torrent.files || []).map(f => String(f.name || ''));
+  const names = (libItem.files || []).map(f => String(f.name || ''));
   const top = names.length ? names[0].split('/')[0] : '';
   if (top && names.every(n => n.includes('/') && n.split('/')[0] === top)) return top;
-  return String(torrent.name || '');
+  return String(libItem.name || '');
 }
 
+
+    // A direct link for Download mode, from the storage server (games/requestdl). '' when it has none: streams and
+    // installs read the game over WebDAV and need no link.
+    async function requestDownloadLink(libItem) {
+      try {
+        const d = await storageApi(`games/requestdl?id=${encodeURIComponent(libItem.id)}`);
+        return typeof d === 'string' ? d : (d && typeof d.url === 'string' ? d.url : '');
+      } catch (e) { return ''; }
+    }
 
     async function fetchArtworkForModal(cleanName) {
       const artGrid = document.getElementById('modalArtGrid');
@@ -4175,28 +4199,26 @@ function webdavFolderFor(torrent, plan) {
     }
 
     async function confirmEnqueue() {
-      const torrent = state.currentJobModal;
-      if (!torrent) return;
+      const libItem = state.currentJobModal;
+      if (!libItem) return;
 
-      const isReady = isItemCached(torrent);
-      if (!isReady) {
-        const pct = Math.round((torrent.progress || 0) * 100);
-        showToast(`Game is still caching in Remote Storage (${pct}%). Please wait for completion.`);
+      if (!isItemCached(libItem)) {
+        const pct = Math.round((libItem.progress || 0) * 100);
+        showToast(`Your storage server is still preparing this (${pct}%). Send it once it is ready.`);
         return;
       }
 
-      const isWeb = torrent._kind === 'webdl';
       let targetDirVal = document.getElementById('modalTargetDir').value;
 
       // Server-side launch plan: what this release is, whether it can stream, which exe to run. Usually already loaded
       // when the sheet opened; checked BEFORE the slow download-link step so a refusal is instant.
-      let plan = state.modalPlan || await fetchPlan(torrent);
+      let plan = state.modalPlan || await fetchPlan(libItem);
       if (plan) {
         if (plan.kind === 'suspicious') { showToast(plan.reason); return; }
         if (plan.recommendation === 'unsupported') { showToast(plan.reason); return; }
         if (targetDirVal === 'stream' && plan.kind !== 'plain') { showToast(plan.reason); return; }
         if (targetDirVal === 'stream') {
-          const clash = mergedFolderClash(torrent, state.torrents);
+          const clash = mergedFolderClash(libItem, state.libraryItems);
           if (clash) { showToast(`Remote Storage keeps this and "${clash}" in one folder with different files, so streaming would mix them. Remove one of them in Remote Storage, then send again.`); return; }
         }
         if (targetDirVal === 'stream' && plan.streamFit === 'poor') {
@@ -4209,68 +4231,16 @@ function webdavFolderFor(torrent, plan) {
       showToast('Preparing the Remote Storage link…');
 
       try {
-        const token = state.torboxKey.trim();
-        let downloadUrl = null;
+        const downloadUrl = await requestDownloadLink(libItem);
 
-        
-        let targetRom = null;
-        if (!isWeb && torrent.files && torrent.files.length > 0) {
-          targetRom = torrent.files.find(f => /\.(nsp|xci|nsz|xcz)$/i.test(f.name || f.short_name || ''));
-        }
-
-        // 1. If this is a Switch game with a ROM file, request that specific ROM file directly!
-        // Remote Storage's zip generator fails on large multi-file releases (returning 0-byte placeholders).
-        if (targetRom) {
-          try {
-            const ep = `/games/requestdl?id=${encodeURIComponent(torrent.id)}&file_id=${encodeURIComponent(targetRom.id)}&redirect=false`;
-            const dlData = await tb(ep);
-            if (dlData && typeof dlData === 'string') downloadUrl = dlData;
-            else if (dlData && dlData.data && typeof dlData.data === 'string') downloadUrl = dlData.data;
-          } catch (e) {}
-        }
-
-        // 2. Try requesting JSON download link via tb() proxy
-        if (!downloadUrl) {
-          try {
-            const ep = isWeb 
-              ? `/webdl/requestdl?web_id=${encodeURIComponent(torrent.id)}&redirect=false`
-              : `/games/requestdl?id=${encodeURIComponent(torrent.id)}&zip=true&redirect=false`;
-            const dlData = await tb(ep);
-            if (dlData && typeof dlData === 'string') downloadUrl = dlData;
-            else if (dlData && dlData.data && typeof dlData.data === 'string') downloadUrl = dlData.data;
-          } catch (e) {}
-        }
-
-        // 3. If zip failed or multiple files, try main file_id
-        if (!downloadUrl && !isWeb && torrent.files && torrent.files.length > 0) {
-          try {
-            const sortedFiles = [...torrent.files].sort((a,b) => (b.size || 0) - (a.size || 0));
-            const mainFile = sortedFiles[0];
-            const ep = `/games/requestdl?id=${encodeURIComponent(torrent.id)}&file_id=${encodeURIComponent(mainFile.id)}&redirect=false`;
-            const dlData = await tb(ep);
-            if (dlData && typeof dlData === 'string') downloadUrl = dlData;
-            else if (dlData && dlData.data && typeof dlData.data === 'string') downloadUrl = dlData.data;
-          } catch (e) {}
-        }
-
-        // 4. No link resolved. Never build a fallback URL with the Remote Storage token in it: the job is stored in the queue and sent to the Deck.
-        // Streams and cloud installs read through WebDAV and need no link; a plain download without one is refused below.
-        if (!downloadUrl) downloadUrl = '';
-
-
-        const fileNames = (torrent.files || []).map(f => String(f.short_name || f.name || '').toLowerCase());
-        const isRepack = false;
+        const fileNames = (libItem.files || []).map(f => String(f.short_name || f.name || '').toLowerCase());
         const hasExe = fileNames.some(n => n.endsWith('.exe') && !/setup|unins|redist|quicksfv/.test(n));
         const isArchive = fileNames.length > 0 && !hasExe && fileNames.some(n => /\.(zip|rar|7z|r\d\d)$/.test(n));
 
-        const streamBlock = targetDirVal === 'stream' ? streamBlockReason(fileNames, isRepack, isArchive) : '';
+        const streamBlock = targetDirVal === 'stream' ? streamBlockReason(fileNames, isArchive) : '';
         if (streamBlock) {
           showToast(streamBlock);
           return;
-        }
-        if ((targetDirVal === 'sd' || targetDirVal === 'internal') && isRepack) {
-          targetDirVal = 'cloudinstall';
-          showToast('Repack detected — switching to Install from Remote Storage → MicroSD');
         }
 
         const mode = targetDirVal === 'stream' ? 'stream' : targetDirVal === 'cloudinstall' ? 'cloudinstall' : 'download';
@@ -4282,16 +4252,15 @@ function webdavFolderFor(torrent, plan) {
           headers: queueHeaders(),
           body: JSON.stringify({
             action: 'enqueue',
-            torrentId: torrent.id,
+            storageId: libItem.id,
             plan: plan ? { kind: plan.kind, recommendation: plan.recommendation, exe: plan.exe || '',
                            hot: (plan.hot && Array.isArray(plan.hot.files)) ? plan.hot.files.slice(0, 200) : [] } : undefined,
-            name: cleanGameName(torrent.name),
-            fileName: targetRom ? (targetRom.name || targetRom.short_name) : undefined,
+            name: cleanGameName(libItem.name),
             downloadUrl: downloadUrl,
             mode,
             targetDir: mode === 'stream' ? 'stream' : mode === 'cloudinstall' ? 'sd' : targetDirVal,
-            webdavPath: usesWebdav ? webdavFolderFor(torrent, plan) : '',
-            size: torrent.size,
+            webdavPath: usesWebdav ? webdavFolderFor(libItem, plan) : '',
+            size: libItem.size,
             artwork: state.selectedArtwork,
             notifyTopic: state.notifyTopic
           })
@@ -4312,33 +4281,31 @@ function webdavFolderFor(torrent, plan) {
       }
     }
 
-    // 1-Tap Zero-Friction Send to Deck (No confirmations unless poor fit or >25 GB repack)
-    async function sendToDeckDirect(torrentId) {
-      const torrent = (state.torrents || []).find(t => String(t.id) === String(torrentId));
-      if (!torrent) {
+    // One-tap Send to Deck (asks only when the planner says the stream fits poorly)
+    async function sendToDeckDirect(storageId) {
+      const libItem = (state.libraryItems || []).find(t => String(t.id) === String(storageId));
+      if (!libItem) {
         showToast("That game isn't in your library any more");
         return;
       }
 
-      if (!isItemCached(torrent)) {
-        const pct = Math.round((torrent.progress || 0) * 100);
+      if (!isItemCached(libItem)) {
+        const pct = Math.round((libItem.progress || 0) * 100);
         showToast(`Remote Storage is still caching this (${pct}%). Send it once it reaches 100%.`);
         return;
       }
 
       // Check planner advice (no sheet is open on the one-tap path)
-      const plan = await fetchPlan(torrent, { modalBound: false });
-      const rel = classifyItem(torrent);
+      const plan = await fetchPlan(libItem, { modalBound: false });
+      const rel = classifyItem(libItem);
 
       // Stream when the planner recommends it (a ready-to-play folder with the game's exe, any size)
       const canStream = plan ? plan.recommendation === 'stream' : rel.streamable;
-      const isSwitch = plan ? (plan.kind === 'switch' || plan.recommendation === 'download') : (rel.kind === 'switch');
-
-      if (!canStream && !isSwitch) {
-        openInstallModal(torrentId);
+      if (!canStream) {
+        openInstallModal(storageId);
         return;
       }
-      const clash = canStream ? mergedFolderClash(torrent, state.torrents) : '';
+      const clash = canStream ? mergedFolderClash(libItem, state.libraryItems) : '';
       if (clash) {
         showToast(`Remote Storage keeps this and "${clash}" in one folder with different files, so streaming would mix them. Remove one of them in Remote Storage, then send again.`);
         return;
@@ -4349,76 +4316,26 @@ function webdavFolderFor(torrent, plan) {
         if (!confirm(`${plan.reason}\n\nIt is ${gb} GB. Stream it to the Deck?`)) return;
       }
 
-      showToast(`Sending ${cleanGameName(torrent.name)} to your Deck…`);
+      showToast(`Sending ${cleanGameName(libItem.name)} to your Deck…`);
 
       try {
-        const token = (state.torboxKey || '').trim();
-        const isWeb = torrent._kind === 'webdl';
-        
-        let downloadUrl = null;
-        let targetRom = null;
-        if (!isWeb && torrent.files && torrent.files.length > 0) {
-          targetRom = torrent.files.find(f => /\.(nsp|xci|nsz|xcz)$/i.test(f.name || f.short_name || ''));
-        }
-
-        // 1. If this is a Switch game with a ROM file, request that specific ROM file directly!
-        if (targetRom) {
-          try {
-            const ep = `/games/requestdl?id=${encodeURIComponent(torrent.id)}&file_id=${encodeURIComponent(targetRom.id)}&redirect=false`;
-            const dlData = await tb(ep);
-            if (dlData && typeof dlData === 'string') downloadUrl = dlData;
-            else if (dlData && dlData.data && typeof dlData.data === 'string') downloadUrl = dlData.data;
-          } catch (e) {}
-        }
-
-        // 2. Try requesting JSON download link via tb() proxy
-        if (!downloadUrl) {
-          try {
-            const ep = isWeb 
-              ? `/webdl/requestdl?web_id=${encodeURIComponent(torrent.id)}&redirect=false`
-              : `/games/requestdl?id=${encodeURIComponent(torrent.id)}&zip=true&redirect=false`;
-            const dlData = await tb(ep);
-            if (dlData && typeof dlData === 'string') downloadUrl = dlData;
-            else if (dlData && dlData.data && typeof dlData.data === 'string') downloadUrl = dlData.data;
-          } catch (e) {}
-        }
-
-        // 3. If multiple files, try main file_id
-        if (!downloadUrl && !isWeb && torrent.files && torrent.files.length > 0) {
-          try {
-            const sortedFiles = [...torrent.files].sort((a,b) => (b.size || 0) - (a.size || 0));
-            const mainFile = sortedFiles[0];
-            const ep = `/games/requestdl?id=${encodeURIComponent(torrent.id)}&file_id=${encodeURIComponent(mainFile.id)}&redirect=false`;
-            const dlData = await tb(ep);
-            if (dlData && typeof dlData === 'string') downloadUrl = dlData;
-            else if (dlData && dlData.data && typeof dlData.data === 'string') downloadUrl = dlData.data;
-          } catch (e) {}
-        }
-
-        // 4. No link resolved. Never build a fallback URL with the Remote Storage token in it: the job is stored in the queue and sent to the Deck.
-        // Streams and cloud installs read through WebDAV and need no link; a plain download without one is refused below.
-        if (!downloadUrl) downloadUrl = '';
-
-        const mode = canStream ? 'stream' : (isSwitch ? 'download' : (plan?.recommendation || 'cloudinstall'));
-        const cleanName = cleanGameName(torrent.name);
-        const usesWebdav = mode === 'stream' || mode === 'cloudinstall';
-        if (!usesWebdav && !downloadUrl) { showToast('Remote Storage did not return a download link for this one. Try again in a moment.'); return; }
+        const mode = 'stream';
+        const cleanName = cleanGameName(libItem.name);
 
         const queueRes = await fetch(`/api/queue?device=${encodeURIComponent(state.deviceId)}`, {
           method: 'POST',
           headers: queueHeaders(),
           body: JSON.stringify({
             action: 'enqueue',
-            torrentId: torrent.id,
+            storageId: libItem.id,
             plan: plan ? { kind: plan.kind, recommendation: plan.recommendation, exe: plan.exe || '',
                            hot: (plan.hot && Array.isArray(plan.hot.files)) ? plan.hot.files.slice(0, 200) : [] } : undefined,
             name: cleanName,
-            fileName: targetRom ? (targetRom.name || targetRom.short_name) : undefined,
-            downloadUrl: downloadUrl,
+            downloadUrl: '',
             mode,
-            targetDir: mode === 'stream' ? 'stream' : 'sd',
-            webdavPath: usesWebdav ? webdavFolderFor(torrent, plan) : '',
-            size: torrent.size,
+            targetDir: 'stream',
+            webdavPath: webdavFolderFor(libItem, plan),
+            size: libItem.size,
             notifyTopic: state.notifyTopic
           })
         });
@@ -4967,22 +4884,17 @@ function webdavFolderFor(torrent, plan) {
       card.style.display = '';
     }
 
-    // Display-only: a friendlier title for cards (release group and packaging tags removed). Never used for matching.
-    // The game's proper name from a release name: "Red.Dead.Redemption.2.Build.1491.50-ElAmigos" -> "Red Dead Redemption 2".
-    // Group tags only go at the END (or inside brackets), so real titles keep their words (Rune Factory 5, Switch Galaxy).
+    // Display-only: a friendlier title for cards from a folder name ("Hades.II.v1.0.104" -> "Hades II"). Never used for matching.
     function displayGameName(raw) {
       const original = String(raw || '').trim();
       let t = original
         .replace(/\[[^\]]*\]|\([^)]*\)|\{[^}]*\}/g, ' ')                      // [Tags] (v1.0)
         .replace(/[™®©]/g, '')
-        .replace(/\s*\|.*$/, '')                                                // 'Hades 2 | RePack by Igruha'
-        .replace(/\s+PC\s+_\s+/i, ' ')                                         // 'Cyberpunk 2077 PC _ GOG Rip' (the Steam tile's own title)
-        .replace(/\s*[-\u2013]?\s*re-?pack by [\w.-]+.*$/i, '')
-        .replace(/\.(nsp|xci|nsz|iso|zip|rar|7z)$/i, '')
-        .replace(/[\s._-]*(?:www[\s.])?(?:game-share|store-download)[\s.](?:net|com|org)(?=$|[\s._)\]-])/gi, ' ')
+        .replace(/\s*\|.*$/, '')                                                // 'Hades 2 | notes'
+        .replace(/\.(iso|zip|rar|7z)$/i, '')
         .replace(/[._]?\b(build|update|patch)[ ._]?\d[\d.]*/gi, ' ')            // Build.1491.50
         .replace(/[._ ]v\.?\d+(?:[._]\d+)*[a-z]?\b/gi, ' ');                    // v2.13  .v4.04  v.1.16
-      if (!/\s/.test(original) || (original.match(/[._]/g) || []).length >= 3) t = t.replace(/[._]+/g, ' ');   // scene-style dots
+      if (!/\s/.test(original) || (original.match(/[._]/g) || []).length >= 3) t = t.replace(/[._]+/g, ' ');   // Dotted.Folder.Names
       t = t.replace(/\s+-\s+/g, ' - ').replace(/\s+/g, ' ').trim();
       const tail = /(?:^|[\s-])(?:deluxe|ultimate|complete|goty|edition|remastered|v\d+(\.\d+)*)$/i;
       for (let i = 0; i < 8 && tail.test(t); i++) t = t.replace(tail, '').replace(/[\s\-:,+]+$/, '').trim();
@@ -5018,10 +4930,10 @@ function webdavFolderFor(torrent, plan) {
       if (!game || !game.name) {
         return { title: 'Pick a game for your Deck', sub: '', status, tone, goLabel: 'Find a game', go: { kind: 'search' } };
       }
-      const rel = typeof classifyItem === 'function' ? classifyItem(game) : classifyReleaseTitle(game.name);
+      const rel = classifyItem(game);
       const isStreamable = rel.streamable !== undefined ? rel.streamable : rel.kind === 'plain';
-      const go = isStreamable ? { kind: 'stream', id: game.id } : rel.kind === 'switch' ? { kind: 'switch', id: game.id } : { kind: 'install', id: game.id };
-      const goLabel = isStreamable ? 'Stream to Deck' : rel.kind === 'switch' ? 'Stream to Deck' : 'Install to Deck';
+      const go = isStreamable ? { kind: 'stream', id: game.id } : { kind: 'install', id: game.id };
+      const goLabel = isStreamable ? 'Stream to Deck' : 'Install to Deck';
       const sub = ['Ready in your library', game.size ? formatBytes(game.size) : ''].filter(Boolean).join(' · ');
       return { title: displayGameName(game.name), sub, status, tone, goLabel, go };
     }
@@ -5031,8 +4943,8 @@ function webdavFolderFor(torrent, plan) {
       try {
         const g = JSON.parse(localStorage.getItem('deck_welcome_game') || 'null');
         if (!g || g.id == null || !g.name) return null;
-        if (typeof state !== 'undefined' && Array.isArray(state?.torrents)) {
-          const live = state.torrents.find(t => String(t.id) === String(g.id));
+        if (typeof state !== 'undefined' && Array.isArray(state?.libraryItems)) {
+          const live = state.libraryItems.find(t => String(t.id) === String(g.id));
           if (live) return live;
         }
         return g;
@@ -5086,7 +4998,7 @@ function webdavFolderFor(torrent, plan) {
       let go = { kind: 'search' };
       try { go = JSON.parse(document.getElementById('welcomeGo').dataset.go || '{}'); } catch (_) {}
       closeWelcome(() => {
-        if (go.kind === 'stream' || go.kind === 'switch') sendToDeckDirect(go.id);
+        if (go.kind === 'stream') sendToDeckDirect(go.id);
         else if (go.kind === 'install') openInstallModal(go.id);
         else { switchTab('search'); const q = document.getElementById('gameSearchInput'); if (q) q.focus(); }
       });
@@ -5241,7 +5153,7 @@ function webdavFolderFor(torrent, plan) {
       const d = state.deckData;
       const cur = d && !d.error ? (d.active_game || (d.status && d.status.currentJob)) : null;
       const when = t => Date.parse(t.updated_at || t.created_at || '') || 0;
-      const feat = cur ? null : (state.torrents || []).filter(t => !t._optimistic && isGameTorrent(t) && isItemCached(t)).sort((a, b) => when(b) - when(a))[0];
+      const feat = cur ? null : (state.libraryItems || []).filter(t => !t._optimistic && isGameItem(t) && isItemCached(t)).sort((a, b) => when(b) - when(a))[0];
       if (!cur && !feat) { el.innerHTML = ''; el.style.display = 'none'; return; }
       const rawName = cur ? (cur.name || 'Game') : feat.name;
       const name = cur ? rawName : displayGameName(rawName);
@@ -5260,8 +5172,8 @@ function webdavFolderFor(torrent, plan) {
       } else {
         const rel = classifyItem(feat);
         const id = JSON.stringify(feat.id).replace(/"/g, '&quot;');
-        const go = rel.streamable || rel.kind === 'switch' ? `sendToDeckDirect(${id})` : `openInstallModal(${id})`;
-        const label = rel.streamable ? 'Stream to Deck' : rel.kind === 'switch' ? 'Stream to Deck' : 'Install to Deck';
+        const go = rel.streamable ? `sendToDeckDirect(${id})` : `openInstallModal(${id})`;
+        const label = rel.streamable ? 'Stream to Deck' : 'Install to Deck';
         open = `openLibraryGame('${jsArg(String(feat.id))}')`;
         kicker = `<span class="home-hero-kicker">${rel.streamable ? 'Ready to stream' : 'Newest in your library'}</span>`;
         info = `<div class="home-spotlight-meta"><span>${formatBytes(feat.size || 0)}</span>${rel.kind !== 'unknown' ? `<span>${escapeHtml(rel.label)}</span>` : ''}<span>Cached in Remote Storage</span></div>`;
@@ -5290,7 +5202,7 @@ function webdavFolderFor(torrent, plan) {
       const grid = document.getElementById('homeReadyGrid');
       const caching = document.getElementById('homeCachingLine');
       if (!section || !grid) return;
-      const games = (state.torrents || []).filter(t => !t._optimistic && isGameTorrent(t));
+      const games = (state.libraryItems || []).filter(t => !t._optimistic && isGameItem(t));
       const when = t => Date.parse(t.updated_at || t.created_at || '') || 0;
       const ready = games.filter(t => isItemCached(t)).sort((a, b) => when(b) - when(a));
       const pending = games.filter(t => !isItemCached(t));
@@ -5335,25 +5247,14 @@ function webdavFolderFor(torrent, plan) {
 
           let badgeClass = relType.streamable ? 'badge-green' : 'badge-yellow';
           let badgeText = relType.label;
-          let actionLabel = relType.streamable ? 'Stream' : relType.kind === 'switch' ? 'Stream' : 'Install';
-          let actionFn = relType.streamable ? `sendToDeckDirect(${JSON.stringify(t.id).replace(/"/g, '&quot;')})` : relType.kind === 'switch' ? `sendToDeckDirect(${JSON.stringify(t.id).replace(/"/g, '&quot;')})` : `openInstallModal(${JSON.stringify(t.id).replace(/"/g, '&quot;')})`;
+          let actionLabel = relType.streamable ? 'Stream' : 'Install';
 
-          if (relType.kind === 'repack') {
-            badgeClass = 'badge-yellow';
-            actionLabel = 'Install';
-            actionFn = `openInstallModal(${JSON.stringify(t.id).replace(/"/g, '&quot;')})`;
-          } else if (relType.kind === 'switch') {
-            badgeClass = 'badge-purple';
-            actionLabel = 'Stream';
-            actionFn = `sendToDeckDirect(${JSON.stringify(t.id).replace(/"/g, '&quot;')})`;
-          } else if (relType.kind === 'disc') {
+          if (relType.kind === 'disc') {
             badgeClass = 'badge-blue';
             actionLabel = 'Disc image';
-            actionFn = `openInstallModal(${JSON.stringify(t.id).replace(/"/g, '&quot;')})`;
           } else if (relType.kind === 'media') {
             badgeClass = 'badge-yellow';
             actionLabel = 'Media file';
-            actionFn = `openInstallModal(${JSON.stringify(t.id).replace(/"/g, '&quot;')})`;
           }
 
           return `
@@ -5383,11 +5284,11 @@ function webdavFolderFor(torrent, plan) {
       if (!box || !list) return;
       // [done, label when done, what to do] (deckSeen is unknown until the first status poll: no flash of the banner, no false "done")
       const items = [
-        [!!state.torboxKey, 'Remote Storage API key added', 'Add your Remote Storage API key'],
+        [!!state.storageKey, 'Remote Storage API key added', 'Add your Remote Storage API key'],
         [!!state.queueSecret, 'Queue password added', 'Add your queue password (the one you gave the Deck installer)'],
         [state.deckSeen === true, 'Steam Deck connected', 'Connect your Deck (run the install command once)'],
       ];
-      const done = !!state.torboxKey && !!state.queueSecret && state.deckSeen !== false;
+      const done = !!state.storageKey && !!state.queueSecret && state.deckSeen !== false;
       box.style.display = done ? 'none' : '';
       const doneCount = items.filter(([ok]) => ok).length;
       const t = document.getElementById('setupTitle'); if (t) t.textContent = `Finish setup · ${doneCount} of ${items.length} done`;
@@ -5397,7 +5298,7 @@ function webdavFolderFor(torrent, plan) {
         const cls = ok ? 'done' : (i === firstTodo ? 'next' : '');
         return `<li class="${cls}">${escapeHtml(ok ? doneLabel : todoLabel)}${checking ? ' <span class="hint">(checking…)</span>' : ''}</li>`;
       }).join('') + '</ol>';
-      const keysMissing = !state.torboxKey || !state.queueSecret;
+      const keysMissing = !state.storageKey || !state.queueSecret;
       const settingsBtn = document.getElementById('setupSettingsBtn'), checkBtn = document.getElementById('setupCheckBtn');
       if (settingsBtn) settingsBtn.className = 'btn btn-full btn-sm' + (keysMissing ? '' : ' btn-secondary');
       if (checkBtn) checkBtn.className = 'btn btn-full btn-sm' + (keysMissing ? ' btn-secondary' : '');
@@ -5486,7 +5387,7 @@ function webdavFolderFor(torrent, plan) {
     // ==========================================
     function initSettings() {
       document.getElementById('cfgDeviceId').value = state.deviceId;
-      document.getElementById('cfgTorboxKey').value = state.torboxKey;
+      document.getElementById('cfgStorageKey').value = state.storageKey;
       document.getElementById('cfgSteamGridKey').value = state.steamGridKey;
       document.getElementById('cfgNotifyTopic').value = state.notifyTopic;
       document.getElementById('cfgAppPin').value = state.appPin;
@@ -5494,32 +5395,24 @@ function webdavFolderFor(torrent, plan) {
       try { document.getElementById('cfgIntro').checked = localStorage.getItem('deck_intro') !== 'off'; } catch (_) {}
       const qsEl = document.getElementById('cfgQueueSecret');
       if (qsEl) qsEl.value = state.queueSecret || '';
-      const pUrlEl = document.getElementById('cfgProwlarrUrl');
-      const pKeyEl = document.getElementById('cfgProwlarrKey');
-      if (pUrlEl) pUrlEl.value = state.prowlarrUrl || '';
-      if (pKeyEl) pKeyEl.value = state.prowlarrKey || '';
-      const nUrlEl = document.getElementById('cfgNewznabUrl');
-      const nKeyEl = document.getElementById('cfgNewznabKey');
-      if (nUrlEl) nUrlEl.value = state.newznabUrl || '';
-      if (nKeyEl) nKeyEl.value = state.newznabKey || '';
       const gKeyEl = document.getElementById('cfgGeminiKey');
       if (gKeyEl) gKeyEl.value = state.geminiKey || '';
 
       const host = window.location.origin;
       const hostEl1 = document.getElementById('setupUrlHost');
       const hostEl2 = document.getElementById('setupUrlHost2');
-      const hostElBoost = document.getElementById('setupUrlHostBoost');
       if (hostEl1) hostEl1.textContent = host;
       if (hostEl2) hostEl2.textContent = host;
-      if (hostElBoost) hostElBoost.textContent = host;
       const devEl = document.getElementById('setupDeviceIdDisplay');
       if (devEl) devEl.textContent = state.deviceId;
+      const cmdEl = document.getElementById('installerCmdText');
+      if (cmdEl) cmdEl.textContent = `curl -sSL ${host}/daemon/install.sh | bash -s -- ${host} ${state.deviceId}`;
     }
 
     function saveSettings(opts = {}) {
-      const before = { torboxKey: state.torboxKey, deviceId: state.deviceId, queueSecret: state.queueSecret };
+      const before = { storageKey: state.storageKey, deviceId: state.deviceId, queueSecret: state.queueSecret };
       state.deviceId = document.getElementById('cfgDeviceId').value.trim() || 'deck-main';
-      state.torboxKey = document.getElementById('cfgTorboxKey').value.trim();
+      state.storageKey = document.getElementById('cfgStorageKey').value.trim();
       let topVal = document.getElementById('cfgNotifyTopic').value.trim();
       if (!topVal || topVal.length < 24) {
         const randHex = Array.from(crypto.getRandomValues(new Uint8Array(12))).map(b => b.toString(16).padStart(2, '0')).join('');
@@ -5528,52 +5421,26 @@ function webdavFolderFor(torrent, plan) {
       }
       state.notifyTopic = topVal;
       state.queueSecret = (document.getElementById('cfgQueueSecret')?.value || '').trim();
-      state.prowlarrUrl = (document.getElementById('cfgProwlarrUrl')?.value || '').trim();
-      state.prowlarrKey = (document.getElementById('cfgProwlarrKey')?.value || '').trim();
-      state.newznabUrl = (document.getElementById('cfgNewznabUrl')?.value || '').trim();
-      state.newznabKey = (document.getElementById('cfgNewznabKey')?.value || '').trim();
+      state.steamGridKey = (document.getElementById('cfgSteamGridKey')?.value || '').trim();
+      state.appPin = (document.getElementById('cfgAppPin')?.value || '').trim();
       state.geminiKey = (document.getElementById('cfgGeminiKey')?.value || '').trim();
 
       localStorage.setItem('deck_device_id', state.deviceId);
-      localStorage.setItem('torbox_api_key', state.torboxKey);
+      localStorage.setItem('storage_api_key', state.storageKey);
       localStorage.setItem('steamgriddb_key', state.steamGridKey);
       localStorage.setItem('deck_notify_topic', state.notifyTopic);
       localStorage.setItem('deck_app_pin', state.appPin);
       localStorage.setItem('deck_queue_secret', state.queueSecret);
-      localStorage.setItem('deck_prowlarr_url', state.prowlarrUrl);
-      localStorage.setItem('deck_prowlarr_key', state.prowlarrKey);
-      localStorage.setItem('deck_newznab_url', state.newznabUrl);
-      localStorage.setItem('deck_newznab_key', state.newznabKey);
       localStorage.setItem('deck_gemini_key', state.geminiKey);
 
       initSettings();
       updateSetupBanner();
       showToast(opts.quiet ? 'Saved' : 'Settings saved');
       // Reload only what the change affects (auto-save runs on every field change).
-      if (!opts.quiet || before.torboxKey !== state.torboxKey) { if (state.torboxKey) loadTorrents(true); }
+      if (!opts.quiet || before.storageKey !== state.storageKey) { if (state.storageKey) loadLibrary(true); }
       if (!opts.quiet || before.deviceId !== state.deviceId || before.queueSecret !== state.queueSecret) {
         pollDeckStatus(true);
         if (before.queueSecret !== state.queueSecret) loadSteamTopSellers();
-      }
-    }
-
-    async function testCustomAddonConnection() {
-      const url = (document.getElementById('cfgProwlarrUrl')?.value || '').trim();
-      const key = (document.getElementById('cfgProwlarrKey')?.value || '').trim();
-      if (!url) return showToast('Please enter your Prowlarr/Jackett server URL first');
-      showToast('Testing connection via relay...');
-      try {
-        const res = await fetch(`/api/addon?action=health&url=${encodeURIComponent(url)}&key=${encodeURIComponent(key)}`);
-        const data = await res.json().catch(() => null);
-        if (res.ok && data && data.ok) {
-          const typeName = data.type === 'jackett' ? 'Jackett' : 'Prowlarr';
-          showToast(`Connected to ${typeName}`);
-          playSuccessChime();
-        } else {
-          showToast('Connection error: ' + ((data && (data.error || data.message)) || `status ${res.status}`));
-        }
-      } catch (e) {
-        showToast('Connection error: ' + e.message);
       }
     }
 
@@ -5602,27 +5469,56 @@ function webdavFolderFor(torrent, plan) {
       });
     }
 
-    function copyBoostCommand() {
-      const cmd = `curl -sSL ${window.location.origin}/daemon/deck-boost.sh | sudo bash`;
-      navigator.clipboard.writeText(cmd).then(() => {
-        showToast('Command copied');
-      });
-    }
-
     // Why a release can't run from a cloud mount, or '' when it can. File names are lowercase paths.
-    function streamBlockReason(fileNames, isRepack, isArchive) {
-      if (isRepack) return `Can't stream a repack. Choose "Install to microSD from Remote Storage" instead.`;
-      if (isArchive) return `Can't stream a compressed archive. Choose "Install to microSD from Remote Storage" instead.`;
-      if (fileNames.some(n => /\.(nsp|xci|nsz|xcz)$/.test(n))) {
-        return `This is a Nintendo Switch game, not a Windows game. It needs an emulator and can't run through Proton.`;
-      }
+    function streamBlockReason(fileNames, isArchive) {
+      if (isArchive) return `Can't stream a compressed archive. Choose "Install to the Deck" instead.`;
       const installerOnly = fileNames.length > 0 &&
         !fileNames.some(n => n.endsWith('.exe') && !/(^|[\/_.-])(setup|unins\w*|redist\w*|vcredist\w*|dxsetup|dotnet\w*|quicksfv|crashreport\w*)/.test(n.split('/').pop()));
-      if (installerOnly) return `No game executable in this release; it looks like an installer (GOG/setup). Choose "Install to microSD from Remote Storage" instead.`;
+      if (installerOnly) return `No game executable in this folder; it looks like an installer (for example a GOG offline installer). Choose "Install to the Deck" instead.`;
       return '';
     }
 
-    // encodeURIComponent leaves ' ( ) ! * ~ unescaped, which lets a hostile torrent title break out of
+    function toggleSecretVisibility(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.type = el.type === 'password' ? 'text' : 'password';
+    }
+
+    // Stream when ready: a library game your storage server is still preparing is handed to the site (api/_watch.js),
+    // which checks it while the Deck or this app polls and queues the stream once its folder is ready.
+    async function streamWhenReady(storageId) {
+      const libItem = (state.libraryItems || []).find(t => String(t.id) === String(storageId));
+      if (!libItem) return;
+      try {
+        const r = await fetch(`/api/queue?device=${encodeURIComponent(state.deviceId)}`, {
+          method: 'POST', headers: queueHeaders(),
+          body: JSON.stringify({ action: 'watch', storageId: String(libItem.id), title: libItem.name, name: cleanGameName(libItem.name),
+            size: Number(libItem.size) || 0, notifyTopic: state.notifyTopic })
+        });
+        const j = await r.json().catch(() => null);
+        if (!r.ok || !j || !j.success) throw new Error((j && j.error) || `HTTP ${r.status}`);
+        if (j.state === 'queued') { showToast(`${cleanGameName(libItem.name)} is ready: sent to the Deck`); switchTab('queue'); }
+        else showToast(`The Deck gets ${cleanGameName(libItem.name)} as soon as your storage server has it ready`);
+      } catch (err) {
+        showToast('Could not set up Stream when ready: ' + err.message);
+      }
+    }
+
+    // From each queue read: a watched game whose files say install opens the install options once, then leaves the list.
+    function handleSiteWatches(watches) {
+      for (const w of Array.isArray(watches) ? watches : []) {
+        if (!w || w.state !== 'needs-install' || !/^\d{1,12}$/.test(String(w.storageId))) continue;
+        if (!(state.libraryItems || []).some(t => String(t.id) === String(w.storageId))) continue;   // library not loaded yet
+        fetch(`/api/queue?device=${encodeURIComponent(state.deviceId)}`, {
+          method: 'POST', headers: queueHeaders(), body: JSON.stringify({ action: 'unwatch', storageId: String(w.storageId) })
+        }).catch(() => {});
+        showToast(`${cleanGameName(w.title || 'Your game')} is ready but needs installing. Opening options…`);
+        openInstallModal(Number(w.storageId));
+        return;   // one sheet at a time; the next queue read brings the next one
+      }
+    }
+
+    // encodeURIComponent leaves ' ( ) ! * ~ unescaped, which lets a hostile libItem title break out of
     // a quoted inline handler. Encode those too so the value is inert inside onclick="fn('...')".
     function jsArg(str) {
       return encodeURIComponent(String(str == null ? '' : str)).replace(/[!'()*~]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase());
@@ -5636,68 +5532,6 @@ function webdavFolderFor(torrent, plan) {
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
-    }
-
-    let cacheDebounceTimer = null;
-    function setupCacheChecker() {
-      const input = document.getElementById('magnetInput');
-      const statusEl = document.getElementById('instantCacheStatus');
-      if (!input || !statusEl) return;
-
-      input.addEventListener('input', (e) => {
-        clearTimeout(cacheDebounceTimer);
-        const val = e.target.value.trim();
-        if (!val) {
-          statusEl.style.display = 'none';
-          return;
-        }
-
-        let hash = null;
-        const magnetMatch = val.match(/xt=urn:btih:([a-zA-Z0-9]+)/i);
-        if (magnetMatch) {
-          hash = magnetMatch[1];
-        } else if (/^[a-fA-F0-9]{40}$/.test(val) || /^[a-zA-Z2-7]{32}$/.test(val)) {
-          hash = val;
-        }
-
-        if (!hash || !state.torboxKey) {
-          statusEl.style.display = 'none';
-          return;
-        }
-
-        statusEl.style.display = 'block';
-        statusEl.style.background = 'rgba(255,255,255,0.05)';
-        statusEl.style.borderColor = 'var(--border)';
-        statusEl.style.color = 'var(--text-muted)';
-        statusEl.innerHTML = 'Checking whether Remote Storage already has it…';
-
-        cacheDebounceTimer = setTimeout(async () => {
-          try {
-            const res = await fetch(`/api/torbox?p=torrents/checkcached?hash=${hash}&format=object&list_files=true`, {
-              headers: { 'authorization': `Bearer ${state.torboxKey}` }
-            });
-            const data = await res.json();
-            if (data && data.data) {
-              const hashKey = Object.keys(data.data).find(k => k.toLowerCase() === hash.toLowerCase());
-              const item = hashKey ? data.data[hashKey] : null;
-              const isCached = item && (item.cached === true || item === true || (typeof item === 'object' && item.name));
-              if (isCached) {
-                statusEl.style.background = 'rgba(16, 185, 129, 0.15)';
-                statusEl.style.borderColor = 'rgba(16, 185, 129, 0.4)';
-                statusEl.style.color = '#34d399';
-                statusEl.innerHTML = `<b style="color:var(--ready)">Remote Storage already has this.</b> It is ready to send the moment you add it.`;
-                return;
-              }
-            }
-            statusEl.style.background = 'rgba(245, 158, 11, 0.12)';
-            statusEl.style.borderColor = 'rgba(245, 158, 11, 0.3)';
-            statusEl.style.color = '#fbbf24';
-            statusEl.innerHTML = `<b>Not in Remote Storage yet.</b> Remote Storage downloads it first when you add it.`;
-          } catch {
-            statusEl.style.display = 'none';
-          }
-        }, 350);
-      });
     }
 
     // Polling Loop & Init
@@ -5714,9 +5548,7 @@ function webdavFolderFor(torrent, plan) {
       initDiscoverScreen();
       renderRecentSearches();
       showSearchIdle(true);
-      setupCacheChecker();
-      if (state.torboxKey) loadTorrents(true);
-      watchPendingStreams();
+      if (state.storageKey) loadLibrary(true);
       pollDeckStatus();
       (function scheduleDeckPoll() {
         const active = document.querySelector('.tab-content.active');

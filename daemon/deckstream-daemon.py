@@ -936,20 +936,20 @@ def stop_fills_off_charger(proc_root="/proc", ac=None, kill=os.killpg):
     return stopped
 
 
-_REPACK_OR_ARCHIVE_NAME_RE = re.compile(
-    r"((?:^|[\W_])(installer|archive|repack)(?:[\W_]|$)|(\.(zip|rar|7z|iso|nsp|xci|nsz|xcz)($|[\W_])))", re.I
+_INSTALLER_OR_ARCHIVE_NAME_RE = re.compile(
+    r"((?:^|[\W_])(installer|archive)(?:[\W_]|$)|(\.(zip|rar|7z|iso)($|[\W_])))", re.I
 )
 
-_ARCHIVE_RANGE_RE = re.compile(r"(\.(zip|rar|7z|r\d{2}|part\d+\.rar)$|(^|/)(fg-\d+|fg-optional[^/]*|setup-?\d*)\.bin$)", re.I)
+_ARCHIVE_RANGE_RE = re.compile(r"(\.(zip|rar|7z|r\d{2}|part\d+\.rar)$|(^|/)(setup[^/]*-\d+|setup-?\d*)\.bin$)", re.I)
 
 
 def _is_streamable_release(slug, folder="", plan=None, prestage_dir=None, profiles_dir=None):
-    """True only when a release is streamable (kind == 'plain' and not a repack/archive folder or failed archive launch)."""
+    """True only when a game is streamable (kind == 'plain' and not an installer/archive folder or failed archive launch)."""
     if isinstance(plan, dict):
         pk = str(plan.get("kind") or "").strip().lower()
         if pk and pk != "plain":
             return False
-    if _REPACK_OR_ARCHIVE_NAME_RE.search(f"{slug or ''} {folder or ''}"):
+    if _INSTALLER_OR_ARCHIVE_NAME_RE.search(f"{slug or ''} {folder or ''}"):
         return False
     d = Path(prestage_dir) if prestage_dir else PRESTAGE_DIR
     pd = Path(profiles_dir) if profiles_dir else PROFILES_DIR
@@ -2771,7 +2771,7 @@ def extract_archive(archive_path, extract_dir):
         pass
 
 
-# A folder counts as an installed game only if it holds something that runs: a Windows game, a Switch ROM, a Linux launcher
+# A folder counts as an installed game only if it holds something that runs: a Windows game or a Linux launcher
 INSTALLED_GAME_SUFFIXES = {".exe", ".sh", ".x86_64", ".appimage"}
 
 
@@ -2979,7 +2979,7 @@ class ChargerGate:
 
 
 def install_argv(script, slug, webdav_folder, dest, which=shutil.which):
-    """The installer runs at the lowest CPU and disk priority, so the Deck stays usable while a repack unpacks for hours."""
+    """The installer runs at the lowest CPU and disk priority, so the Deck stays usable while an installer unpacks for hours."""
     argv = []
     if which("nice"):
         argv += ["nice", "-n", "19"]
@@ -3025,7 +3025,7 @@ def run_cloud_install(script, slug, webdav_folder, dest, on_tick, size_fn=None, 
     whole run. `paused_fn` (ChargerGate) returning True stops the installer's process group until it returns False;
     time spent paused never counts as a stall. `keep_all` ("Get skipped files") copies the files a rip install left out.
     """
-    env = {**os.environ, "DECKSTREAM_REPACK_ALL": "1"} if keep_all else None
+    env = {**os.environ, "DECKSTREAM_INSTALL_ALL": "1"} if keep_all else None
     proc = subprocess.Popen(
         install_argv(script, slug, webdav_folder, dest),
         stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1, start_new_session=True, env=env,
@@ -3065,7 +3065,7 @@ def run_cloud_install(script, slug, webdav_folder, dest, on_tick, size_fn=None, 
 
     t = threading.Thread(target=reader, daemon=True)
     t.start()
-    # Long silent stretches (a repack installer can run for hours) must not look like a dead Deck.
+    # Long silent stretches (an installer can run for hours) must not look like a dead Deck.
     last_sig = (size_fn() if size_fn else None, state["lines"])
     last_change = time.time()
     paused = False
@@ -3307,7 +3307,7 @@ def run_daemon():
                         time.sleep(poll_sec)
                         continue
 
-                    if plan_kind in ("archive", "repack", "installer", "switch", "disc-image", "not-a-game", "suspicious"):
+                    if plan_kind in ("archive", "installer", "disc-image", "not-a-game", "suspicious"):
                         err_msg = f"Cannot stream release of type '{plan_kind}'. It must be extracted or installed first."
                         print(f"[!] {err_msg}")
                         r = queue_request(
@@ -3382,7 +3382,7 @@ def run_daemon():
                     time.sleep(poll_sec)
                     continue
 
-                # Cloud install: unpack a repack/zip straight from the RemoteStorage mount onto the SD card
+                # Cloud install: unpack an installer/zip straight from the storage mount onto the SD card
                 if job_mode == "cloudinstall":
                     webdav_folder = (job.get("webdavPath") or "").strip().strip("/")
                     script = Path.home() / ".config" / "deckstream" / "cloud-install.sh"
