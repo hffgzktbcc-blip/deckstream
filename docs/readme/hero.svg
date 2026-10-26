@@ -43,7 +43,7 @@
     <text x="2" y="212" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="22" font-weight="600" fill="#cbd5e1">Your remote PC game library, playable on a Steam Deck.</text>
     
     <text x="2" y="248" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="15" font-weight="400" fill="#94a3b8">Pick a title on your phone or web app; the Deck streams blocks on demand.</text>
-    <text x="2" y="272" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="15" font-weight="400" fill="#94a3b8">Zero 100 GB storage penalties • Copy-on-Write saves • Native Proton execution.</text>
+    <text x="2" y="272" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="15" font-weight="400" fill="#94a3b8">No full download first • Saves backed up • Native Proton.</text>
 
     <!-- Feature Badges -->
     <g transform="translate(0, 318)">
@@ -119,6 +119,6 @@
     
     <rect x="14" y="214" width="140" height="6" rx="3" fill="#1e293b"/>
     <rect x="14" y="214" width="120" height="6" rx="3" fill="#10b981"/>
-    <text x="14" y="238" font-family="sans-serif" font-size="10" font-weight="600" fill="#10b981">Zero wait to play</text>
+    <text x="14" y="238" font-family="sans-serif" font-size="10" font-weight="600" fill="#10b981">Profiled start</text>
   </g>
 </svg>

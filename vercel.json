@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "routes": [
+    {
+      "src": "/(.*)",
+      "headers": {
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Referrer-Policy": "no-referrer",
+        "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+        "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'"
+      },
+      "continue": true
+    },
+    {
+      "src": "/(scripts/.*|decky/(src|node_modules)/.*|\\.git/.*|\\.github/.*|package\\.json|CONTRIBUTING\\.md)",
+      "status": 404
+    },
+    { "src": "/api/([a-z]+)(.*)", "dest": "/api/$1.js$2" },
+    { "src": "/(.*)", "dest": "/$1" }
+  ]
+}

@@ -1,7 +1,7 @@
 {
-  "name": "DeckDebrid",
-  "short_name": "DeckDebrid",
-  "description": "Control your TorBox game library and install directly to Steam Deck with Proton shortcuts & artwork.",
+  "name": "DeckStream",
+  "short_name": "DeckStream",
+  "description": "Stream games you own from your own storage server to a Steam Deck, or install them, from your phone.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0e141b",

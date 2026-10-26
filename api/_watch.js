@@ -1,4 +1,4 @@
-// Stream when ready: monitors remote transfers until they are ready to stream.
+// Stream when ready: remembers a game your storage server is still preparing and queues the stream once it is ready.
 const crypto = require('crypto');
 const { buildPlan } = require('./_plan');
 
@@ -37,17 +37,16 @@ function isCached(t) {
 
 const publicWatch = ({ key, ...w }) => w;
 
-function addWatch(device, { storageId, remoteId, torrentId, title, name, size, artwork, notifyTopic }, token) {
-  const id = String(storageId || remoteId || torrentId || '').trim();
+function addWatch(device, { storageId, gameId, title, name, size, artwork, notifyTopic }, token) {
+  const id = String(storageId || gameId || '').trim();
   if (!/^\d{1,12}$/.test(id)) return { error: 'A storage game id is needed' };
   if (!token) return { error: 'Storage credentials required in the Authorization header' };
   if (token.length > 512 || /[\s\0]/.test(token)) return { error: 'That storage credential looks invalid' };
   const art = artwork && typeof artwork === 'object' ? artwork : null;
-  device.watches = (device.watches || []).filter(w => w.storageId !== id && w.torrentId !== id);
+  device.watches = (device.watches || []).filter(w => w.storageId !== id);
   if (device.watches.length >= MAX_WATCHES) return { error: 'Too many games waiting for remote storage' };
   const w = {
     storageId: id,
-    torrentId: id,
     title: String(title || 'Game').trim().slice(0, 200),
     name: String(name || title || 'Game').trim().slice(0, 120),
     size: Number.isFinite(Number(size)) ? Math.max(0, Number(size)) : 0,
@@ -65,15 +64,15 @@ function addWatch(device, { storageId, remoteId, torrentId, title, name, size, a
 function removeWatch(device, id) {
   const targetId = String(id);
   const before = (device.watches || []).length;
-  device.watches = (device.watches || []).filter(w => w.storageId !== targetId && w.torrentId !== targetId);
+  device.watches = (device.watches || []).filter(w => w.storageId !== targetId);
   return device.watches.length !== before;
 }
 
 const AUTH_ERROR = /BAD_TOKEN|NO_AUTH|AUTH_ERROR|INVALID_TOKEN|TOKEN_EXPIRED|UNAUTHORI[SZ]ED/i;
-const watchJobId = (w) => `job_w${w.storageId || w.torrentId}_${Number(w.at) || 0}`;
+const watchJobId = (w) => `job_w${w.storageId}_${Number(w.at) || 0}`;
 
 async function readRemoteStorage(token, id, ms) {
-  const base = process.env.STORAGE_API_URL || process.env.TORBOX_API_URL || 'http://127.0.0.1:8765/mock-storage';
+  const base = require('./storage').storageBase();
   const r = await fetch(`${base}/games/mylist?id=${id}&bypass_cache=true`, {
     headers: { authorization: `Bearer ${token}`, 'user-agent': 'DeckStream/1.0' },
     signal: AbortSignal.timeout(ms),
@@ -105,7 +104,7 @@ async function checkWatches(device, notifyFn, msPerWatch = 8000) {
     const token = unseal(w.key);
     if (!token) { modified = true; continue; }
 
-    const id = w.storageId || w.torrentId;
+    const id = w.storageId;
     const res = await readRemoteStorage(token, id, msPerWatch);
     if (res.rejected) { modified = true; continue; }
     if (res.retry) { keep.push(w); continue; }
@@ -126,8 +125,14 @@ async function checkWatches(device, notifyFn, msPerWatch = 8000) {
     // Streamable!
     const job = {
       id: watchJobId(w),
+      name: w.name || w.title,
       title: w.title,
+      storageId: w.storageId,
       mode: 'stream',
+      targetDir: 'stream',
+      notifyTopic: w.notifyTopic,
+      progress: 0,
+      enqueuedAt: now,
       webdavPath: plan.webdavFolder || item.name,
       plan,
       artwork: w.artwork,

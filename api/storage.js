@@ -1,75 +1,59 @@
-// Relays Remote Storage API requests (WebDAV / S3 / Local NAS)
-// for DeckStream cloud game streaming companion.
+// Same-origin relay to YOUR storage server (STORAGE_API_URL). The app never calls the storage server directly, so
+// there is no CORS setup and the storage key never sits in a URL. The contract is in docs/STORAGE_API.md;
+// scripts/storage_server.js is a reference server that serves a folder of games.
 const { applyCors, requireSecret } = require('./_lib');
 
-const ALLOWED_ENDPOINTS = new Set([
-  'games/mylist',
-  'games/checkcached',
-  'games/mount',
-  'storage/mylist',
-  'storage/checkcached',
-  'storage/mount',
-  'user/me'
-]);
+const ALLOWED_ENDPOINTS = new Set(['games/mylist', 'games/requestdl', 'games/mount', 'user/me']);
+
+// Base URL of the storage API, without a trailing slash; '' when it is not configured.
+function storageBase() {
+  return String(process.env.STORAGE_API_URL || '').trim().replace(/\/+$/, '');
+}
 
 module.exports = async (req, res) => {
   if (applyCors(req, res, 'GET, POST, OPTIONS')) return;
   if (!requireSecret(req, res)) return;
+  res.setHeader('cache-control', 'no-store');
 
-  const STORAGE_API = process.env.STORAGE_API_URL || process.env.TORBOX_API_URL || 'http://127.0.0.1:8765/mock-storage';
+  const base = storageBase();
+  if (!base) return res.status(503).json({ success: false, error: 'Set STORAGE_API_URL on the server (see docs/STORAGE_API.md)' });
 
-  let token = req.headers['authorization'] || '';
+  let token = String(req.headers['authorization'] || '');
   if (token.startsWith('Bearer ')) token = token.slice(7).trim();
 
-  // Parse path and query
-  let rawPath = String(req.query.p || req.query.path || req.url.replace(/^\/api\/storage(\?.*)?$/, '')).replace(/^\/+/, '');
-  if (!rawPath) {
-    return res.status(400).json({ error: 'Missing path parameter' });
-  }
+  const rawPath = String(req.query.p || req.query.path || '').replace(/^\/+/, '');
+  if (!rawPath) return res.status(400).json({ success: false, error: 'Missing path parameter' });
 
-  // Handle case where path contains query string or duplicate ?
   const [basePath, existingQuery] = rawPath.split('?');
-  if (!/^[A-Za-z0-9_\/-]{1,80}$/.test(basePath) || basePath.split('/').some(p => p === '' || p === '..')) {
-    return res.status(400).json({ error: 'Invalid path' });
+  if (!/^[A-Za-z0-9_/-]{1,80}$/.test(basePath) || basePath.split('/').some((p) => p === '' || p === '..')) {
+    return res.status(400).json({ success: false, error: 'Invalid path' });
+  }
+  if (!ALLOWED_ENDPOINTS.has(basePath)) {
+    return res.status(403).json({ success: false, error: `Path not allowed: ${basePath}` });
   }
 
-  // Normalize aliases
-  const normalizedPath = basePath.replace(/^storage\//, 'games/');
-  if (!ALLOWED_ENDPOINTS.has(basePath) && !ALLOWED_ENDPOINTS.has(normalizedPath)) {
-    return res.status(403).json({ error: `Path not allowed: ${basePath}` });
+  const params = new URLSearchParams(existingQuery || '');
+  for (const [k, v] of Object.entries(req.query || {})) {
+    if (k !== 'p' && k !== 'path' && !params.has(k)) params.set(k, String(v));
   }
-
-  // Forward query parameters
-  const targetParams = new URLSearchParams(existingQuery || '');
-  for (const [k, v] of Object.entries(req.query)) {
-    if (k !== 'p' && k !== 'path' && !targetParams.has(k)) {
-      targetParams.set(k, String(v));
-    }
-  }
-
-  const queryStr = targetParams.toString();
-  const targetUrl = `${STORAGE_API}/${basePath}${queryStr ? '?' + queryStr : ''}`;
+  const qs = params.toString();
+  const targetUrl = `${base}/${basePath}${qs ? '?' + qs : ''}`;
 
   try {
-    const fetchHeaders = {};
-    if (token) fetchHeaders['authorization'] = `Bearer ${token}`;
-
-    const opts = {
-      method: req.method,
-      headers: fetchHeaders
-    };
-
-    if (req.method === 'POST') {
-      fetchHeaders['content-type'] = 'application/json';
+    const headers = { 'user-agent': 'DeckStream/1.0' };
+    if (token) headers.authorization = `Bearer ${token}`;
+    const opts = { method: req.method === 'POST' ? 'POST' : 'GET', headers, signal: AbortSignal.timeout(25000) };
+    if (opts.method === 'POST') {
+      headers['content-type'] = 'application/json';
       opts.body = typeof req.body === 'string' ? req.body : JSON.stringify(req.body || {});
     }
-
     const resp = await fetch(targetUrl, opts);
-    const contentType = resp.headers.get('content-type') || 'application/json';
-    res.setHeader('content-type', contentType);
-    const bodyText = await resp.text();
-    return res.status(resp.status).send(bodyText);
+    res.setHeader('content-type', resp.headers.get('content-type') || 'application/json');
+    return res.status(resp.status).send(await resp.text());
   } catch (err) {
-    return res.status(502).json({ error: 'Storage backend unreachable', detail: err.message });
+    return res.status(502).json({ success: false, error: 'Storage server unreachable', detail: err.message });
   }
 };
+
+module.exports.storageBase = storageBase;
+module.exports.ALLOWED_ENDPOINTS = ALLOWED_ENDPOINTS;

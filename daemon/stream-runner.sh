@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
 # ==============================================================================
 # DeckStream - Stream Runner & Launcher
-# Streams a PRE-INSTALLED (ready-to-play) game folder on demand from RemoteStorage WebDAV.
+# Streams a ready-to-play game folder on demand from your storage server's WebDAV.
 #   - rclone VFS mount of ONLY the game's folder, with a capped rolling cache
 #   - fuse-overlayfs write layer so saves/configs land on local SSD (optional)
 #   - isolated Proton prefix per game
 #
-# NOTE: Repacks (installer archives and binaries) and archives (.zip/.rar/.7z)
+# NOTE: Installers (setup*.exe + .bin payloads) and archives (.zip/.rar/.7z)
 # CANNOT be streamed - they must be installed/extracted first. This script
 # detects those and exits with a clear message.
 #
 # Usage: stream-runner.sh GAME_ID "GAME NAME" "WEBDAV_FOLDER" [EXE_REL_PATH]
-# Credentials are read from ~/.config/deckstream/storage.conf (STORAGE_PASS=...)
+# Credentials are read from ~/.config/deckstream/storage.conf (STORAGE_KEY=...)
 # ==============================================================================
 
 GREEN='\033[0;32m'; CYAN='\033[0;36m'; YELLOW='\033[1;33m'; RED='\033[0;31m'; NC='\033[0m'
@@ -98,9 +98,10 @@ bounded() { local secs="$1"; shift; if command -v timeout >/dev/null 2>&1; then 
 
 # shellcheck disable=SC1090
 [ -f "$CRED_FILE" ] && source "$CRED_FILE"
-WEBDAV_URL="${STORAGE_WEBDAV_URL:-https://storage.local}"
-WEBDAV_USER="${STORAGE_WEBDAV_USER:-storage}"
-[ -z "${STORAGE_PASS:-}" ] && fail "No RemoteStorage key. Re-run the installer with your key, or put STORAGE_PASS=... in $CRED_FILE"
+WEBDAV_URL="${STORAGE_WEBDAV_URL:-}"
+WEBDAV_USER="${STORAGE_WEBDAV_USER:-deckstream}"
+[ -z "$WEBDAV_URL" ] && fail "No STORAGE_WEBDAV_URL in $CRED_FILE. Re-run the installer, or add the WebDAV address of your games there."
+[ -z "${STORAGE_KEY:-}" ] && fail "No RemoteStorage key. Re-run the installer with your key, or put STORAGE_KEY=... in $CRED_FILE"
 
 BASE_DIR="$HOME/.local/share/deckstream/stream"
 
@@ -266,7 +267,7 @@ tools_mirror() {
     if [ -z "$base" ] && [ -f "$HOME/.config/deckstream/daemon_config.json" ]; then
         base="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("server_url",""))' "$HOME/.config/deckstream/daemon_config.json" 2>/dev/null)"
     fi
-    echo "${base:-https://deckstream.vercel.app}/daemon/tools"
+    if [ -n "$base" ]; then echo "$base/daemon/tools"; fi
 }
 sha256_of() { (sha256sum "$1" 2>/dev/null || shasum -a 256 "$1") | awk '{print $1}'; }
 fetch_verified() {   # fetch_verified UPSTREAM_URL MIRROR_URL SHA256 DEST
@@ -306,17 +307,17 @@ export RCLONE_CONFIG_TBSTREAM_USER="$WEBDAV_USER"
 # cache folder per launch: the cache never survived (Cyberpunk's 50 GB was spread over three folders). Obscure once per
 # key, keep the result in a private file next to storage.conf (which already holds the key itself), and reuse it.
 PASS_FILE="$HOME/.config/deckstream/.stream_pass"
-KEY_SHA="$(printf '%s' "$STORAGE_PASS" | sha256sum | cut -d' ' -f1)"
+KEY_SHA="$(printf '%s' "$STORAGE_KEY" | sha256sum | cut -d' ' -f1)"
 if [ -f "$PASS_FILE" ] && [ "$(sed -n 1p "$PASS_FILE")" = "$KEY_SHA" ] && [ -n "$(sed -n 2p "$PASS_FILE")" ]; then
     RCLONE_CONFIG_TBSTREAM_PASS="$(sed -n 2p "$PASS_FILE")"
 else
-    RCLONE_CONFIG_TBSTREAM_PASS="$(rclone obscure "$STORAGE_PASS")" || fail "Could not obscure RemoteStorage key"
+    RCLONE_CONFIG_TBSTREAM_PASS="$(rclone obscure "$STORAGE_KEY")" || fail "Could not obscure RemoteStorage key"
     ( umask 077; printf '%s\n%s\n' "$KEY_SHA" "$RCLONE_CONFIG_TBSTREAM_PASS" > "$PASS_FILE" )
 fi
 export RCLONE_CONFIG_TBSTREAM_PASS
 REMOTE="tbstream:$WEBDAV_FOLDER"
 
-# >>> hedge_proxy (OFF unless DECKSTREAM_HEDGE=1: no Deck run yet, AHEADOFTHEPACK row 34)
+# >>> hedge_proxy (OFF unless DECKSTREAM_HEDGE=1: not yet measured on a Deck)
 # Every range request is sent twice through a local helper and the first answer is used: a first launch waits on one
 # read at a time and RemoteStorage's first byte is random (median 1.4 s, p90 3.2 s on the Deck). Bounded: if the helper does
 # not answer within 3 s the mount talks to RemoteStorage directly, exactly as without the flag. The mount URL then differs,
@@ -355,24 +356,22 @@ LISTING="$(rclone lsf -R --max-depth 2 "$REMOTE" 2>&1)" || fail "Cannot read Rem
 [ -z "$LISTING" ] && fail "RemoteStorage folder is empty: $WEBDAV_FOLDER"
 
 # >>> preflight_kind
-# RemoteStorage's WebDAV names a folder after the first folder in a torrent's file paths, so two torrents with the same top
-# folder are MERGED into one. When both hold the same file names (two versions of one game), the listing shows each name
-# twice and the game would read a mix of both: 18 Oct, Spider-Man Remastered (InsaneRamZes + a rutor copy, 19 files of
-# different sizes) died at start with c000007b. Refuse it and say what to do.
+# A storage server can merge two copies of a game into one WebDAV folder (same top folder). When both hold the same
+# file names (two versions of one game), the listing shows each name twice and the game would read a mix of both,
+# which dies at start (c000007b). Refuse it and say what to do.
 DUPES="$(echo "$LISTING" | grep -v '/$' | sort | uniq -d | head -n 3)"
 if [ -n "$DUPES" ]; then
-    fail "RemoteStorage put two releases in this folder (both have $(echo "$DUPES" | head -n 1 | sed 's|.*/||')): the game would mix their files. Remove one of them in RemoteStorage, then send the game again."
+    fail "This folder holds two copies of the game (both have $(echo "$DUPES" | head -n 1 | sed 's|.*/||')): the game would mix their files. Keep one copy on your storage server, then send the game again."
 fi
-if echo "$LISTING" | grep -qiE '(^|/)fg-[0-9]+\.bin$|(^|/)fg-optional.*\.bin$|(^|/)setup-?[0-9]*\.bin$'; then
-    fail "This is a REPACK (installer payload). Repacks must be installed first and can't be streamed."
+if echo "$LISTING" | grep -qiE '(^|/)setup[^/]*-[0-9]+\.bin$|(^|/)setup-?[0-9]*\.bin$'; then
+    fail "This is an installer (setup + .bin payload). Installers must be installed first and can't be streamed."
 fi
 EXE_COUNT=$(echo "$LISTING" | grep -iE '\.exe$' | grep -ivE '(^|/)(setup|unins|vcredist|dxsetup|dotnet|redist|crash)[^/]*$' | grep -c . || true)
 if [ "$EXE_COUNT" -eq 0 ] && echo "$LISTING" | grep -qiE '(^|/)setup[^/]*\.exe$'; then
-    fail "This looks like an installer (GOG/setup), not an extracted game. Use 'Install from RemoteStorage' instead."
+    fail "This looks like an installer (for example a GOG offline installer), not an installed game folder. Use 'Install to the Deck' instead."
 fi
 # The listing is 2 levels deep, but the plan's exe can sit deeper (Cyberpunk: Cyberpunk 2077/bin/x64/Cyberpunk2077.exe).
-# If that exact file is there, the folder holds the game, even with another release's zip beside it (18 Oct: RemoteStorage put
-# the 69 GB GOG-Rip folder and a 148 GB InsaneRamZes zip in one WebDAV folder, and this refused it as an archive).
+# If that exact file is there, the folder holds the game, even with a zip of something else beside it.
 if [ "$EXE_COUNT" -eq 0 ] && [ -n "$EXE_REL_PATH" ] && \
    rclone lsf "$REMOTE/$(dirname -- "$EXE_REL_PATH")" 2>/dev/null | grep -qixF -- "$(basename -- "$EXE_REL_PATH")"; then
     EXE_COUNT=1
@@ -390,7 +389,7 @@ fi
 # several files open, and on the Deck 1 chunk stream per file beat 4 (see CHUNK_STREAMS below).
 # Read-ahead: measured on the Deck (Sifu, 29 GB pak): with 128M read-ahead a cold random 4 MB read took
 # ~6 s because earlier reads were still downloading; 32M read-ahead with 16M chunks cut that to ~3.5 s and
-# kept sequential reads at ~17 MB/s (vs ~18). See RESEARCH.md section 9. Override without editing code:
+# kept sequential reads at ~17 MB/s (vs ~18). Override without editing code:
 #   DECKSTREAM_CHUNK_SIZE=32M DECKSTREAM_CHUNK_STREAMS=4 DECKSTREAM_READ_AHEAD=128M
 #   (lower the chunk size or streams if the Deck ever feels memory-starved)
 CHUNK_SIZE="${DECKSTREAM_CHUNK_SIZE:-16M}"
@@ -849,7 +848,7 @@ GAME_DURATION=$(( $(date +%s) - LAUNCH_AT ))
 echo -e "${CYAN}[*] Game exited after ${GAME_DURATION}s.${NC}"
 echo "[stats] cached from RemoteStorage: $(du -sh "$CACHE_DIR" 2>/dev/null | cut -f1) (cap $CACHE_MAX)"
 
-# Cap the Proton logs on EVERY exit (they reached ~1 GB when only short runs were rotated; CHECKLIST 59)
+# Cap the Proton logs on EVERY exit (they reached ~1 GB when only short runs were rotated)
 if [ -f "$CONF_DIR/proton_matcher.py" ]; then
     for candidate in "$LOG_DIR/steam-"*.log "$HOME/steam-"*.log; do
         [ -f "$candidate" ] && timeout 60 python3 "$CONF_DIR/proton_matcher.py" "$candidate" --rotate-only >/dev/null 2>&1

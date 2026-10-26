@@ -9,6 +9,7 @@
 Exit code: 0 = nothing failed, 1 = at least one check failed. Warnings do not fail it.
 Secrets (the queue password and the RemoteStorage key) are never printed or written to a bundle.
 """
+import base64
 import concurrent.futures
 import hashlib
 import json
@@ -30,9 +31,9 @@ CONF = HOME / ".config" / "deckstream"
 DATA = HOME / ".local" / "share" / "deckstream"
 UA = "DeckStream-doctor/1.0"
 
-NEEDED_HOSTS = ["webdav.storage.local"]
+NEEDED_HOSTS = []   # plus the DeckStream site and the storage server from the config files
 OPTIONAL_HOSTS = {
-    "github.com": "rclone / umu / Ludusavi downloads (a copy is mirrored on your DeckStream site)",
+    "github.com": "rclone / umu / Ludusavi downloads (your DeckStream site can mirror them under /daemon/tools)",
     "downloads.rclone.org": "rclone downloads (mirrored)",
     "repo.steampowered.com": "umu's game runtime (NOT mirrored; only needed if you use umu)",
 }
@@ -112,12 +113,16 @@ def load_json(path, default=None):
         return default
 
 
-def storage_key():
+def storage_setting(name):
     try:
-        m = re.search(r"STORAGE_KEY=(?:'([^']*)'|\"([^\"]*)\"|(\S+))", (CONF / "storage.conf").read_text())
+        m = re.search(name + r"=(?:'([^']*)'|\"([^\"]*)\"|(\S+))", (CONF / "storage.conf").read_text())
         return next((g for g in m.groups() if g), "") if m else ""
     except OSError:
         return ""
+
+
+def storage_key():
+    return storage_setting("STORAGE_KEY")
 
 
 def version_tuple(text):
@@ -152,6 +157,9 @@ def check_dns(cfg):
     server = urllib.parse.urlparse(cfg.get("server_url", "")).hostname if cfg else None
     if server:
         hosts[server] = None
+    storage = urllib.parse.urlparse(storage_setting("STORAGE_WEBDAV_URL")).hostname
+    if storage:
+        hosts[storage] = None
     names = list(hosts) + list(OPTIONAL_HOSTS)
     with concurrent.futures.ThreadPoolExecutor(max_workers=6) as ex:
         results = dict(zip(names, ex.map(resolve, names)))
@@ -202,18 +210,21 @@ def check_server(cfg):
 
 
 def check_storage():
-    key = storage_key()
-    if not key:
-        return [R(WARN, "RemoteStorage key", "not saved on this Deck", f"Put STORAGE_KEY=... in {CONF / 'storage.conf'} (streaming and cloud install need it).")]
+    key, url = storage_key(), storage_setting("STORAGE_WEBDAV_URL")
+    user = storage_setting("STORAGE_WEBDAV_USER") or "deckstream"
+    if not key or not url:
+        return [R(WARN, "Storage server", "not set on this Deck",
+                  f"Put STORAGE_KEY, STORAGE_WEBDAV_URL and STORAGE_WEBDAV_USER in {CONF / 'storage.conf'} (streaming and installs need them).")]
+    auth = base64.b64encode(f"{user}:{key}".encode()).decode()
     try:
-        status, _, _ = http("https://api.storage.local/v1/api/user/me", {"Authorization": f"Bearer {key}"})
-    except (OSError, urllib.error.URLError) as e:
-        return [R(WARN, "RemoteStorage key", f"saved, but RemoteStorage could not be reached to check it ({e})")]
-    if status == 200:
-        return [R(OK, "RemoteStorage key", "saved and accepted by RemoteStorage")]
+        status, _, _ = http(url.rstrip("/") + "/", {"Authorization": f"Basic {auth}", "Depth": "0"}, method="PROPFIND")
+    except (OSError, urllib.error.URLError, ValueError) as e:
+        return [R(WARN, "Storage server", f"set, but {url} could not be reached ({e})")]
+    if status in (200, 207):
+        return [R(OK, "Storage server", f"{url} accepts this Deck's key")]
     if status in (401, 403):
-        return [R(FAIL, "RemoteStorage key", "saved, but RemoteStorage rejected it", "Put the current key in storage.conf (it may have been regenerated).")]
-    return [R(WARN, "RemoteStorage key", f"saved; RemoteStorage answered HTTP {status}")]
+        return [R(FAIL, "Storage server", f"{url} rejected the key", "Put the current key in storage.conf.")]
+    return [R(WARN, "Storage server", f"{url} answered HTTP {status}")]
 
 
 def check_rclone():
