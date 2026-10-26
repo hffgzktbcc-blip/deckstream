@@ -1,0 +1,41 @@
+name: tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Install the browser test's Chromium
+        run: |
+          npm i --no-save playwright@1.63.0
+          npx playwright install --with-deps chromium
+
+      - name: Run the DeckStream test suite
+        run: bash scripts/run_all_tests.sh
+
+      - name: The committed Decky zip matches its source
+        run: |
+          git show HEAD:decky/DeckStream.zip > "$RUNNER_TEMP/committed.zip"
+          bash scripts/build_decky.sh
+          unzip -q "$RUNNER_TEMP/committed.zip" -d "$RUNNER_TEMP/committed"
+          unzip -q decky/DeckStream.zip -d "$RUNNER_TEMP/built"
+          diff -r "$RUNNER_TEMP/committed" "$RUNNER_TEMP/built"
