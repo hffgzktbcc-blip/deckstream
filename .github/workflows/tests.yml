@@ -34,5 +34,8 @@ jobs:
 
       - name: The committed Decky zip matches its source
         run: |
+          git show HEAD:decky/DeckStream.zip > "$RUNNER_TEMP/committed.zip"
           bash scripts/build_decky.sh
-          git diff --exit-code decky/DeckStream.zip
+          unzip -q "$RUNNER_TEMP/committed.zip" -d "$RUNNER_TEMP/committed"
+          unzip -q decky/DeckStream.zip -d "$RUNNER_TEMP/built"
+          diff -r "$RUNNER_TEMP/committed" "$RUNNER_TEMP/built"
