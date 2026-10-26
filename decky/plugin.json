@@ -1,0 +1,11 @@
+{
+  "name": "DeckStream",
+  "author": "DeckStream Contributors",
+  "flags": [],
+  "api_version": 1,
+  "publish": {
+    "tags": ["streaming", "storage", "library"],
+    "description": "DeckStream Gaming Mode companion: manage remote mounts, local cache, performance presets, and game streaming.",
+    "image": ""
+  }
+}

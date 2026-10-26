@@ -1,0 +1,15 @@
+{
+  "name": "deckstream",
+  "version": "1.0.0",
+  "description": "On-demand virtual filesystem gaming runtime & companion app for Steam Deck",
+  "scripts": {
+    "start": "node scripts/dev_server.js --port 8765",
+    "test": "bash scripts/run_all_tests.sh"
+  },
+  "dependencies": {
+    "web-push": "^3.6.7"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
