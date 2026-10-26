@@ -11,7 +11,7 @@ Backups go to the INTERNAL drive (~/.local/share/deckstream/saves-backup) so tha
 the games and their Proton prefixes live, cannot take the backups with it.
 
 Limits worth knowing:
-  * Ludusavi must know the game by its official title. Torrent names are messy, so several cleaned-up
+  * Ludusavi must know the game by its official title. Folder names are messy, so several cleaned-up
     candidates are tried; `title` pins the right one. Games with no match are reported, never skipped silently.
   * Ludusavi does not back up registry-based saves from a custom Wine prefix, so user.reg is copied as well.
   * `ludusavi restore` has no --wine-prefix option: it restores to the original paths. Keep the prefix

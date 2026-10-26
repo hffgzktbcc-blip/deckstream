@@ -20,7 +20,7 @@ module.exports = async (req, res) => {
     // 1. If no appId given, look up Steam App ID from title
     let cleanGameTitle = title;
     if (!appId && title) {
-      // Strip scene release tags, repacks, and noise for clean Steam search
+      // Strip version numbers, edition words and punctuation for a clean Steam search
       cleanGameTitle = title
         .replace(/\b(v?\d+(\.\d+)+|deluxe|ultimate|complete|goty|edition|remastered|directors cut|enhanced)\b/gi, '')
         .replace(/[\[\]\(\)\-_]/g, ' ')

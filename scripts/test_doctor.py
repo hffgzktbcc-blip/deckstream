@@ -10,13 +10,14 @@ sys.path.insert(0, str(ROOT / "daemon"))
 doctor = importlib.import_module("doctor")
 CONF = home / ".config/deckstream"; DATA = home / ".local/share/deckstream"
 SECRET, KEY = "queue-secret-123456", "storage-key-abcdef789"
+STORAGE_CONF = f"STORAGE_KEY={KEY}\nSTORAGE_WEBDAV_URL=http://nas.lan:8781\nSTORAGE_WEBDAV_USER=deckstream\n"
 
 def sha(b): return hashlib.sha256(b).hexdigest()
 
 def setup(files_ok=True):
     CONF.mkdir(parents=True, exist_ok=True); DATA.mkdir(parents=True, exist_ok=True)
-    (CONF / "daemon_config.json").write_text(json.dumps({"server_url": "https://deckstream.vercel.app", "device_id": "deck-main", "queue_secret": SECRET}))
-    (CONF / "storage.conf").write_text(f"STORAGE_KEY={KEY}\n")
+    (CONF / "daemon_config.json").write_text(json.dumps({"server_url": "https://deckstream.example", "device_id": "deck-main", "queue_secret": SECRET}))
+    (CONF / "storage.conf").write_text(STORAGE_CONF)
     files = {"deckstream-daemon.py": b"print(1)\n", "saves.py": b"print(2)\n"}
     for n, b in files.items(): (CONF / n).write_bytes(b)
     (CONF / "manifest.json").write_text(json.dumps({"version": "v1", "files": {n: {"sha256": sha(b)} for n, b in files.items()}}))
@@ -31,9 +32,10 @@ def fake(**o):
         if "/api/queue" in url:
             assert headers and headers.get("x-deckstream-secret") == SECRET
             return o.get("queue", 200), {"Date": formatdate(doctor.now() + o.get("skew", 0), usegmt=True)}, b"{}"
-        if "user/me" in url:
-            assert headers["Authorization"] == f"Bearer {KEY}"
-            return o.get("storage", 200), {}, b"{}"
+        if url.startswith("http://nas.lan:8781"):
+            import base64
+            assert method == "PROPFIND" and headers["Authorization"] == "Basic " + base64.b64encode(f"deckstream:{KEY}".encode()).decode()
+            return o.get("storage", 207), {}, b""
         if url.endswith("/daemon/manifest.json"):
             return 200, {}, json.dumps({"version": o.get("remote_ver", "v1")}).encode()
         raise AssertionError(url)
@@ -77,8 +79,8 @@ print("[ok] Wi-Fi power saving on: points at the Deck's Developer toggle (surviv
 r = res(dns_fail={"github.com", "repo.steampowered.com"})
 assert r["DNS: github.com"].status == "warn" and "nmcli" in r["DNS: github.com"].fix and "mirror" in r["DNS: github.com"].detail
 assert r["DNS: repo.steampowered.com"].status == "warn" and "NOT mirrored" in r["DNS: repo.steampowered.com"].detail
-r = res(dns_fail={"webdav.storage.local"}); assert r["DNS: webdav.storage.local"].status == "fail"
-print("[ok] DNS trouble is named host by host, with the exact nmcli fix; RemoteStorage hosts failing is a failure")
+r = res(dns_fail={"nas.lan"}); assert r["DNS: nas.lan"].status == "fail"
+print("[ok] DNS trouble is named host by host, with the exact nmcli fix; the storage server failing is a failure")
 
 # 3. server / password / clock
 assert res(queue=401)["Queue password"].status == "fail"
@@ -86,10 +88,10 @@ assert res(queue=503)["DeckStream server"].status == "warn"
 r = res(skew=3600); assert r["Clock"].status == "fail"
 print("[ok] wrong queue password, a server with no password set, and a badly wrong clock are each reported")
 
-# 4. RemoteStorage key
-assert res(storage=401)["RemoteStorage key"].status == "fail"
-(CONF / "storage.conf").unlink(); assert res()["RemoteStorage key"].status == "warn"; (CONF / "storage.conf").write_text(f"STORAGE_KEY={KEY}\n")
-print("[ok] a rejected or missing RemoteStorage key is reported")
+# 4. storage server
+assert res(storage=401)["Storage server"].status == "fail"
+(CONF / "storage.conf").unlink(); assert res()["Storage server"].status == "warn"; (CONF / "storage.conf").write_text(STORAGE_CONF)
+print("[ok] a rejected key or a missing storage server is reported")
 
 # 5. rclone, SD card, disk, daemon, journal
 assert res(rclone_out="rclone v1.60.0\n")["rclone"].status == "warn"
@@ -140,5 +142,5 @@ buf = io.StringIO()
 with redirect_stdout(buf): doctor.main(["--json"])
 assert json.loads(buf.getvalue()) and SECRET not in buf.getvalue() and KEY not in buf.getvalue()
 assert doctor.redact(f"https://x/y?token={KEY}&a=1 Authorization: Bearer {KEY}") .count(KEY) == 0
-print("[ok] reports, JSON and the shareable bundle contain neither the queue password nor the RemoteStorage key (bundle is private, 600)")
+print("[ok] reports, JSON and the shareable bundle contain neither the queue password nor the storage key (bundle is private, 600)")
 print("\nDOCTOR TESTS PASSED")

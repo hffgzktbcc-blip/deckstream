@@ -5,8 +5,8 @@ Why: a first launch of a never-played game waits on one read at a time, and ever
 median 1.40 s, p90 3.2 s in the Deck's own BG3 cold log (1,260 range requests), with two requests sent at the same
 moment almost unrelated (correlation 0.12) and no slower when more are in flight. So: send each range request twice
 and use whichever answers first; the other is cancelled before its body is read. Replay rig (real rclone, the Deck's
-measured first-byte times): 1 stream 169-185 s -> 132 s on BG3's start-up reads. See
-deckstream-plans/first-launch-untried-ideas-1019.md and AHEADOFTHEPACK.md row 34.
+measured first-byte times): 1 stream 169-185 s -> 132 s on BG3's start-up reads. Not yet measured on a Deck, so
+stream-runner.sh starts it only with DECKSTREAM_HEDGE=1.
 
     rclone (webdav remote, url=http://127.0.0.1:PORT) -> this proxy -> https://webdav.storage.local
 

@@ -48,7 +48,7 @@ for name, want in cases.items():
     got = saves.title_candidates(name)
     assert got == want, (name, got, want)
 assert saves.title_candidates("x", override="Official")[0] == "Official"
-print("[ok] torrent-style names turn into likely official titles (Spider-Man survives, release groups don't)")
+print("[ok] dotted folder names turn into likely official titles (Spider-Man survives, version tags don't)")
 
 # 2. register + prefix layouts
 proton = tmp / "compat" / "id"; (proton / "pfx" / "drive_c").mkdir(parents=True)
@@ -60,7 +60,7 @@ assert saves.wine_prefix(proton) == proton / "pfx" and saves.wine_prefix(plain) 
 (proton / "pfx" / "user.reg").write_text("REGEDIT4")
 for i in range(5):
     pass
-r = run("register", "--slug", "ghost", "--title", "Ghost.of.Tsushima.Directors.Cut-InsaneRamZes", "--prefix", str(proton))
+r = run("register", "--slug", "ghost", "--title", "Ghost.of.Tsushima.Directors.Cut.v1.0", "--prefix", str(proton))
 assert r.returncode == 0, r.stderr
 run("register", "--slug", "mystery", "--title", "Some Unknown Game", "--prefix", str(plain))
 run("register", "--slug", "never", "--title", "Never Run Game", "--prefix", str(tmp / "empty"))

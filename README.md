@@ -1,188 +1,139 @@
 <p align="center">
-  <img src="docs/readme/hero.svg" alt="DeckStream: your remote PC game library, playable on a Steam Deck. Pick a game on your phone or web app; the Deck streams it on demand." width="100%">
+  <img src="docs/readme/hero.svg" alt="DeckStream: your own PC game library, playable on a Steam Deck. Pick a game on your phone or web app; the Deck streams it on demand." width="100%">
 </p>
 
 <p align="center">
-  <a href="https://github.com/hffgzktbcc-blip/deckstream/releases/tag/v1.0.0"><img alt="Release" src="https://img.shields.io/badge/Release-v1.0.0-3b82f6?labelColor=1c2027"></a>
   <a href="https://github.com/hffgzktbcc-blip/deckstream/actions/workflows/tests.yml"><img alt="tests" src="https://github.com/hffgzktbcc-blip/deckstream/actions/workflows/tests.yml/badge.svg"></a>
   <img alt="Steam Deck" src="https://img.shields.io/badge/Steam%20Deck-SteamOS%203.5+-5ab0ff?labelColor=1c2027">
-  <img alt="Storage" src="https://img.shields.io/badge/Storage-WebDAV%20%7C%20NAS%20%7C%20S3-3fd6a4?labelColor=1c2027">
-  <img alt="Proton" src="https://img.shields.io/badge/Runs%20On-Proton%20%2B%20UMU-f1b647?labelColor=1c2027">
+  <img alt="Storage" src="https://img.shields.io/badge/Storage-WebDAV-3fd6a4?labelColor=1c2027">
   <img alt="License" src="https://img.shields.io/badge/License-MIT-blue?labelColor=1c2027">
 </p>
 
-**DeckStream** turns your **remote game library** (personal NAS, WebDAV, Nextcloud, TrueNAS, or cloud storage) into games you can play natively on a **Steam Deck** or handheld Linux PC, without filling limited local storage first.
+**DeckStream** plays PC games you already own, stored on your own server (a NAS, Nextcloud, or anything that speaks
+WebDAV), on a **Steam Deck** without copying the whole game to the Deck first.
 
-You choose a title from your library. The Deck fetches only the small fraction of blocks the game needs to start, boots natively through **Proton**, and streams the remaining assets seamlessly in the background while you play.
-
-<p align="center">
-  <img src="docs/readme/deck-ecosystem.svg" alt="DeckStream ecosystem: SteamOS Gaming Mode with Decky Loader QAM panel alongside the cartridge shelf companion." width="100%">
-</p>
-<p align="center"><sub>The DeckStream ecosystem: SteamOS Gaming Mode Decky Loader Quick Access Panel alongside the signature cartridge-shelf companion app.</sub></p>
+You pick a game on your phone. The Deck mounts the game folder over WebDAV, fetches the parts the game reads at
+start-up, starts it through **Proton**, and reads the rest while you play.
 
 <p align="center">
-  <img src="docs/readme/screens.png" alt="The companion app: Home with the next game ready to play, the cartridge shelf library, search results, and the Send to Deck sheet" width="100%">
+  <img src="docs/readme/screens.png" alt="The companion app: Home, the library from your storage server, Search, and the Deck's queue" width="100%">
 </p>
-<p align="center"><sub>The companion app with the signature cartridge-shelf design system: physical cartridge notches, printed paper labels, horizontal shelves, and live ProtonDB ratings.</sub></p>
 
 ---
 
-## ⚡ How It Works
+## How it works
 
 <p align="center">
-  <img src="docs/readme/how-it-works.svg" alt="1 Storage: pick a game from your NAS. 2 Queue: a lightweight server holds the job behind your password. 3 Deck: the DeckStream service picks it up and adds a shortcut. 4 Fill: demand profiler pre-fills startup byte ranges to local card/SSD. 5 Play: Proton starts the game and the rest streams in while you play." width="100%">
+  <img src="docs/readme/how-it-works.svg" alt="Storage, Queue, Deck, Fill, Play" width="100%">
 </p>
 
-Under the hood:
-1. **Virtual FUSE Mount**: Remote game directories are mounted over high-performance WebDAV with **rclone VFS** and chunk-level caching.
-2. **Copy-on-Write Upper Layer**: Uses **`fuse-overlayfs`** so remote storage stays 100% read-only. Game writes, INI configuration tweaks, local saves, and DirectX/Vulkan shader caches land in an isolated upper layer on your local MicroSD card or NVMe.
-3. **Proton & UMU Execution**: Games launch via **`umu-launcher`** (Proton plus the Steam Linux Runtime), automatically applying game-specific Wine fixes and Proton prefixes.
-4. **Smart Startup Profiler**: Each session logs the exact byte ranges read during launch. Subsequent cold launches fetch only those startup ranges in parallel, taking cold launches from minutes down to seconds.
+| Part | What it is |
+| :--- | :--- |
+| **Storage server** | Yours. Serves the library over a small HTTP API ([docs/STORAGE_API.md](docs/STORAGE_API.md)) and the files over WebDAV. `scripts/storage_server.js` is a reference server for a folder of games. |
+| **Site** | `index.html` (the phone app) and `api/*.js` on Vercel: library, search (your library plus Steam store titles), launch planner, and the Deck's job queue behind your password. |
+| **Deck daemon** | `daemon/`: a user systemd service that polls the queue, mounts games with **rclone**, adds a Steam shortcut, launches with **umu-launcher** + Proton, and backs up saves with **Ludusavi**. |
+| **Decky plugin** | `decky/`: the phone's status, queue, library and search in Gaming Mode's quick-access menu. |
 
----
+On the Deck:
+1. **rclone mount** of the game folder, read-only, with a local VFS cache.
+2. **fuse-overlayfs** write layer when it is installed, so game writes land on local storage and the server copy stays untouched. Without it the game runs from the read-only mount.
+3. **Start-up profile** (`startup_profile.py`): the first launch records the byte ranges the game reads; later cold launches fetch those ranges first, in parallel, before the game starts.
+4. **After sleep**, the daemon runs `suspend-resume-hook.sh`: it waits for the network, probes the rclone mounts and lazily unmounts a hung one so it can be remounted.
 
-## 🏗️ Technical Architecture
+Not on by default:
+- **Hedge proxy** (`hedge_proxy.py`, `DECKSTREAM_HEDGE=1`): sends each range request twice and uses the first answer. It helped in a replay rig; it has **not been measured on a Deck**.
+- **Self-update**: off until you set up a signing key (see `scripts/make_manifest.py`). Without it, re-run the install command to update.
 
-<p align="center">
-  <img src="docs/readme/architecture.svg" alt="Technical architecture: unprivileged FUSE overlays, range-hedged HTTP streaming, and Proton compatibility" width="100%">
-</p>
+## Measured
 
-DeckStream operates completely in user space without requiring root privileges:
-- **Network Hedging Proxy (`hedge_proxy.py`)**: Sits between rclone and your remote server. If any HTTP range-read chunk takes longer than 200 ms to return its first byte, a duplicate request is immediately raced in parallel, discarding whichever arrives second.
-- **Copy-on-Write Isolation (`fuse-overlayfs`)**: Multiple handhelds or PCs can mount the exact same game folder from a single NAS simultaneously without file-locking conflicts or corrupted settings.
-- **Save Integrity Engine (`saves.py`)**: Automatically detects game saves and creates encrypted post-session backups via **Ludusavi**, shielding player progress against prefix resets.
+On one Steam Deck over home Wi-Fi (about 23 MB/s) from a cloud WebDAV store, October 2026, with the code this
+project grew out of:
 
----
-
-## 🎮 Handheld & Decky Loader QAM Controls
-
-<p align="center">
-  <img src="docs/readme/decky-controls.svg" alt="Decky Loader QAM: SteamOS Handheld Controls for streaming telemetry, battery presets, and diagnostics" width="100%">
-</p>
-
-The native **Decky Loader** plugin integrates directly into the SteamOS Quick Access Menu (QAM):
-- **⚡ Live Stream Telemetry**: Monitor real-time throughput (MB/s), tail latency (p99), and active VFS cache footprint without leaving your game.
-- **🔋 One-Tap Deck Mode Preset**: Cap framerates at 30 FPS and apply handheld low graphics presets with a single switch toggle, extending battery life by up to 130%.
-- **🌙 Overnight Startup Warmup**: Automatically pre-fetches startup profiles for your most played games while your Deck rests on its official charger dock.
-- **🛠️ Self-Healing Doctor**: Instant checks for Wi-Fi power-saving conflicts, DNS latency, and storage mount health.
-
----
-
-## 📊 Measured on a Steam Deck
-
-Real benchmark measurements on one Steam Deck over home Wi-Fi (about 23 MB/s sustained from remote WebDAV storage).
-
-| Game | Start State | Measured Real-World Performance |
+| Game | Start | Result |
 | :--- | :--- | :--- |
-| **Cyberpunk 2077** | Cold, empty cache | 12.88 GB fetched in 9m 31s; **title menu on screen at 17m 42s** |
-| **Cyberpunk 2077** | Warm, cached profile | **9 seconds** from pressing Play until Proton initializes |
-| **Sifu** | Cold, profiled | 5.35 GB fetched in ~4 min; in full control at **7 minutes** |
-| **Profiled Games** | Warm relaunch | Usable title screen in **2.5 to 3 minutes**, zero full-game download |
-| **Baldur's Gate 3** | First ever launch | ~25 min: 76,000 scattered reads, bound by remote response time, not bandwidth |
+| Cyberpunk 2077 | cold, empty cache | 12.88 GB fetched in 9 min 31 s; title menu at 17 min 42 s |
+| Cyberpunk 2077 | warm | 9 s from Play until Proton starts |
+| Sifu | cold, profiled | 5.35 GB in about 4 min; in control at about 7 min |
+| Baldur's Gate 3 | first launch, no profile | about 25 min: 76,000 small reads, limited by server latency, not bandwidth |
+
+The first launch of a game with no profile is slow when the server is far away. A NAS on your own network has far lower
+latency; that setup has not been benchmarked yet.
 
 ---
 
-## 🎢 Engineering Highs & Lows: Lessons from the Handheld Trenches
+## Setup
 
-Building an on-demand virtual filesystem gaming runtime for a handheld console came with non-trivial distributed systems challenges. Here are the genuine technical highs and lows encountered during development:
-
-### 🚀 High: Range-Request Hedging Cured 99th-Percentile Micro-Stutters
-- **The Problem**: Over home Wi-Fi or high-capacity NAS storage, occasional 400–800 ms tail latency spikes occur (e.g., Wi-Fi beacon collisions, disk spin-up, or TCP window re-negotiations). While tolerable for file downloads, when a game engine like Unreal or REDengine performs a blocking read for audio or geometry streaming, an 800 ms stall produces an immersion-shattering micro-freeze in GameScope.
-- **The Fix**: We built an asynchronous range hedging proxy (`hedge_proxy.py`). If a remote byte range chunk doesn't return its first byte within 200 ms, the proxy races a second duplicate connection in parallel and serves whichever arrives first. Stutters dropped to near zero, bringing p99 latency under 25 ms.
-
-### 💥 Low: The Unreal Engine 5 "76,000 Seeks" Catastrophe
-- **The Problem**: On cold launch, modern game archives (such as *Baldur's Gate 3* or UE5 pak files) do not read sequentially. During engine initialization, they perform tens of thousands of tiny 4 KB header seeks scattered across hundreds of gigabytes of archives. Over remote storage, 76,000 round trips at even 5 ms network ping produced over 6 minutes of pure latency before the splash screen even appeared!
-- **The Fix**: The **Smart Startup Profiler** (`startup_profile.py`). During the first launch, the daemon records every byte offset and block length requested by the engine. On subsequent cold launches, the daemon pre-fetches the entire startup block profile across 16 parallel TCP connections in under 90 seconds.
-
-### 🚀 High: `fuse-overlayfs` Made Multi-Device Library Sharing Effortless
-- **The Problem**: When multiple handhelds or PCs stream from the same centralized NAS, games crash if they attempt to write configuration files (`settings.ini`), user saves, or DXVK Vulkan pipeline caches to the shared read-only network folder.
-- **The Fix**: An unprivileged Copy-on-Write upper layer using `fuse-overlayfs`. Remote storage remains 100% read-only (`ro`). All game writes, DXVK shader caches, and configuration changes are seamlessly redirected to an isolated folder on the local MicroSD card or NVMe. Zero network file locking, zero NAS corruption risk.
-
-### 💥 Low: Handheld Sleep/Wake Power Saving Severed FUSE Mounts
-- **The Problem**: When the Steam Deck is suspended in Gaming Mode, SteamOS powers down the Wi-Fi chipset to conserve battery. Upon waking, games resumed faster than the Wi-Fi card could renegotiate its DHCP lease, causing active FUSE read operations to immediately return `EIO` (Input/output error) and crash the game to the Steam library.
-- **The Fix**: The `suspend-resume-hook.sh` systemd inhibitor. Upon waking, the hook pauses the game process (`SIGSTOP`), verifies Wi-Fi reconnect and WebDAV socket health, clears stalled rclone read buffers, and then sends `SIGCONT` to seamlessly resume gameplay without a hiccup.
-
----
-
-## 🌟 Key Features
-
-- **🎮 Handheld & Decky First**: Native Decky Loader Quick Access Menu plugin for SteamOS Gaming Mode: check active streaming sessions, view cache usage, trigger cache cleanup, and toggle per-game battery presets.
-- **🔋 Per-Game Deck Mode**: One-tap toggle in the Decky panel to cap game framerate at 30 FPS and apply Unreal Engine low graphics presets, dramatically extending handheld battery life.
-- **⚡ Range-Request Hedging**: High-latency remote storage can suffer from first-byte jitter. DeckStream's built-in hedge proxy monitors range requests and automatically races redundant connections if a remote chunk stalls past 200 ms.
-- **🌙 Overnight Startup Warm-up**: While the Deck rests on its charger overnight, the daemon can pre-fetch the startup profiles of your most recently played games so they launch instantly when you take your Deck on the go.
-- **💾 Automated Save Snapshots**: Backs up game saves automatically after each session using **Ludusavi**, preserving user progress across prefix updates.
-- **🛡️ Self-Healing Diagnostics**: Includes `doctor.py` to diagnose Wi-Fi power-saving toggles, DNS lookups, rclone VFS responsiveness, SD card filesystem health, and systemd service status.
-- **🔄 Safe Signed Updates**: The companion daemon self-updates against an integrity manifest with automatic rollback support.
-
----
-
-## 🚀 Quick Setup
-
-### 1. Connect Your Steam Deck
-Switch your Steam Deck to **Desktop Mode**, open **Konsole**, and run:
+### 1. Storage server
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/hffgzktbcc-blip/deckstream/main/daemon/install.sh | bash -s -- https://deckstream.local deck-main
+STORAGE_KEY=change-me node scripts/storage_server.js --dir /srv/games --port 8780
+rclone serve webdav /srv/games --addr :8781 --user deckstream --pass change-me
 ```
 
-This installs:
-- The user-level companion service (`deckstream.service`) that starts on boot and operates seamlessly in Gaming Mode.
-- Core FUSE streaming and compatibility wrappers in `~/.local/bin`.
-- The Decky Loader companion plugin in `~/homebrew/plugins/DeckStream/` (if Decky Loader is installed).
+One folder per game inside `/srv/games`. Details and the API for your own server: [docs/STORAGE_API.md](docs/STORAGE_API.md).
 
-### 2. Configure Remote Storage
-Set your remote storage credentials in `~/.config/deckstream/storage.conf`:
+### 2. Site (Vercel)
+
+Import this repo into Vercel (no build step) and set:
+
+| Variable | |
+| :--- | :--- |
+| `DECKSTREAM_SECRET` | the queue password the phone and the Deck use |
+| `STORAGE_API_URL` | your storage server's API, e.g. `https://games.example.com/v1/api` (must be reachable from Vercel) |
+| `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | the queue's storage. Required on Vercel: without it each function instance has its own memory and jobs get lost |
+| `ALLOWED_DOWNLOAD_HOSTS` | optional extra https hosts for file links |
+| `STEAMGRIDDB_API_KEY`, `VAPID_*` | optional: cover art, push notifications |
+
+Open the site on your phone, and in **Settings** enter the storage key and the queue password.
+
+### 3. Steam Deck
+
+In Desktop Mode, open Konsole and paste the command from the app's Settings tab:
 
 ```bash
-# ~/.config/deckstream/storage.conf
-STORAGE_WEBDAV_URL="https://nas.local/remote.php/webdav/Games"
-STORAGE_WEBDAV_USER="gamer"
-STORAGE_PASS="your_secure_password_or_token"
+curl -sSL https://YOUR-SITE/daemon/install.sh | bash -s -- https://YOUR-SITE deck-main
 ```
 
-### 3. Service Commands on the Deck
+It asks for the WebDAV address and the storage key, and installs the `deckstream` user service.
+
+For the Gaming Mode panel, install [Decky Loader](https://decky.xyz), then in its settings use **Install plugin from URL**
+with `https://YOUR-SITE/decky/DeckStream.zip`.
+
 | Action | Command |
 | :--- | :--- |
-| **Status** | `systemctl --user status deckstream` |
-| **Live Logs** | `journalctl --user -u deckstream -f` |
-| **Restart** | `systemctl --user restart deckstream` |
-| **Stop** | `systemctl --user stop deckstream` |
+| Status | `systemctl --user status deckstream` |
+| Logs | `journalctl --user -u deckstream -f` |
+| Check the setup | `python3 ~/.config/deckstream/doctor.py` (`--bundle` writes a report with keys redacted) |
 
 ---
 
-## 🛠️ Diagnostics & Self-Healing
-
-DeckStream includes a comprehensive self-diagnostic doctor tool:
+## Development
 
 ```bash
-python3 ~/.config/deckstream/doctor.py
+npm start                    # the app + real api/*.js + a mock storage library, at http://127.0.0.1:8765
+npm test                     # the whole suite (Python, API, Decky panel, browser smoke test)
+bash scripts/build_decky.sh  # rebuild decky/DeckStream.zip after changing decky/
+python3 scripts/make_manifest.py   # after changing a shipped daemon file
 ```
 
-- Explains in plain English if DNS resolution, storage credentials, Wi-Fi power management, or SD card filesystem formats require attention.
-- `--brief`: reports only problems (used by the installer).
-- `--bundle`: exports a shareable report with all passwords and keys redacted.
+The browser test needs Playwright (`npm i --no-save playwright && npx playwright install chromium`); it is skipped
+without it, except in CI.
 
----
+## Security
 
-## 🔒 Security & Sandboxing
+- The Deck side runs as the normal `deck` user. No root.
+- Keys live in `~/.config/deckstream/storage.conf` (mode 600) and the browser's local storage.
+- The site relays only the four storage endpoints, behind the queue password; file links are only fetched from your storage host.
+- The installer checks every file against `daemon/manifest.json` (SHA-256).
 
-- Runs entirely as a standard unprivileged user (`deck`). No root daemon or sudo requirements.
-- Credentials and storage access tokens are stored in `~/.config/deckstream/storage.conf` with restricted `600` permissions.
-- Remote game mounts are strictly read-only; all game writes are isolated to local copy-on-write scratch layers.
-- Cryptographic SHA-256 manifests verify all shipped files prior to installation or update.
+## Legal
 
----
+DeckStream manages games you own on storage you control.
 
-## ⚖️ Legal & Non-Infringement Disclaimer
+- **No content**: it does not provide, host, index, search for or distribute games or other copyrighted material.
+- **No circumvention**: it contains nothing that circumvents DRM or other technical protection measures.
+- **Your responsibility**: you must have the right to the files on your storage server.
 
-DeckStream is an open-source virtual filesystem and runtime utility intended strictly for managing personal media, backups, and game libraries on Linux handheld devices.
+## License
 
-- **No Content Included**: DeckStream does not provide, host, index, or distribute copyrighted video games, ROMs, or digital media.
-- **No Circumvention**: DeckStream contains no tools or software designed to circumvent digital rights management (DRM) or technological protection measures.
-- **User Responsibility**: Users are solely responsible for ensuring they have lawful access to any remote storage, software, or media mounted through this tool.
-
----
-
-## 📄 License
-
-Licensed under the [MIT License](LICENSE).
+[MIT](LICENSE).

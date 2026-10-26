@@ -3,7 +3,8 @@
 # DeckStream Steam Deck Installer
 # Sets up the DeckStream background daemon as a systemd user service on SteamOS.
 # Usage:
-#   curl -sSL https://YOUR_DOMAIN/daemon/install.sh | bash -s -- [SERVER_URL] [DEVICE_ID]
+#   curl -sSL https://YOUR_SITE/daemon/install.sh | bash -s -- [SERVER_URL] [DEVICE_ID] [STORAGE_KEY]
+#   (STORAGE_WEBDAV_URL / STORAGE_WEBDAV_USER may be set in the environment instead of answering the questions)
 # Or run locally:
 #   bash install.sh
 # ==============================================================================
@@ -28,7 +29,7 @@ DEVICE_ID="${2:-}"
 # Questions are asked on the terminal (/dev/tty): with `curl ... | bash`, stdin IS this script, and a plain `read`
 # would swallow the script's own next lines as the answer.
 if [ -z "$SERVER_URL" ] && [ -r /dev/tty ]; then
-    read -r -p "Enter your DeckStream Web URL (e.g. https://my-deckstream.vercel.app): " SERVER_URL < /dev/tty || true
+    read -r -p "Enter your DeckStream site address (e.g. https://your-site.vercel.app): " SERVER_URL < /dev/tty || true
 fi
 [ -n "$SERVER_URL" ] || { echo -e "${RED}[!] No DeckStream web address given. Run: curl -sSL <site>/daemon/install.sh | bash -s -- <site> deck-main${NC}"; exit 1; }
 
@@ -89,22 +90,33 @@ chmod 600 "$CONFIG_FILE"
 umask 022
 echo -e "${GREEN}[✓] Saved daemon configuration to ${CONFIG_FILE} (private)${NC}"
 
-# RemoteStorage credentials for 0-GB streaming (kept only on this Deck, never sent to the queue)
+# Storage server credentials for streaming (kept only on this Deck, never sent to the queue). The Deck reads your games
+# over WebDAV (for example `rclone serve webdav` on your NAS, see docs/STORAGE_API.md); the key is the WebDAV password.
 CRED_FILE="$INSTALL_DIR/storage.conf"
-STORAGE_KEY_ARG="${3:-}"
-if [ -z "$STORAGE_KEY_ARG" ] && [ ! -f "$CRED_FILE" ] && [ -r /dev/tty ]; then
-    read -r -p "RemoteStorage API key for cloud streaming (Enter to skip): " STORAGE_KEY_ARG < /dev/tty || true
+STORAGE_KEY_ARG="${3:-${STORAGE_KEY:-}}"
+WEBDAV_URL_ARG="${STORAGE_WEBDAV_URL:-}"
+WEBDAV_USER_ARG="${STORAGE_WEBDAV_USER:-deckstream}"
+if [ ! -f "$CRED_FILE" ] && [ -r /dev/tty ]; then
+    [ -n "$WEBDAV_URL_ARG" ] || read -r -p "WebDAV address of your games (e.g. http://nas.lan:8781, Enter to skip): " WEBDAV_URL_ARG < /dev/tty || true
+    if [ -n "$WEBDAV_URL_ARG" ] && [ -z "$STORAGE_KEY_ARG" ]; then
+        read -r -s -p "Storage key (the WebDAV password): " STORAGE_KEY_ARG < /dev/tty || true
+        echo ""
+    fi
 fi
-if [ -n "$STORAGE_KEY_ARG" ]; then
+if [ -n "$STORAGE_KEY_ARG" ] && [ -n "$WEBDAV_URL_ARG" ]; then
     umask 077
-    printf 'STORAGE_KEY=%q\n' "$STORAGE_KEY_ARG" > "$CRED_FILE"
+    {
+        printf 'STORAGE_KEY=%q\n' "$STORAGE_KEY_ARG"
+        printf 'STORAGE_WEBDAV_URL=%q\n' "${WEBDAV_URL_ARG%/}"
+        printf 'STORAGE_WEBDAV_USER=%q\n' "$WEBDAV_USER_ARG"
+    } > "$CRED_FILE"
     chmod 600 "$CRED_FILE"
     umask 022
-    echo -e "${GREEN}[✓] Saved RemoteStorage streaming credentials to ${CRED_FILE} (private)${NC}"
+    echo -e "${GREEN}[✓] Saved storage credentials to ${CRED_FILE} (private)${NC}"
 elif [ -f "$CRED_FILE" ]; then
-    echo -e "${GREEN}[✓] Keeping existing RemoteStorage credentials${NC}"
+    echo -e "${GREEN}[✓] Keeping existing storage credentials${NC}"
 else
-    echo -e "${YELLOW}[!] No RemoteStorage key set - cloud streaming will not work until you add one.${NC}"
+    echo -e "${YELLOW}[!] No storage server set - streaming will not work until ${CRED_FILE} has STORAGE_KEY, STORAGE_WEBDAV_URL and STORAGE_WEBDAV_USER.${NC}"
 fi
 
 # >>> fetch_verified (identical in stream-runner.sh, cloud-install.sh, umu-test.sh and install.sh)
@@ -116,7 +128,7 @@ tools_mirror() {
     if [ -z "$base" ] && [ -f "$HOME/.config/deckstream/daemon_config.json" ]; then
         base="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("server_url",""))' "$HOME/.config/deckstream/daemon_config.json" 2>/dev/null)"
     fi
-    echo "${base:-https://deckstream.vercel.app}/daemon/tools"
+    if [ -n "$base" ]; then echo "$base/daemon/tools"; fi
 }
 sha256_of() { (sha256sum "$1" 2>/dev/null || shasum -a 256 "$1") | awk '{print $1}'; }
 fetch_verified() {   # fetch_verified UPSTREAM_URL MIRROR_URL SHA256 DEST
@@ -223,7 +235,7 @@ if [ -f "$MANIFEST" ]; then
     ALL_REQUIRED=1
     NEW_VERSION="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("version",""))' "$MANIFEST")"
 else
-    FILES="deckstream-daemon.py parallel_download.py stream-runner.sh cloud-install.sh game-launcher.sh umu-test.sh saves.py bench_storage.py parallel_unzip.py deck-boost.sh doctor.py rollback.sh"
+    FILES="deckstream-daemon.py parallel_download.py stream-runner.sh cloud-install.sh game-launcher.sh umu-test.sh saves.py parallel_unzip.py doctor.py rollback.sh"
     ALL_REQUIRED=0
     NEW_VERSION="unverified"
 fi

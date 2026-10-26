@@ -63,8 +63,8 @@ function isPrivateIp(ip) {
   return true;
 }
 
-// For user-supplied add-on URLs (Prowlarr/Jackett). Must be http(s) and resolve only to public
-// addresses, so the relay can't be pointed at cloud metadata or internal services.
+// For user-supplied URLs the server fetches. Must be http(s) and resolve only to public
+// addresses, so a relay can't be pointed at cloud metadata or internal services.
 async function assertPublicHttpUrl(raw) {
   let u;
   try { u = new URL(String(raw)); } catch { throw new Error('Invalid URL'); }
@@ -78,17 +78,21 @@ async function assertPublicHttpUrl(raw) {
   return u;
 }
 
-// Hosts a download job may fetch from.
-const DEFAULT_DOWNLOAD_HOSTS = ['nas.local', 'storage.local', 's3.amazonaws.com'];
+// Hosts a download job may fetch from: the storage server's own host, plus ALLOWED_DOWNLOAD_HOSTS (comma separated).
+function storageHost() {
+  try { return new URL(String(process.env.STORAGE_API_URL || '')).hostname.toLowerCase(); } catch { return ''; }
+}
 function downloadHosts() {
   const extra = (process.env.ALLOWED_DOWNLOAD_HOSTS || '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
-  return [...DEFAULT_DOWNLOAD_HOSTS, ...extra];
+  return [storageHost(), ...extra].filter(Boolean);
 }
+// https for any allowed host; plain http only for the storage server itself (a NAS on the home network).
 function isAllowedDownloadUrl(raw) {
   try {
     const u = new URL(String(raw));
-    if (u.protocol !== 'https:') return false;
     const h = u.hostname.toLowerCase();
+    if (u.protocol === 'http:') return h === storageHost();
+    if (u.protocol !== 'https:') return false;
     return downloadHosts().some(d => h === d || h.endsWith('.' + d));
   } catch {
     return false;

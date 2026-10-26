@@ -4,7 +4,7 @@ const { applyCors, requireSecret } = require('./_lib');
 const { buildPlan } = require('./_plan');
 
 async function fetchRemoteStorage(endpoint, token, id) {
-  const base = process.env.STORAGE_API_URL || process.env.TORBOX_API_URL || 'http://127.0.0.1:8765/mock-storage';
+  const base = require('./storage').storageBase();
   const url = /^\d{1,12}$/.test(id)
     ? `${base}/${endpoint}?id=${id}&bypass_cache=true`
     : `${base}/${endpoint}?bypass_cache=true`;

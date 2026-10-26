@@ -1,7 +1,7 @@
-// Service Worker for DeckDebrid PWA
+// Service Worker for DeckStream PWA
 // Provides background push notifications for game install/readiness and offline shell caching.
 
-const CACHE_NAME = 'deckdebrid-shell-v5';
+const CACHE_NAME = 'deckstream-shell-v5';
 const SHELL_URLS = [
   '/',
   '/index.html',
@@ -39,12 +39,12 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
   const url = new URL(event.request.url);
-  // Only this site's own files. Other origins (game covers from IGDB/Steam, TorBox) go straight to the network: a
+  // Only this site's own files. Other origins (game covers from Steam and SteamGridDB) go straight to the network: a
   // service-worker fetch() of them falls under the site's CSP connect-src and fails, which broke every cover image.
   if (url.origin !== self.location.origin) return;
 
   // Do not cache API requests or external CDN ranges
-  if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/torbox/')) {
+  if (url.pathname.startsWith('/api/')) {
     return;
   }
 
@@ -66,14 +66,14 @@ self.addEventListener('push', (event) => {
     }
   }
 
-  const title = data.title || '🎮 DeckDebrid';
+  const title = data.title || '🎮 DeckStream';
   const options = {
     body: data.body || 'Your Steam Deck has an update.',
     icon: data.icon || 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="%231a9fff"/></svg>',
     badge: data.badge || 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="%231a9fff"/></svg>',
     data: data.data || { url: '/' },
     vibrate: [200, 100, 200],
-    tag: data.tag || 'deckdebrid-status',
+    tag: data.tag || 'deckstream-status',
     renotify: true
   };
 

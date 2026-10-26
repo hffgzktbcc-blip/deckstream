@@ -1,120 +1,74 @@
-// DeckStream Game Library & Storefront Search Relay
-// Searches user remote storage and Steam Storefront catalog with zero pirate indexer scrapers.
+// Search: games in YOUR storage library (by name, through STORAGE_API_URL) plus the official Steam store catalog
+// (titles and app ids only, for the game page). Nothing else is searched: DeckStream has no indexers or scrapers.
+//
+//   GET /api/search?q=hades   ->  [ { source: 'library', id, title, size, cached, streamable, kind },
+//                                   { source: 'steam', appId, title } ]
 const { applyCors, requireSecret } = require('./_lib');
+const { buildPlan } = require('./_plan');
+const { storageBase } = require('./storage');
 
 const STEAM_SEARCH_URL = 'https://store.steampowered.com/api/storesearch/';
 
-const MOCK_STORAGE_GAMES = [
-  {
-    title: 'Cyberpunk 2077 [Remote VFS]',
-    size: 69 * 1024 * 1024 * 1024,
-    cached: true,
-    cachedLayout: 'folder',
-    streamable: true,
-    source: 'webdav',
-    tag: '⚡ Pre-mounted VFS',
-    hash: 'cp77' + '0'.repeat(36),
-    storageUri: 'webdav://nas.local/Games/Cyberpunk%202077'
-  },
-  {
-    title: 'Baldurs Gate 3 [Remote VFS]',
-    size: 122 * 1024 * 1024 * 1024,
-    cached: true,
-    cachedLayout: 'folder',
-    streamable: true,
-    source: 'webdav',
-    tag: '⚡ Pre-mounted VFS',
-    hash: 'bg3' + '0'.repeat(37),
-    storageUri: 'webdav://nas.local/Games/Baldurs%20Gate%203'
-  },
-  {
-    title: 'Sifu [Remote VFS]',
-    size: 24 * 1024 * 1024 * 1024,
-    cached: true,
-    cachedLayout: 'folder',
-    streamable: true,
-    source: 'webdav',
-    tag: '⚡ Pre-mounted VFS',
-    hash: 'sifu' + '0'.repeat(36),
-    storageUri: 'webdav://nas.local/Games/Sifu'
-  },
-  {
-    title: 'Hades II [Remote VFS]',
-    size: 11 * 1024 * 1024 * 1024,
-    cached: true,
-    cachedLayout: 'folder',
-    streamable: true,
-    source: 'webdav',
-    tag: '⚡ Pre-mounted VFS',
-    hash: 'hades2' + '0'.repeat(34),
-    storageUri: 'webdav://nas.local/Games/Hades%20II'
-  },
-  {
-    title: 'Control Ultimate Edition [Remote VFS]',
-    size: 42 * 1024 * 1024 * 1024,
-    cached: true,
-    cachedLayout: 'folder',
-    streamable: true,
-    source: 'webdav',
-    tag: '⚡ Pre-mounted VFS',
-    hash: 'control' + '0'.repeat(33),
-    storageUri: 'webdav://nas.local/Games/Control'
-  }
-];
+const words = (s) => String(s || '').toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '')
+  .replace(/['’`]/g, '').replace(/[^a-z0-9]+/g, ' ').trim().split(' ').filter(Boolean);
+
+function matches(name, q) {
+  const have = words(name);
+  const want = words(q);
+  return want.length > 0 && want.every((w) => have.some((h) => h === w || h.startsWith(w)));
+}
+
+async function searchLibrary(q, token) {
+  if (!token) return [];
+  const r = await fetch(`${storageBase()}/games/mylist`, {
+    headers: { authorization: `Bearer ${token}`, 'user-agent': 'DeckStream/1.0' },
+    signal: AbortSignal.timeout(10000),
+  });
+  if (!r.ok) return [];
+  const j = await r.json().catch(() => null);
+  const list = j && Array.isArray(j.data) ? j.data : [];
+  return list.filter((g) => g && matches(g.name, q)).slice(0, 20).map((g) => {
+    const plan = Array.isArray(g.files) && g.files.length ? buildPlan(g) : null;
+    return {
+      source: 'library',
+      id: g.id,
+      title: String(g.name || ''),
+      size: Number(g.size) || 0,
+      cached: g.cached === true || g.download_finished === true,
+      streamable: Boolean(plan && plan.recommendation === 'stream'),
+      kind: plan ? plan.kind : 'unknown',
+    };
+  });
+}
+
+async function searchSteam(q) {
+  const r = await fetch(`${STEAM_SEARCH_URL}?term=${encodeURIComponent(q)}&l=english&cc=US`, {
+    headers: { 'user-agent': 'DeckStream/1.0' },
+    signal: AbortSignal.timeout(6000),
+  });
+  if (!r.ok) return [];
+  const data = await r.json().catch(() => null);
+  return (data && Array.isArray(data.items) ? data.items : []).slice(0, 15)
+    .filter((it) => it && Number.isInteger(it.id) && typeof it.name === 'string')
+    .map((it) => ({ source: 'steam', appId: it.id, title: it.name }));
+}
 
 module.exports = async (req, res) => {
   if (applyCors(req, res, 'GET, OPTIONS')) return;
   if (!requireSecret(req, res)) return;
+  res.setHeader('cache-control', 'no-store');
 
-  const q = String(req.query.q || req.query.query || '').trim();
-  if (!q) {
-    return res.status(200).json([]);
-  }
+  const q = String(req.query.q || req.query.query || '').trim().slice(0, 100);
+  if (!q) return res.status(200).json([]);
 
-  const qLower = q.toLowerCase();
-  const results = [];
+  let token = String(req.headers['authorization'] || '');
+  if (token.startsWith('Bearer ')) token = token.slice(7).trim();
 
-  // 1. Search mounted storage games
-  for (const g of MOCK_STORAGE_GAMES) {
-    if (g.title.toLowerCase().includes(qLower)) {
-      results.push(g);
-    }
-  }
-
-  // 2. Query official Steam Storefront search
-  try {
-    const steamRes = await fetch(`${STEAM_SEARCH_URL}?term=${encodeURIComponent(q)}&l=english&cc=US`, {
-      headers: { 'User-Agent': 'DeckStream/1.0' },
-      signal: AbortSignal.timeout(5000)
-    });
-
-    if (steamRes.ok) {
-      const data = await steamRes.json();
-      if (Array.isArray(data.items)) {
-        for (const item of data.items) {
-          const cleanTitle = item.name;
-          if (results.some(r => r.title.toLowerCase().includes(cleanTitle.toLowerCase()))) {
-            continue;
-          }
-
-          results.push({
-            title: `${cleanTitle} [Steam Store Library]`,
-            size: 20 * 1024 * 1024 * 1024,
-            cached: true,
-            cachedLayout: 'folder',
-            streamable: true,
-            source: 'steam',
-            tag: '⚡ On-Demand VFS',
-            hash: 'steam_' + item.id + '0'.repeat(Math.max(0, 40 - String(item.id).length - 6)),
-            storageUri: `steam://store/${item.id}`,
-            appId: item.id
-          });
-        }
-      }
-    }
-  } catch (err) {
-    // Non-fatal, return storage results
-  }
-
-  return res.status(200).json(results);
+  const [lib, steam] = await Promise.all([
+    searchLibrary(q, token).catch(() => []),
+    searchSteam(q).catch(() => []),
+  ]);
+  return res.status(200).json([...lib, ...steam]);
 };
+
+module.exports.matches = matches;
