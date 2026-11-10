@@ -402,7 +402,7 @@ function Content() {
           <>
             <PanelSectionRow>
               <ProgressBarWithInfo label={displayGameName(cur.name)} nProgress={cur.progress || 0}
-                sOperationText={cur.message || cur.mode} sTimeRemaining={`${cur.progress || 0}%`} />
+                sOperationText={`${cur.message || cur.mode} · ${cur.progress || 0}%`} />
             </PanelSectionRow>
             <PanelSectionRow>
               <ButtonItem layout="below" onClick={() => act("cancel", cur.id)}>{armed === cur.id ? "Press again to cancel" : "Cancel"}</ButtonItem>
