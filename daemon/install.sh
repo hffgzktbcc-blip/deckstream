@@ -235,7 +235,7 @@ if [ -f "$MANIFEST" ]; then
     ALL_REQUIRED=1
     NEW_VERSION="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("version",""))' "$MANIFEST")"
 else
-    FILES="deckstream-daemon.py parallel_download.py stream-runner.sh cloud-install.sh game-launcher.sh umu-test.sh saves.py parallel_unzip.py doctor.py rollback.sh"
+    FILES="deckstream-daemon.py ds_core.py ds_steam.py ds_shortcuts.py ds_stream.py ds_cache.py ds_update.py ds_status.py ds_janitor.py ds_install.py parallel_download.py stream-runner.sh cloud-install.sh game-launcher.sh umu-test.sh saves.py parallel_unzip.py doctor.py rollback.sh"
     ALL_REQUIRED=0
     NEW_VERSION="unverified"
 fi
@@ -259,7 +259,7 @@ STAGED=""
 for name in $FILES; do
     if stage_file "$name"; then
         STAGED="$STAGED $name"
-    elif [ "$ALL_REQUIRED" = 1 ] || [ "$name" = "deckstream-daemon.py" ]; then
+    elif [ "$ALL_REQUIRED" = 1 ] || [ "$name" = "deckstream-daemon.py" ] || [ "${name#ds_}" != "$name" ]; then   # the daemon and its ds_*.py parts
         echo -e "${RED}[!] Could not get a verified copy of ${name}. Nothing was changed; the current install still works.${NC}"
         exit 1
     else

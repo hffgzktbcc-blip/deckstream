@@ -1,6 +1,6 @@
 {
-  "version": "v07005d21d0",
-  "released": 1792999812,
+  "version": "vf005525a26",
+  "released": 1794320343,
   "files": {
     "cloud-install.sh": {
       "sha256": "880bf33aa8282596acf8e9e1627f894039d7c723f17446e38d8995b624d2e8ad",
@@ -13,9 +13,9 @@
       "bytes": 3950
     },
     "deckstream-daemon.py": {
-      "sha256": "3d51bde299002b20f80e4ba1eeb517f6c430a45f6c3fa7434029d5e351ecaaaf",
+      "sha256": "47067dc216500b8659558e1b05999267f754aedb274636333c424ed98553e41c",
       "mode": "755",
-      "bytes": 161255
+      "bytes": 27031
     },
     "demand_gate.py": {
       "sha256": "b0f8119166ecef7e0272a502417da86b566628c757553b12030c77ec739907fa",
@@ -26,6 +26,51 @@
       "sha256": "244a402302d17ee17a8351ea3a4bc2fcb0f35208b97fb96c52ba81f0bd155cbe",
       "mode": "755",
       "bytes": 22421
+    },
+    "ds_cache.py": {
+      "sha256": "0a3100292228be6c17df71e0380659c7979b668383492e174daf0a4ded36e78a",
+      "mode": "644",
+      "bytes": 40399
+    },
+    "ds_core.py": {
+      "sha256": "ff2f795f8b50204c74a49227c86cc44f0b9813acf27b7b66425cb3d444a7931e",
+      "mode": "644",
+      "bytes": 8163
+    },
+    "ds_install.py": {
+      "sha256": "a967fb87e8035b872a2ab6bf4ab3bad135832a5534e6b796d8ee798ff06edf31",
+      "mode": "644",
+      "bytes": 21364
+    },
+    "ds_janitor.py": {
+      "sha256": "1a2f90c2ebe860d1a03f3d4c5e3006119bf9bc4967909801fb0399113c442921",
+      "mode": "644",
+      "bytes": 4655
+    },
+    "ds_shortcuts.py": {
+      "sha256": "5dde3adc0f4590f811a53c7a75dbfaecce32ff1a7cba01fd2abaa2855eca29b7",
+      "mode": "644",
+      "bytes": 20198
+    },
+    "ds_status.py": {
+      "sha256": "849929c4ddd6be9a320d244cf90bf86e11d31f7b835aed079f2347e150b45b2e",
+      "mode": "644",
+      "bytes": 15209
+    },
+    "ds_steam.py": {
+      "sha256": "769d3f27dd0ee4751f08023694663f689f028af75bdd7ecd7e1a79ef5e7b4f32",
+      "mode": "644",
+      "bytes": 8929
+    },
+    "ds_stream.py": {
+      "sha256": "e061f443e67ccb201bb0b8a9eab203360b03bec59e7aab41d5c571305736a240",
+      "mode": "644",
+      "bytes": 11185
+    },
+    "ds_update.py": {
+      "sha256": "6dddab1682d192d78f0b24d070300687fd0b7968d7b78be7c396cb5a414b3699",
+      "mode": "644",
+      "bytes": 10630
     },
     "focus_game.sh": {
       "sha256": "5cd9d6d397fde2613f59f91fd272b06e9dd6f5b1be755a9eda1f4b3211af6c2a",
@@ -43,9 +88,9 @@
       "bytes": 13628
     },
     "install.sh": {
-      "sha256": "26ad78352db7c51d394618737b4fe19fca7360825ade8d6b7928cd7df132e883",
+      "sha256": "5f4e56a4a538e5038621017636c2b01fbd0201ffe202ed2504f29f00f0a465c2",
       "mode": "755",
-      "bytes": 20774
+      "bytes": 20961
     },
     "language_fix.py": {
       "sha256": "3be9e1da47d66d90d4c1c956bd5bd209097844b4ac03e7ff6a208700374f8336",

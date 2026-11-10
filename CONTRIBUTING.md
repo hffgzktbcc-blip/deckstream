@@ -37,6 +37,26 @@ CI runs the whole suite on every pull request.
 Labels: `good first issue` means scoped, one or two files, no Deck. `help wanted` is open to anyone.
 `area: …` says which part of the tree it touches. `claimed` means someone said they are on it.
 
+## Where the daemon code lives
+
+`daemon/deckstream-daemon.py` is the entry point: the main poll loop and the command line. The rest is in parts
+next to it, each importing only from the parts above it in this list:
+
+| Part | What it does |
+|---|---|
+| `ds_core.py` | Settings, paths, download-host checks, job state, the config file |
+| `ds_steam.py` | Steam's binary VDF format, finding a game's executable, launcher scripts |
+| `ds_shortcuts.py` | Non-Steam shortcuts (pending, live, `shortcuts.vdf`) and artwork |
+| `ds_stream.py` | Stream sessions, running cache fills, charger checks |
+| `ds_cache.py` | Prestage, start-up profile backup, warm-up, Deck mode, eviction, removing a game |
+| `ds_update.py` | Self-update and the Decky plugin update |
+| `ds_status.py` | What the phone and the Decky panel show |
+| `ds_janitor.py` | The background janitor and warm-up passes |
+| `ds_install.py` | Downloading, extracting and installing games |
+
+A new part must also be added to `_PARTS` in `deckstream-daemon.py` and to `SHIPPED` in `scripts/make_manifest.py`;
+`scripts/test_daemon_parts.py` checks both.
+
 ## Development Workflow
 
 1. Fork the repository and create your branch from `main`.
