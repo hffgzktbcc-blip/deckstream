@@ -1,0 +1,25 @@
+name: Steam Deck launch report
+description: Report a reproducible failure or a measured result on a Steam Deck
+body:
+  - type: markdown
+    attributes:
+      value: "Use authorized software and storage. Remove credentials, tokens, private hosts and identifying paths before posting."
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Site and daemon revision, Deck model, SteamOS, Proton, storage type and cache state.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps and result
+      description: Include the expected result, what happened, and the last observed launch milestone.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Redacted evidence
+      description: Include relevant service, doctor or launch report output and any measured timings.
