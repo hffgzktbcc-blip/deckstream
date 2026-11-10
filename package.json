@@ -7,7 +7,7 @@
     "test": "bash scripts/run_all_tests.sh"
   },
   "dependencies": {
-    "web-push": "^3.6.7"
+    "web-push": "^4.0.0"
   },
   "engines": {
     "node": ">=18"
