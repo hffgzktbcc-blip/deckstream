@@ -111,7 +111,7 @@ with `https://YOUR-SITE/decky/DeckStream.zip`.
 | :--- | :--- |
 | Status | `systemctl --user status deckstream` |
 | Logs | `journalctl --user -u deckstream -f` |
-| Check the setup | `python3 ~/.config/deckstream/doctor.py` (`--bundle` writes a report with keys redacted) |
+| Check the setup | `python3 ~/.config/deckstream/doctor.py` (`--bundle` writes a report with keys redacted). What each result means: [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) |
 
 ---
 
