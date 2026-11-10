@@ -4,21 +4,32 @@
   color: #e9eef9;
   background: #111722;
 }
-
+* { box-sizing: border-box; }
 body { margin: 0; }
-main { max-width: 62rem; margin: auto; padding: 2rem clamp(1rem, 5vw, 4rem) 4rem; }
-header { padding: clamp(2rem, 8vw, 6rem) 0 3rem; }
-h1, h2 { line-height: 1.1; }
+main { max-width: 65rem; margin: auto; padding: 2rem clamp(1rem, 5vw, 4rem) 4rem; }
+header { padding: clamp(1.5rem, 6vw, 4rem) 0 2rem; }
+h1, h2 { line-height: 1.12; }
 h1 { font-size: clamp(3rem, 11vw, 7rem); letter-spacing: -.06em; margin: .15em 0; }
 h2 { font-size: clamp(1.65rem, 4vw, 2.4rem); }
-p { max-width: 60ch; }
+p { max-width: 66ch; }
 .kicker { color: #85dcce; text-transform: uppercase; letter-spacing: .12em; font-weight: 700; }
-.lead { font-size: clamp(1.25rem, 3vw, 2rem); }
-section { border-top: 1px solid #455166; padding: 1rem 0; }
+.lead { font-size: clamp(1.3rem, 3vw, 2rem); max-width: 32ch; }
+section { border-top: 1px solid #455166; padding: 1.25rem 0 1.75rem; }
+footer { border-top: 1px solid #455166; padding-top: 1.5rem; color: #b4c0d2; }
 a { color: #a3ceff; text-underline-offset: .2em; }
+a:hover { color: #dfebff; }
 a:focus-visible { outline: 3px solid #f0d28b; outline-offset: .25rem; }
-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; margin-top: 1.5rem; }
-.primary { color: #101a25; background: #a3ceff; padding: .55rem 1rem; font-weight: 700; border-radius: .35rem; }
+nav { display: flex; flex-wrap: wrap; align-items: center; gap: .85rem 1.15rem; margin-top: 1.5rem; }
+.primary { display: inline-block; color: #101a25; background: #a3ceff; padding: .55rem 1rem; font-weight: 700; border-radius: .35rem; }
+.primary:hover { color: #101a25; background: #d5eaff; }
+.status { border-left: 3px solid #85dcce; padding: .75rem 1rem; margin-top: 1.7rem; background: #1c2837; max-width: 100%; }
+figure { margin: 2.2rem 0 .5rem; }
+.screens { display: block; width: 100%; height: auto; border: 1px solid #455166; border-radius: .8rem; }
+figcaption { color: #b4c0d2; font-size: .9rem; padding-top: .6rem; }
 .flow { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: .8rem; padding-left: 1.4rem; }
 .flow li { border-left: 2px solid #85dcce; padding: .2rem .75rem; }
 .flow span { display: block; }
+pre { max-width: 100%; overflow-x: auto; background: #1c2837; padding: 1rem; border-radius: .5rem; border: 1px solid #455166; }
+code { font-size: .95em; }
+.skip { position: absolute; left: -9999px; top: .4rem; padding: .5rem; background: #a3ceff; color: #101a25; }
+.skip:focus { left: .4rem; z-index: 2; }
