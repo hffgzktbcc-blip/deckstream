@@ -12,7 +12,11 @@
 **DeckStream** plays PC games you already own, stored on your own server (a NAS, Nextcloud, or anything that speaks
 WebDAV), on a **Steam Deck** without copying the whole game to the Deck first.
 
-[Wiki](https://github.com/hffgzktbcc-blip/deckstream/wiki) · [Delivery plan](PLAN.md) · [Vision](docs/VISION.md) · [Limits](docs/LIMITS.md) · [Roadmap](docs/ROADMAP.md) · [Start here](docs/community/START_HERE.md) · [Contributing](CONTRIBUTING.md) · [Device test report](docs/community/DEVICE_TEST_REPORT.md)
+**New here?** [Project homepage](https://hffgzktbcc-blip.github.io/deckstream/) · [Try the companion locally](#development) · [Self-hosting setup](#setup) · [Report a real Steam Deck test](https://github.com/hffgzktbcc-blip/deckstream/issues/new?template=launch-report.yml) · [Beginner-friendly issues](https://github.com/hffgzktbcc-blip/deckstream/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
+
+> **Current status (November 2026):** The own-storage app and launch path are implemented and have automated checks with mock storage. A clean Steam Deck launch of this revision, LAN NAS performance and an independent reproduction are **not yet established**. [v1.0.0](https://github.com/hffgzktbcc-blip/deckstream/releases/tag/v1.0.0) predates the own-storage changes; it is not a verified release of the current flow. See [evidence and limits](docs/LIMITS.md).
+
+[Wiki](https://github.com/hffgzktbcc-blip/deckstream/wiki) · [Delivery plan](PLAN.md) · [Vision](docs/VISION.md) · [Roadmap](docs/ROADMAP.md) · [Start here](docs/community/START_HERE.md) · [Contributing](CONTRIBUTING.md) · [Device test report](docs/community/DEVICE_TEST_REPORT.md)
 
 You pick a game on your phone. The Deck mounts the game folder over WebDAV, fetches the parts the game reads at
 start-up, starts it through **Proton**, and reads the rest while you play.
