@@ -1,0 +1,25 @@
+name: Scoped task (maintainers)
+description: A small, well-defined change someone new can pick up. Used for "good first issue" and "help wanted".
+labels: [help wanted]
+body:
+  - type: markdown
+    attributes:
+      value: "Write it so a stranger can finish without asking. Add `good first issue` only if it needs no Steam Deck and touches one or two files."
+  - type: textarea
+    id: goal
+    attributes: {label: What and why, description: "The user-visible or maintainer-visible result, in two or three sentences"}
+    validations: {required: true}
+  - type: textarea
+    id: files
+    attributes: {label: Where, description: "The exact files and functions involved"}
+    validations: {required: true}
+  - type: textarea
+    id: done
+    attributes: {label: Done when, description: "Acceptance checks: a command that passes, a test that fails before and passes after"}
+    validations: {required: true}
+  - type: dropdown
+    id: hardware
+    attributes:
+      label: Hardware needed
+      options: ["None: tests, docs or the companion app in a browser", "A Linux machine", "A Steam Deck"]
+    validations: {required: true}

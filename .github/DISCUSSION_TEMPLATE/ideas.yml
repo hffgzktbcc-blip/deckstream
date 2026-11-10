@@ -1,0 +1,11 @@
+body:
+  - type: textarea
+    id: problem
+    attributes: {label: The problem, description: "What is hard today, and for whom"}
+    validations: {required: true}
+  - type: textarea
+    id: idea
+    attributes: {label: Your idea}
+  - type: markdown
+    attributes:
+      value: "Out of scope: anything that provides, indexes or searches for games, or circumvents protection (see CONTRIBUTING.md)."

@@ -5,10 +5,21 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
+
+# Read-only token: outside pull requests run with no write access to the repository.
+permissions:
+  contents: read
+
+# A new push to the same PR cancels the older run, so contributors get a result sooner.
+concurrency:
+  group: tests-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
 

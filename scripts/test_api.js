@@ -88,6 +88,17 @@ const listen = (srv) => new Promise((r) => srv.listen(0, '127.0.0.1', () => r(sr
   assert.ok(!lib.isAllowedDownloadUrl('http://cdn.example.com/f'), 'extra hosts need https');
   assert.ok(!lib.isAllowedDownloadUrl('https://cdn.example.com.evil.io/f'));
 
+  // Public-address check for user-supplied URLs: literal IPv6 forms that reach private space are refused.
+  for (const u of ['http://127.0.0.1/', 'http://[::1]/', 'http://[::ffff:127.0.0.1]/', 'http://[::ffff:7f00:1]/',
+    'http://[::7f00:1]/', 'http://[64:ff9b::a9fe:a9fe]/', 'http://[fe90::1]/', 'http://[febf::1]/',
+    'http://[fd00::1]/', 'http://[ff02::1]/', 'http://[2002:c0a8:101::1]/', 'http://169.254.169.254/']) {
+    await assert.rejects(lib.assertPublicHttpUrl(u), /public address/, u);
+  }
+  for (const u of ['https://[2606:4700:4700::1111]/', 'https://1.1.1.1/', 'https://[::ffff:1.1.1.1]/']) {
+    assert.strictEqual((await lib.assertPublicHttpUrl(u)).protocol, 'https:', u);
+  }
+  assert.ok(lib.isPrivateIp('fe80::1%eth0') && lib.isPrivateIp('not-an-ip') && !lib.isPrivateIp('8.8.8.8'));
+
   // Mount: a folder name in the games directory, nothing else.
   r = await call(relay, { method: 'POST', query: { p: 'games/mount' }, headers: auth, body: { path: 'Tiny Game' } });
   assert.strictEqual(r.code, 200);

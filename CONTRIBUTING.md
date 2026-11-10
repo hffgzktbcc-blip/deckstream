@@ -11,6 +11,32 @@ DeckStream is dedicated to building high-performance storage and runtime softwar
 3. **No Piracy Indexers**: The core repository must remain completely clean of torrent search engines or warez scrapers.
 4. **Performance First**: Handheld devices are constrained by battery and memory bandwidth. All background helpers must respect sleep locks and battery thresholds.
 
+## Set up in five minutes
+
+You need Python 3.12 and Node 22. No Steam Deck is needed for anything below.
+
+```bash
+git clone https://github.com/<you>/deckstream && cd deckstream
+npm start                     # companion app + real api/*.js + mock library at http://127.0.0.1:8765
+npm test                      # the whole suite
+npm i --no-save playwright && npx playwright install chromium   # only for the browser test
+```
+
+One test is enough while you work, for example `python3 scripts/test_saves.py` or `node scripts/test_api.js`.
+CI runs the whole suite on every pull request.
+
+## Ways to help
+
+| You have | You can |
+|---|---|
+| A browser | Fix docs, try the companion app with `npm start`, review a PR for clarity |
+| Python or Node | Pick a [good first issue](https://github.com/hffgzktbcc-blip/deckstream/issues?q=is%3Aopen+label%3A%22good+first+issue%22) (most are unit tests) or a [help wanted](https://github.com/hffgzktbcc-blip/deckstream/issues?q=is%3Aopen+label%3A%22help+wanted%22) issue |
+| A NAS or WebDAV server | Write a setup guide for it ([#10](https://github.com/hffgzktbcc-blip/deckstream/issues/10)) |
+| A Steam Deck | Send a [launch report](https://github.com/hffgzktbcc-blip/deckstream/issues/new?template=launch-report.yml), success or failure ([#9](https://github.com/hffgzktbcc-blip/deckstream/issues/9)) |
+
+Labels: `good first issue` means scoped, one or two files, no Deck. `help wanted` is open to anyone.
+`area: …` says which part of the tree it touches. `claimed` means someone said they are on it.
+
 ## Development Workflow
 
 1. Fork the repository and create your branch from `main`.
@@ -34,7 +60,7 @@ DeckStream is dedicated to building high-performance storage and runtime softwar
 - Have a Deck? A [launch report](https://github.com/hffgzktbcc-blip/deckstream/issues/new?template=launch-report.yml) is a contribution, including when it failed.
 - Say in the PR what you tested and what you could not. Do not claim a device result you did not measure
   ([docs/LIMITS.md](docs/LIMITS.md)).
-- Questions and ideas go in [Discussions](https://github.com/hffgzktbcc-blip/deckstream/discussions). Security reports go through the
+- Stuck? See [SUPPORT.md](SUPPORT.md). Questions and ideas go in [Discussions](https://github.com/hffgzktbcc-blip/deckstream/discussions). Security reports go through the
   [private form](https://github.com/hffgzktbcc-blip/deckstream/security/advisories/new) ([SECURITY.md](SECURITY.md)).
 - Be kind: [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md). Roadmap: [docs/ROADMAP.md](docs/ROADMAP.md).
 
