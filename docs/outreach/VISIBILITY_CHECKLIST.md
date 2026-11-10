@@ -1,25 +1,32 @@
-# DeckStream visibility checklist
+# DeckStream launch checklist
 
-The goal is **a real outside setup/test report**, not stars alone. Review alongside [the evidence limits](../LIMITS.md) and [the outreach drafts](LAUNCH_POSTS.md).
+Goal: **first independently recorded clean-setup result**, then first meaningful outside contribution. Do not confuse stars, views or generated activity with adoption.
 
-## In the repository
-- [x] Public description, homepage URL and relevant GitHub topics set (verified in repository metadata, 10 November 2026)
-- [x] Issues, Discussions and GitHub Pages enabled in repository settings
-- [x] Several scoped beginner issues open ([issue list](https://github.com/hffgzktbcc-blip/deckstream/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22))
-- [x] README with interface screenshots, setup steps, tests and evidence limits
-- [x] Contribution guide, issue forms, CI and one-time newcomer welcome workflow
-- [ ] Merge and verify the homepage discovery enhancements, canonical URL, social metadata and `sitemap.xml` from the visibility PR
-- [ ] Verify live Pages URL and every top-level CTA on a phone and a desktop browser
-- [ ] Add a branded PNG/JPG GitHub social preview in **Settings → General → Social preview** (a file in the repository is not enough)
-- [ ] Publish a short, concrete welcome/feedback prompt in Discussions and pin it; GitHub Discussions is enabled, but a welcome post has not been verified
-- [ ] Test the current own-storage build on a real Deck, retain redacted evidence, and then qualify a new release; v1.0.0 predates the own-storage flow
+## Verified in GitHub
 
-## Distribution — manual, authentic, staggered
-- [ ] Submit `https://hffgzktbcc-blip.github.io/deckstream/sitemap.xml` to Google Search Console / Bing Webmaster Tools when Pages serves it; confirm indexing rather than assuming it
-- [ ] Publish **one** author-identified announcement using [the launch drafts](LAUNCH_POSTS.md), aligned to each community's rules
-- [ ] After real engagement, propose a genuinely relevant entry to an appropriate Steam Deck or self-hosting curated list; avoid shotgun/spam PRs
-- [ ] Answer replies and issues; guide testers to [the device report form](https://github.com/hffgzktbcc-blip/deckstream/issues/new?template=launch-report.yml)
-- [ ] Retain at least one unaffiliated report with revision, environment, results and explicit limitations; update documentation only with supported findings
+- [x] Repository homepage, README, setup, evidence limits and contribution docs
+- [x] GitHub Pages deployment completed successfully after [PR #17](https://github.com/hffgzktbcc-blip/deckstream/pull/17) on 10 Nov 2026
+- [x] Canonical URL, Open Graph/Twitter meta tags and sitemap added to the Pages source
+- [x] GitHub Topics, Issues and Discussions enabled
+- [x] At least four scoped `good first issue` items open as of 10 Nov 2026
+- [x] Real-device [tester invitation #9](https://github.com/hffgzktbcc-blip/deckstream/issues/9) updated with explicit limits and steps
 
-## Weekly review
-Track repository **visitors and clones** from GitHub Insights → Traffic (owner access), site search visibility, unique incoming questions, external test reports, and merged outside PRs. A zero in any metric is useful feedback; never fabricate or buy engagement.
+## Owner / browser follow-through
+
+- [ ] Upload the branded PNG to **Settings → General → Social preview**, then check how a GitHub link unfurls
+- [ ] Verify the live [website](https://hffgzktbcc-blip.github.io/deckstream/) and [sitemap](https://hffgzktbcc-blip.github.io/deckstream/sitemap.xml) in a browser
+- [ ] Publish and pin one [Discussions welcome](https://github.com/hffgzktbcc-blip/deckstream/discussions) from [the draft](LAUNCH_POSTS.md#github-discussions-welcome-prompt-owner-to-post-and-pin)
+- [ ] Publish **one** relevant tester call in a community that permits early projects; log the post URL (no automated spam)
+- [ ] Respond to questions, collect redacted tester reports, then qualify a current release only from on-device evidence
+- [ ] Submit the sitemap to search consoles if owner chooses to connect those services
+
+## Why distribution is staged
+
+- [r/selfhosted](https://www.reddit.com/r/selfhosted/) expects promoted software to be production-ready. This project is not there yet.
+- [Hacker News](https://news.ycombinator.com/newsguidelines.html) asks people not to use AI-generated text in HN posts and prohibits automated posting. Owner should write and submit their own message.
+- [r/homelab](https://www.reddit.com/r/homelab/) tightened its project-promotion rules in 2026. Ask moderators first if unsure.
+- Check community rules again before posting because rules and accounts change.
+
+## Check weekly
+
+From GitHub Insights → Traffic (owner-only), review unique visitors and clones. Count actual outside reports and PRs from issue links, not invented conversion figures. Review the [outreach drafts](LAUNCH_POSTS.md) and [evidence limits](../LIMITS.md) before making a new public claim.
