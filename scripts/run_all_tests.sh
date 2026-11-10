@@ -26,6 +26,7 @@ run_test "demand_gate"      python3 scripts/test_demand_gate.py
 run_test "saves"            python3 scripts/test_saves.py
 run_test "proton_matcher"   python3 scripts/test_proton_matcher.py
 run_test "deck_mode"        python3 scripts/test_deck_mode.py
+run_test "daemon_parts"     python3 scripts/test_daemon_parts.py
 run_test "language_fix"     python3 scripts/test_language_fix.py
 run_test "umu_gameid"       python3 scripts/test_umu_gameid.py
 run_test "doctor"           python3 scripts/test_doctor.py

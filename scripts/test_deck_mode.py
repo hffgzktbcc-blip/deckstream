@@ -38,7 +38,9 @@ assert d.apply_deck_mode_wanted({"hades_ii": {"on": True, "at": t + 1000}}) == 0
 assert plugin.set_deck_mode("../etc", True, home=home)["ok"] is False
 r = plugin.set_deck_mode("sifu", True, home=home)
 assert r["ok"] and (conf / "deck_mode" / "sifu.env").read_text() == d.DECK_MODE_ENV
-import shutil; shutil.copy(ROOT / "daemon" / "deckstream-daemon.py", conf / "deckstream-daemon.py")
+import shutil
+for f in [ROOT / "daemon" / "deckstream-daemon.py", *(ROOT / "daemon").glob("ds_*.py")]:   # the daemon and its parts
+    shutil.copy(f, conf / f.name)
 assert plugin.status(home)["deck_mode"] == {"hades_ii": False, "sifu": True}
 assert d.deck_mode_state()["sifu"]["on"] is True, "the daemon reads what the panel wrote"
 print("[ok] Decky writes the same files; a newer Deck choice wins; the panel shows each game's switch")

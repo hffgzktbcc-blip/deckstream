@@ -31,11 +31,13 @@ SHIPPED = [
     "umu-test.sh", "saves.py", "parallel_unzip.py", "doctor.py", "rollback.sh", "warmup.py", "startup_profile.py",
     "umu_gameid.py", "focus_game.sh", "launch_report.py", "language_fix.py", "suspend-resume-hook.sh",
     "proton_matcher.py", "demand_gate.py", "hedge_proxy.py", "deck_preset.py",
+    "ds_core.py", "ds_steam.py", "ds_shortcuts.py", "ds_stream.py", "ds_cache.py", "ds_update.py", "ds_status.py",
+    "ds_janitor.py", "ds_install.py",   # the daemon's parts, imported by deckstream-daemon.py
     "install.sh",       # listed so a self-update can check the installer it runs against the signed manifest
 ]
 NAMESPACE = "deckstream-manifest"
 SIGNER_ID = "deckstream"
-MODULES = {"parallel_download.py"}      # imported, not run: not executable
+MODULES = {"parallel_download.py"} | {n for n in SHIPPED if n.startswith("ds_")}   # imported, not run: not executable
 
 
 def build(folder):
