@@ -37,27 +37,31 @@
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar">
+    <a class="brand" href="./">Deck<span>Stream</span></a>
+    <nav aria-label="Project"><a href="#flow">How it works</a><a href="#try-it">Local demo</a><a href="https://github.com/hffgzktbcc-blip/deckstream">GitHub</a></nav>
+  </div>
   <main id="main">
-    <header>
-      <p class="kicker">Open source · Self-hosted · Steam Deck</p>
-      <h1>DeckStream</h1>
-      <p class="lead">Your PC game library on your Steam Deck, without copying every game across first.</p>
-      <p>Pick a game on your phone. DeckStream mounts a folder from your own WebDAV server (such as a NAS or Nextcloud), caches the data the game reads and starts it locally through Proton. You supply the games and the storage.</p>
-      <nav aria-label="Get started">
-        <a class="primary" href="https://github.com/hffgzktbcc-blip/deckstream#setup">Self-host the setup</a>
-        <a href="#try-it">Try the local demo</a>
-        <a href="#test-on-a-deck">Help test on a Deck</a>
-        <a href="https://github.com/hffgzktbcc-blip/deckstream">View on GitHub</a>
-      </nav>
-      <p class="status"><strong>Current status:</strong> The own-storage path is implemented and tested in automation with mock storage. A clean launch on a Steam Deck using this revision has not yet been independently verified. <a href="https://github.com/hffgzktbcc-blip/deckstream/blob/main/docs/LIMITS.md">Read exactly what is and isn't proven.</a></p>
+    <header class="hero">
+      <div class="hero-copy">
+        <p class="kicker">Open source · Self-hosted · Steam Deck</p>
+        <h1>Your game library.<br><span>On your Deck.</span></h1>
+        <p class="lead">Launch PC games you own from your own storage without copying the whole library to your Steam Deck.</p>
+        <p>Pick a game on your phone. DeckStream mounts a folder from your own WebDAV server (such as a NAS or Nextcloud), caches the data the game reads and starts it locally through Proton. You supply the games and the storage.</p>
+        <nav aria-label="Get started">
+          <a class="primary" href="#test-on-a-deck">Help test on a Deck</a>
+          <a class="secondary" href="https://github.com/hffgzktbcc-blip/deckstream#setup">Self-host the setup</a>
+        </nav>
+      </div>
       <figure>
-        <img class="screens" src="https://raw.githubusercontent.com/hffgzktbcc-blip/deckstream/main/docs/readme/screens.png" alt="Four screens from the DeckStream companion: Home, storage library, Search, and Deck queue" loading="lazy" decoding="async">
+        <img class="screens" src="https://raw.githubusercontent.com/hffgzktbcc-blip/deckstream/main/docs/readme/screens.png" alt="Four screens from the DeckStream companion: Home, storage library, Search, and Deck queue" decoding="async">
         <figcaption>Phone-friendly companion interface. The repository includes a mock-library mode for trying the interface without a Steam Deck.</figcaption>
       </figure>
+      <p class="status"><strong>Current status:</strong> The own-storage path is implemented and tested in automation with mock storage. A clean launch on a Steam Deck using this revision has not yet been independently verified. <a href="https://github.com/hffgzktbcc-blip/deckstream/blob/main/docs/LIMITS.md">Read exactly what is and isn't proven.</a></p>
     </header>
     <section aria-labelledby="flow">
       <h2 id="flow">From your library to the Deck</h2>
-      <ol class="flow">
+      <ol class="flow" role="list">
         <li><strong>Serve</strong><span>Keep the files on storage you control, exposed through a library API and WebDAV.</span></li>
         <li><strong>Queue</strong><span>Choose a game folder in the phone companion or optional Decky panel.</span></li>
         <li><strong>Launch</strong><span>The Deck mounts the folder with rclone and starts the game with Proton.</span></li>
@@ -77,11 +81,12 @@ npm start</code></pre>
       <p>Automated API, browser and Decky package checks exist. The published hardware timings were measured on one Steam Deck with the predecessor runtime, not the current own-storage revision. LAN NAS performance has not yet been benchmarked, and game compatibility has not been established for this revision.</p>
       <p><a href="https://github.com/hffgzktbcc-blip/deckstream/blob/main/docs/LIMITS.md">Evidence and limitations</a> · <a href="https://github.com/hffgzktbcc-blip/deckstream/actions/workflows/tests.yml">CI test results</a> · <a href="https://github.com/hffgzktbcc-blip/deckstream/blob/main/docs/ROADMAP.md">Roadmap</a></p>
     </section>
-    <section id="test-on-a-deck" aria-labelledby="testing">
+    <section class="tester" id="test-on-a-deck" aria-labelledby="testing">
       <h2 id="testing">Have a Steam Deck and a NAS? We need your report.</h2>
       <p>The most valuable contribution right now is a clean setup test using game files you are authorized to use. A precise failure report is just as valuable as a success. Include the revision, SteamOS/Proton version, storage type and last successful step; remove private addresses and credentials.</p>
       <nav aria-label="Contribute">
         <a class="primary" href="https://github.com/hffgzktbcc-blip/deckstream/issues/new?template=launch-report.yml">Submit a Deck test report</a>
+        <a href="https://github.com/hffgzktbcc-blip/deckstream/issues/9">Open the tester call</a>
         <a href="https://github.com/hffgzktbcc-blip/deckstream/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22">Find a first issue</a>
         <a href="https://github.com/hffgzktbcc-blip/deckstream/discussions">Ask a question</a>
       </nav>
