@@ -1,0 +1,17 @@
+[
+  {"name": "good first issue", "color": "7057ff", "description": "Scoped, no Steam Deck needed, one or two files"},
+  {"name": "help wanted", "color": "008672", "description": "Open for anyone to pick up"},
+  {"name": "bug", "color": "d73a4a", "description": "Something is wrong in the site, API, app, panel or docs"},
+  {"name": "enhancement", "color": "a2eeef", "description": "New feature or improvement"},
+  {"name": "device-report", "color": "fbca04", "description": "A result or failure measured on a Steam Deck"},
+  {"name": "needs-repro", "color": "e4e669", "description": "Waiting for steps or evidence to reproduce"},
+  {"name": "claimed", "color": "c5def5", "description": "Someone is working on it; free again after a week of silence"},
+  {"name": "community", "color": "bfdadc", "description": "Outreach, onboarding and contributor experience"},
+  {"name": "question", "color": "d876e3", "description": "A question rather than a task"},
+  {"name": "area: daemon", "color": "1d76db", "description": "daemon/ (runs on the Deck)"},
+  {"name": "area: api", "color": "1d76db", "description": "api/ serverless relays and the storage contract"},
+  {"name": "area: app", "color": "1d76db", "description": "The companion web app (index.html, sw.js)"},
+  {"name": "area: decky", "color": "1d76db", "description": "decky/ Decky Loader panel"},
+  {"name": "area: ci", "color": "1d76db", "description": "Workflows, tests and tooling"},
+  {"name": "area: docs", "color": "1d76db", "description": "Documentation and the project site"}
+]

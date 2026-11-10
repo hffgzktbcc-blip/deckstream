@@ -1,0 +1,12 @@
+body:
+  - type: markdown
+    attributes:
+      value: "Ran DeckStream on your own setup? Share it here, success or failure. Use authorized files only and remove credentials and private hosts. A structured report can go in the [launch report form](https://github.com/hffgzktbcc-blip/deckstream/issues/new?template=launch-report.yml)."
+  - type: textarea
+    id: setup
+    attributes: {label: Your setup, description: "Deck model, SteamOS, storage server (NAS, Nextcloud, other WebDAV), network"}
+    validations: {required: true}
+  - type: textarea
+    id: result
+    attributes: {label: What happened, description: "What worked, what did not, the last milestone you saw and any timings you measured"}
+    validations: {required: true}
