@@ -1,5 +1,6 @@
 name: Steam Deck launch report
 description: Report a reproducible failure or a measured result on a Steam Deck
+labels: [device-report]
 body:
   - type: markdown
     attributes:
