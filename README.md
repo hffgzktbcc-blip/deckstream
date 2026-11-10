@@ -12,6 +12,8 @@
 **DeckStream** plays PC games you already own, stored on your own server (a NAS, Nextcloud, or anything that speaks
 WebDAV), on a **Steam Deck** without copying the whole game to the Deck first.
 
+[Wiki](https://github.com/hffgzktbcc-blip/deckstream/wiki) · [Delivery plan](PLAN.md) · [Contributing](CONTRIBUTING.md) · [Device test report](docs/community/DEVICE_TEST_REPORT.md)
+
 You pick a game on your phone. The Deck mounts the game folder over WebDAV, fetches the parts the game reads at
 start-up, starts it through **Proton**, and reads the rest while you play.
 
