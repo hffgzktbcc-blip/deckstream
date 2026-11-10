@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "principle": "Close each milestone on retained evidence, not on merged code.",
+  "milestones": [
+    {"id": "clean-setup-launch", "title": "Clean-setup launch", "stage": "implemented", "evidence": "Hosted tests pass with mock storage; no clean-Deck run of the current revision yet", "next": "Run the setup and first queue job on a Deck with authorized files; keep the failing stage if blocked"},
+    {"id": "failure-to-fix", "title": "Failure to fix", "stage": "planned", "evidence": "Launch-report issue template and doctor --bundle exist", "next": "Collect one real failure, redact it, reproduce the stage, add a regression"},
+    {"id": "startup-comparison", "title": "Startup comparison", "stage": "planned", "evidence": "Predecessor numbers only (README Measured)", "next": "Cold unprofiled vs cold profiled vs warm on the current code, with bytes and milestone times"},
+    {"id": "qualified-release", "title": "Qualified release", "stage": "planned", "evidence": "v1.0.0 predates own-storage", "next": "Rebuild Decky zip, check manifest, test the exact candidate, publish checksums"},
+    {"id": "discoverable", "title": "Discoverable", "stage": "implemented", "evidence": "Landing page and docs/community/START_HERE.md", "next": "Verify published routes; list in discovery directories"},
+    {"id": "outside-feedback", "title": "Outside feedback", "stage": "planned", "evidence": "none", "next": "Retain one unaffiliated tester report with revision, environment and outcome"}
+  ]
+}
