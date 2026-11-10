@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="DeckStream launches PC games from your own storage on a Steam Deck. Learn how to self-host it and check the evidence.">
+  <title>DeckStream · Your library on Steam Deck</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <header>
+      <p class="kicker">Open source · Steam Deck</p>
+      <h1>DeckStream</h1>
+      <p class="lead">Play from your own PC game library on Steam Deck.</p>
+      <p>Queue a game from your phone. DeckStream mounts your WebDAV folder, caches the data the game reads, and runs it on the Deck through Proton.</p>
+      <nav aria-label="Project links">
+        <a class="primary" href="https://github.com/hffgzktbcc-blip/deckstream/wiki/Getting-Started">Set up DeckStream</a>
+        <a href="https://github.com/hffgzktbcc-blip/deckstream">View source</a>
+      </nav>
+    </header>
+    <section aria-labelledby="flow">
+      <h2 id="flow">From library to launch</h2>
+      <ol class="flow">
+        <li><strong>Serve</strong><span>Point the companion at your library API and the Deck at your WebDAV storage.</span></li>
+        <li><strong>Queue</strong><span>Choose a ready game folder in the web companion or the optional Decky panel.</span></li>
+        <li><strong>Play</strong><span>The Deck mounts the folder read-only and runs the game locally.</span></li>
+      </ol>
+      <p><a href="https://github.com/hffgzktbcc-blip/deckstream/wiki/Architecture">See the launch architecture</a></p>
+    </section>
+    <section aria-labelledby="evidence">
+      <h2 id="evidence">What has been tested</h2>
+      <p>The current own-storage revision has automated API, browser, and Decky package checks. Published launch timings come from one Steam Deck setup using predecessor code. Startup depends on the title, connection and cache state.</p>
+      <ul>
+        <li><a href="https://github.com/hffgzktbcc-blip/deckstream/wiki/Evidence-and-Limits">Read the measurements and limits</a></li>
+        <li><a href="https://github.com/hffgzktbcc-blip/deckstream/wiki/Testing-and-Reproduction">Run the software checks or collect a device report</a></li>
+      </ul>
+    </section>
+    <section aria-labelledby="contribute">
+      <h2 id="contribute">Contribute a result</h2>
+      <p>Test the documented setup with a library you control. A report that names the exact revision and first failing stage can help isolate a setup or launch problem.</p>
+      <ul>
+        <li><a href="https://github.com/hffgzktbcc-blip/deckstream/wiki/Contributing">Contribution guide</a></li>
+        <li><a href="https://github.com/hffgzktbcc-blip/deckstream/discussions">GitHub Discussions</a></li>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>
