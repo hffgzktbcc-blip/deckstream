@@ -22,6 +22,7 @@ run_test() {
 
 echo "Running DeckStream test suite..."
 run_test "manifest"         python3 scripts/make_manifest.py --check
+run_test "version"          python3 scripts/check_version.py
 run_test "demand_gate"      python3 scripts/test_demand_gate.py
 run_test "saves"            python3 scripts/test_saves.py
 run_test "proton_matcher"   python3 scripts/test_proton_matcher.py
@@ -36,6 +37,7 @@ run_test "shell_syntax"     bash -c 'for f in daemon/*.sh scripts/*.sh; do bash 
 run_test "python_compile"   python3 -m py_compile daemon/*.py decky/main.py
 run_test "clean_tree"       python3 scripts/test_clean_tree.py
 run_test "api"              node scripts/test_api.js
+run_test "push"             node scripts/test_push.js
 run_test "decky_plugin"     python3 scripts/test_decky_plugin.py
 run_test "app_e2e"          node scripts/test_e2e_app.js
 

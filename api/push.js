@@ -2,7 +2,7 @@
 // Stores subscriptions in Redis via saveDoc('push', deviceId, sub).
 // Dispatches notifications to mobile browser service workers via Web Push (RFC 8291/8292) and ntfy.sh topics.
 
-const { applyCors, requireSecret } = require('./_lib');
+const { applyCors, requireSecret, assertPublicHttpUrl } = require('./_lib');
 const { loadDoc, saveDoc } = require('./_store');
 
 let webpush = null;
@@ -15,6 +15,15 @@ try {
 const DEVICE_ID_RE = /^[a-z0-9_-]{1,40}$/;
 const PUSH_TTL_SEC = 30 * 86400; // 30 days
 const NTFY_TOPIC_RE = /^[a-zA-Z0-9_-]{24,64}$/; // >= 24 chars for unguessable privacy
+
+// A subscription endpoint is a URL the server POSTs to, so it must be https and resolve only to
+// public addresses (no cloud metadata, localhost or home-network hosts). Browser push services
+// always hand out https endpoints on public hosts. Throws with a short reason otherwise.
+async function assertPushEndpoint(raw) {
+  const u = await assertPublicHttpUrl(raw);
+  if (u.protocol !== 'https:') throw new Error('Push endpoint must use https');
+  return u;
+}
 
 // Internal notification dispatcher callable by api/status.js or HTTP POST
 // ntfyTitle/ntfyBody: wording for ntfy that names no game (ntfy topics are public); defaults to the ready message.
@@ -34,7 +43,12 @@ async function sendPushNotification({ deviceId, title, body, tag, url, topic, nt
   const vapidPrivate = process.env.VAPID_PRIVATE_KEY || '';
   const vapidSubject = process.env.VAPID_SUBJECT || 'mailto:deckstream@example.com';
 
-  if (sub && sub.endpoint && webpush && vapidPublic && vapidPrivate) {
+  let canSend = Boolean(sub && sub.endpoint && webpush && vapidPublic && vapidPrivate);
+  if (canSend) {
+    // Checked again at send time: a stored host can later resolve somewhere private.
+    try { await assertPushEndpoint(sub.endpoint); } catch { webpushOutcome = 'blocked'; canSend = false; }
+  }
+  if (canSend) {
     try {
       webpush.setVapidDetails(vapidSubject, vapidPublic, vapidPrivate);
       const payload = JSON.stringify({
@@ -109,6 +123,11 @@ module.exports = async (req, res) => {
         if (!sub || typeof sub !== 'object' || !sub.endpoint) {
           return res.status(400).json({ error: 'Missing subscription endpoint' });
         }
+        try {
+          await assertPushEndpoint(String(sub.endpoint).slice(0, 1000));
+        } catch (e) {
+          return res.status(400).json({ error: 'Invalid subscription endpoint: ' + e.message });
+        }
 
         const subObj = {
           endpoint: String(sub.endpoint).slice(0, 1000),
@@ -164,3 +183,4 @@ module.exports = async (req, res) => {
 };
 
 module.exports.sendPushNotification = sendPushNotification;
+module.exports.assertPushEndpoint = assertPushEndpoint;

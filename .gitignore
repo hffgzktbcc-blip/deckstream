@@ -37,3 +37,8 @@ cache/
 # OS Specific
 .DS_Store
 Thumbs.db
+
+# Coverage reports (scripts/coverage.sh)
+coverage/
+.coverage
+.coverage.*
