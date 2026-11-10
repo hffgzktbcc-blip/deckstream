@@ -58,7 +58,7 @@ def parse_stamp(text):
 
 def agent_name(args=None):
     name = (getattr(args, 'agent', None) or os.environ.get('AGENT_NAME') or os.environ.get('DECKSTREAM_AGENT')
-            or os.environ.get('USER') or 'agent')
+            or 'agent')  # never $USER: claims and snapshots are pushed to the public remote
     return SAFE.sub('-', name).strip('-') or 'agent'
 
 
@@ -312,7 +312,7 @@ def resume(args):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('--agent', help='name recorded on snapshots and claims (default: $AGENT_NAME or $USER)')
+    parser.add_argument('--agent', help='name recorded on snapshots and claims (default: $AGENT_NAME, else "agent"; never the login name, because it is pushed publicly)')
     parser.add_argument('--offline', action='store_true', help='do not contact origin')
     sub = parser.add_subparsers(dest='command', required=True)
     p = sub.add_parser('save', help='snapshot the working state')
