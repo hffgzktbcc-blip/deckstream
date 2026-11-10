@@ -20,14 +20,15 @@ Each line starts with a status:
 | ❌ | fail | DeckStream will not work until this is fixed. Any failure makes the exit code `1`. |
 | ℹ️ | info | Information only. |
 
-A line with a problem is followed by `→` and the first thing to try. `--bundle` writes
+A warning or failure, and some info lines, are followed by `→` and the first thing to try. `--bundle` writes
 `~/.local/share/deckstream/diag-<date>-<time>.txt` with the report, the last 80 daemon log lines,
 disk usage, the mounts under `/run/media` and the save-backup status. The queue password, the
 storage key and anything that looks like a token or password are replaced with `***`, so that file
 is the one to attach to an issue.
 
 If one of the checks below crashes, the doctor does not stop: it prints a warning naming the check
-and `the check itself failed: <error>`, then runs the rest. That message is a bug in the doctor;
+(the config, DNS, server and install checks show up as `<lambda>`) and
+`the check itself failed: <error>`, then runs the rest. That message is a bug in the doctor;
 please report it with the bundle.
 
 The checks run in this order.
@@ -38,7 +39,7 @@ The checks run in this order.
 
 | Result | Meaning | First thing to try |
 |---|---|---|
-| ❌ `DeckStream needs Python 3.9 or newer` | The Python is older than 3.9. | Check `python3 --version` and run the doctor with Python 3.9 or newer. |
+| ❌ Python: `<version>` → `DeckStream needs Python 3.9 or newer` | The Python is older than 3.9. | Check `python3 --version` and run the doctor with Python 3.9 or newer. |
 
 ## DeckStream config (`check_config`)
 
@@ -194,4 +195,4 @@ server's `<server_url>/daemon/manifest.json` version.
 |---|---|---|
 | ℹ️ `no manifest.json` | Installed before checksums existed. | Re-run the installer once. |
 | ⚠️ Installed files: `<file> (missing)` / `(changed)` | A DeckStream file was deleted or edited. | Re-run the installer to repair. |
-| ⚠️ Update available | The server has a newer version than the Deck. | Run the installer command again (it waits for a running job). |
+| ⚠️ Update available | The server's version differs from the Deck's. The doctor only compares them for equality, so a Deck running a newer build than the server sees this too. | Run the installer command again (it waits for a running job). |
