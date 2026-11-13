@@ -12,6 +12,8 @@
 **DeckStream** plays PC games you already own, stored on your own server (a NAS, Nextcloud, or anything that speaks
 WebDAV), on a **Steam Deck** without copying the whole game to the Deck first.
 
+**[Try one small test this week—Steam Deck optional →](docs/community/TRY_THIS_WEEK.md)**
+
 **Looking for the first independent tester?** [Join the Steam Deck + NAS/WebDAV test call (#9)](https://github.com/hffgzktbcc-blip/deckstream/issues/9) — clean-device successes *and failures* welcome.
 
 **New here?** [Project homepage](https://hffgzktbcc-blip.github.io/deckstream/) · [Try the companion locally](#development) · [Self-hosting setup](#setup) · [Report a real Steam Deck test](https://github.com/hffgzktbcc-blip/deckstream/issues/new?template=launch-report.yml) · [Beginner-friendly issues](https://github.com/hffgzktbcc-blip/deckstream/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
