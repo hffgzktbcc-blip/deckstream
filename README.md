@@ -29,6 +29,23 @@ start-up, starts it through **Proton**, and reads the rest while you play.
 
 ---
 
+## The Growing Family
+
+> *Built by curiosity. Tested by evidence. Powered by community.*
+
+DeckStream is one of four independent, open-source projects sharing an evidence-first philosophy and a community:
+
+| Project | What it is for | When to choose it | Licence | Link |
+| :--- | :--- | :--- | :--- | :--- |
+| **ounce-core** | ARM64 execution and verification research engine. Runs programs across three CPU tiers and compares output with real hardware. | You want evidence-first correctness, hardware differential checks, or the safe-Rust core. | MIT | [github.com/hffgzktbcc-blip/ounce-core](https://github.com/hffgzktbcc-blip/ounce-core) |
+| **ounce-hb** | Simplified homebrew runner built around Ounce-Core with diagnostics, process safety, and stable exit codes. | You want a simple way to run your own homebrew from a script or terminal and see why a run stopped. | MIT | [github.com/hffgzktbcc-blip/ounce-hb](https://github.com/hffgzktbcc-blip/ounce-hb) |
+| **ounce-runtime** | Experimental performance runtime with native JIT, host GPU presentation, and controller support. | You want to experiment with high performance, visual rendering, or controller input under GPL-3.0-or-later terms. | GPL-3.0-or-later | [github.com/hffgzktbcc-blip/ounce-runtime](https://github.com/hffgzktbcc-blip/ounce-runtime) |
+| **deckstream** (this repo) | Steam Deck NAS/WebDAV game launcher and streaming-oriented experimentation. | You want an on-demand virtual filesystem for handheld Linux gaming PCs (SteamOS) with Gaming Mode integration. | MIT | You are here |
+
+**Independent siblings, clean boundaries.** Each project solves a distinct problem with its own repository, tests, and releases. DeckStream is an independent sibling, not an Ounce-Core derivative; no code flows inappropriately across licensing boundaries (`ounce-core`, `ounce-hb`, and `deckstream` are MIT; `ounce-runtime` is GPL-3.0-or-later).
+
+---
+
 ## How it works
 
 <p align="center">
