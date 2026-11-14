@@ -1,0 +1,161 @@
+{
+  "version": "vf005525a26",
+  "released": 1794320343,
+  "files": {
+    "cloud-install.sh": {
+      "sha256": "880bf33aa8282596acf8e9e1627f894039d7c723f17446e38d8995b624d2e8ad",
+      "mode": "755",
+      "bytes": 16229
+    },
+    "deck_preset.py": {
+      "sha256": "fb276775ff1a0689a9d14960096b55ebf83502bf4c3b7eac41e15379a13782c0",
+      "mode": "755",
+      "bytes": 3950
+    },
+    "deckstream-daemon.py": {
+      "sha256": "47067dc216500b8659558e1b05999267f754aedb274636333c424ed98553e41c",
+      "mode": "755",
+      "bytes": 27031
+    },
+    "demand_gate.py": {
+      "sha256": "b0f8119166ecef7e0272a502417da86b566628c757553b12030c77ec739907fa",
+      "mode": "755",
+      "bytes": 8035
+    },
+    "doctor.py": {
+      "sha256": "244a402302d17ee17a8351ea3a4bc2fcb0f35208b97fb96c52ba81f0bd155cbe",
+      "mode": "755",
+      "bytes": 22421
+    },
+    "ds_cache.py": {
+      "sha256": "0a3100292228be6c17df71e0380659c7979b668383492e174daf0a4ded36e78a",
+      "mode": "644",
+      "bytes": 40399
+    },
+    "ds_core.py": {
+      "sha256": "ff2f795f8b50204c74a49227c86cc44f0b9813acf27b7b66425cb3d444a7931e",
+      "mode": "644",
+      "bytes": 8163
+    },
+    "ds_install.py": {
+      "sha256": "a967fb87e8035b872a2ab6bf4ab3bad135832a5534e6b796d8ee798ff06edf31",
+      "mode": "644",
+      "bytes": 21364
+    },
+    "ds_janitor.py": {
+      "sha256": "1a2f90c2ebe860d1a03f3d4c5e3006119bf9bc4967909801fb0399113c442921",
+      "mode": "644",
+      "bytes": 4655
+    },
+    "ds_shortcuts.py": {
+      "sha256": "5dde3adc0f4590f811a53c7a75dbfaecce32ff1a7cba01fd2abaa2855eca29b7",
+      "mode": "644",
+      "bytes": 20198
+    },
+    "ds_status.py": {
+      "sha256": "849929c4ddd6be9a320d244cf90bf86e11d31f7b835aed079f2347e150b45b2e",
+      "mode": "644",
+      "bytes": 15209
+    },
+    "ds_steam.py": {
+      "sha256": "769d3f27dd0ee4751f08023694663f689f028af75bdd7ecd7e1a79ef5e7b4f32",
+      "mode": "644",
+      "bytes": 8929
+    },
+    "ds_stream.py": {
+      "sha256": "e061f443e67ccb201bb0b8a9eab203360b03bec59e7aab41d5c571305736a240",
+      "mode": "644",
+      "bytes": 11185
+    },
+    "ds_update.py": {
+      "sha256": "6dddab1682d192d78f0b24d070300687fd0b7968d7b78be7c396cb5a414b3699",
+      "mode": "644",
+      "bytes": 10630
+    },
+    "focus_game.sh": {
+      "sha256": "5cd9d6d397fde2613f59f91fd272b06e9dd6f5b1be755a9eda1f4b3211af6c2a",
+      "mode": "755",
+      "bytes": 2703
+    },
+    "game-launcher.sh": {
+      "sha256": "88c0403f1a046aa75b9840840258577ce656b8336530eb80c2d631b33329482d",
+      "mode": "755",
+      "bytes": 9801
+    },
+    "hedge_proxy.py": {
+      "sha256": "8eaf6768a00ceb51857c3ab205f52d2d7131f9667bb4609493c1139092d4afd5",
+      "mode": "755",
+      "bytes": 13628
+    },
+    "install.sh": {
+      "sha256": "5f4e56a4a538e5038621017636c2b01fbd0201ffe202ed2504f29f00f0a465c2",
+      "mode": "755",
+      "bytes": 20961
+    },
+    "language_fix.py": {
+      "sha256": "3be9e1da47d66d90d4c1c956bd5bd209097844b4ac03e7ff6a208700374f8336",
+      "mode": "755",
+      "bytes": 4434
+    },
+    "launch_report.py": {
+      "sha256": "cebeb485e83439d4593c087078e6d1a576a6e8befbd3f81724ffc5598cd627d4",
+      "mode": "755",
+      "bytes": 5652
+    },
+    "parallel_download.py": {
+      "sha256": "50cc4862cdcd49741887cdb2a914377fdcf2052ce431445d0b70a20e3bfabfff",
+      "mode": "644",
+      "bytes": 7457
+    },
+    "parallel_unzip.py": {
+      "sha256": "60501f0b936f194cc9feaff5426188bcc2448073e18966535b3f35e08ebb9568",
+      "mode": "755",
+      "bytes": 4761
+    },
+    "proton_matcher.py": {
+      "sha256": "7cbdbc16682970b18871453fa0d5d7807e4276fc331dbe93a880d762571e712c",
+      "mode": "755",
+      "bytes": 7327
+    },
+    "rollback.sh": {
+      "sha256": "c7a05616190525ef7a3262adbef9733286b98880f64f804489ad54636abe74ab",
+      "mode": "755",
+      "bytes": 2952
+    },
+    "saves.py": {
+      "sha256": "e18aef50f386c8f6b7ba04ff1cab03e0a1831b73365f5c436906c40785b9f94f",
+      "mode": "755",
+      "bytes": 21493
+    },
+    "startup_profile.py": {
+      "sha256": "51022593768e5dae6f84b79acd189871f5241921f19821fbe23484a7f199efd3",
+      "mode": "755",
+      "bytes": 70983
+    },
+    "stream-runner.sh": {
+      "sha256": "d4c50fbb47093c7a8f9088c8fab91e821ac0efb1b52a349f0d25fc630903646d",
+      "mode": "755",
+      "bytes": 54107
+    },
+    "suspend-resume-hook.sh": {
+      "sha256": "08ee629a984c437346472f8921170c396fd0843a1f2ddcfc93e3bc064f890406",
+      "mode": "755",
+      "bytes": 4800
+    },
+    "umu-test.sh": {
+      "sha256": "10a752e2d6395511e5519d41208eeace49df55a84c26ff997d425b4242896757",
+      "mode": "755",
+      "bytes": 6239
+    },
+    "umu_gameid.py": {
+      "sha256": "fbded1e3ab62c777197712fbcbdaab6e87921ce978c936dbb635b21418798edf",
+      "mode": "755",
+      "bytes": 5216
+    },
+    "warmup.py": {
+      "sha256": "3e36554c163c1356f2182065ca93164dd45e3b5f09e39bf1505bb6980de7aeac",
+      "mode": "755",
+      "bytes": 5739
+    }
+  }
+}

@@ -1,0 +1,15 @@
+labels: [question]
+body:
+  - type: markdown
+    attributes:
+      value: "Remove credentials, tokens, private hosts and identifying paths. For a reproducible bug, open an issue instead."
+  - type: textarea
+    id: question
+    attributes: {label: Your question}
+    validations: {required: true}
+  - type: input
+    id: revision
+    attributes: {label: Revision or version (if relevant)}
+  - type: textarea
+    id: tried
+    attributes: {label: What you have tried}

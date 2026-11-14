@@ -1,0 +1,81 @@
+name: release
+
+# Builds the Decky panel zip and daemon bundle with SHA-256 checksums.
+# - Manual run (Actions > release > Run workflow): build only; files are a run artifact. Nothing is published.
+# - Pushing a vX.Y.Z tag: same build, then a DRAFT GitHub release with the changelog section as notes.
+#   A maintainer reviews the draft and publishes it by hand, only after a real Steam Deck run (docs/RELEASING.md).
+on:
+  push:
+    tags: [ 'v*.*.*' ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v4.4.0
+        with:
+          version: 10
+
+      - name: Version, changelog and manifest agree
+        run: |
+          if [ "$GITHUB_REF_TYPE" = tag ]; then
+            python3 scripts/check_version.py --tag "$GITHUB_REF_NAME"
+          else
+            python3 scripts/check_version.py
+          fi
+          python3 scripts/make_manifest.py --check
+
+      - name: Build and package
+        run: |
+          VERSION="$(node -p "require('./package.json').version")"
+          bash scripts/build_decky.sh
+          git diff --exit-code -- decky/DeckStream.zip || { echo "::error::committed decky/DeckStream.zip is stale; run scripts/build_decky.sh"; exit 1; }
+          mkdir -p out
+          cp decky/DeckStream.zip "out/DeckStream-decky-$VERSION.zip"
+          git archive --format=tar.gz --prefix="deckstream-daemon-$VERSION/" -o "out/deckstream-daemon-$VERSION.tar.gz" HEAD daemon LICENSE
+          (cd out && sha256sum -- * > SHA256SUMS)
+          python3 scripts/check_version.py --notes "$VERSION" > out/RELEASE_NOTES.md || echo "No changelog section for $VERSION yet." > out/RELEASE_NOTES.md
+          cat out/SHA256SUMS
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-files
+          path: out/
+          retention-days: 30
+
+  draft-release:
+    if: github.ref_type == 'tag'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-files
+          path: out
+
+      - name: Create a draft release (never published automatically)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          cd out
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --draft --verify-tag \
+            --title "DeckStream $TAG" --notes-file RELEASE_NOTES.md \
+            DeckStream-decky-*.zip deckstream-daemon-*.tar.gz SHA256SUMS

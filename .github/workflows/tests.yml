@@ -1,0 +1,83 @@
+name: tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+# Read-only token: outside pull requests run with no write access to the repository.
+permissions:
+  contents: read
+
+# A new push to the same PR cancels the older run, so contributors get a result sooner.
+concurrency:
+  group: tests-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v4.4.0
+        with:
+          version: 10
+
+      - name: Install the browser test's Chromium
+        run: |
+          npm i --no-save playwright@1.63.0
+          npx playwright install --with-deps chromium
+
+      - name: Run the DeckStream test suite
+        run: bash scripts/run_all_tests.sh
+
+      - name: The committed Decky zip matches its source
+        run: |
+          git show HEAD:decky/DeckStream.zip > "$RUNNER_TEMP/committed.zip"
+          bash scripts/build_decky.sh
+          unzip -q "$RUNNER_TEMP/committed.zip" -d "$RUNNER_TEMP/committed"
+          unzip -q decky/DeckStream.zip -d "$RUNNER_TEMP/built"
+          diff -r "$RUNNER_TEMP/committed" "$RUNNER_TEMP/built"
+
+      - name: Type-check the Decky panel
+        working-directory: decky
+        run: pnpm exec tsc --noEmit
+
+  coverage:
+    # Reports line coverage in the run summary and as a downloadable artifact. It never fails the build on a number.
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Measure coverage
+        run: |
+          pip install coverage==7.6.10
+          bash scripts/coverage.sh
+          cat coverage/summary.md >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage/
+          retention-days: 14

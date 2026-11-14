@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10151e">
+  <meta name="robots" content="index,follow">
+  <meta name="description" content="DeckStream is an open-source Steam Deck launcher for PC games you own on your NAS or WebDAV server. Queue from your phone, mount on demand, and help test the current build.">
+  <title>DeckStream — self-hosted WebDAV game launcher for Steam Deck</title>
+  <link rel="canonical" href="https://hffgzktbcc-blip.github.io/deckstream/">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="mark.svg" type="image/svg+xml">
+  <link rel="sitemap" type="application/xml" href="sitemap.xml">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="DeckStream">
+  <meta property="og:title" content="DeckStream — your own PC game library, on Steam Deck">
+  <meta property="og:description" content="Open-source, self-hosted WebDAV game launcher. Queue from your phone, launch through Proton, and help verify the current Steam Deck build.">
+  <meta property="og:url" content="https://hffgzktbcc-blip.github.io/deckstream/">
+  <meta property="og:image" content="https://hffgzktbcc-blip.github.io/deckstream/images/cloud.png">
+  <meta property="og:image:alt" content="DeckStream phone companion browsing the local demo library">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="DeckStream — your own PC game library, on Steam Deck">
+  <meta name="twitter:description" content="Open-source WebDAV launcher and phone companion for games you own. Looking for real Steam Deck and NAS testers.">
+  <meta name="twitter:image" content="https://hffgzktbcc-blip.github.io/deckstream/images/cloud.png">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareSourceCode",
+      "name": "DeckStream",
+      "description": "Open-source self-hosted launcher and companion for running PC games you own from WebDAV storage on Steam Deck.",
+      "url": "https://hffgzktbcc-blip.github.io/deckstream/",
+      "codeRepository": "https://github.com/hffgzktbcc-blip/deckstream",
+      "license": "https://github.com/hffgzktbcc-blip/deckstream/blob/main/LICENSE",
+      "programmingLanguage": ["Python", "JavaScript", "TypeScript"],
+      "runtimePlatform": "SteamOS"
+    }
+  </script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="masthead wrap">
+    <a class="brand" href="./"><img src="mark.svg" width="30" height="30" alt="">DeckStream</a>
+    <nav aria-label="Site">
+      <a href="#flow">How it works</a>
+      <a href="https://github.com/hffgzktbcc-blip/deckstream">GitHub</a>
+    </nav>
+  </header>
+
+  <main id="main" class="wrap" tabindex="-1">
+    <section class="hero" aria-labelledby="headline">
+      <div class="hero-copy">
+        <p class="eyebrow">Open-source Steam Deck launcher</p>
+        <h1 id="headline">Your library lives on your storage.</h1>
+        <p class="lead">Queue a PC game from your phone. DeckStream mounts the game folder from your WebDAV storage and runs it locally on your Steam Deck through Proton.</p>
+        <div class="actions">
+          <a class="button primary" href="https://github.com/hffgzktbcc-blip/deckstream/issues/9">Join the Steam Deck test</a>
+          <a class="button" href="#try-it">Try the local demo</a>
+        </div>
+        <aside class="status" aria-label="Current build status">
+          <strong>Hardware testers wanted</strong>
+          <p>Automated checks use mock storage. An independent clean-device launch of the current own-storage revision is still unconfirmed. <a href="#evidence">See the evidence</a>.</p>
+        </aside>
+      </div>
+
+      <figure class="showcase">
+        <div class="screens">
+          <div>
+            <a href="images/cloud.png"><img src="images/cloud.png" width="390" height="844" alt="Open full-size screenshot of the companion's Library tab"></a>
+            <span>Browse library</span>
+          </div>
+          <div>
+            <a href="images/queue.png"><img src="images/queue.png" width="390" height="844" alt="Open full-size screenshot of the companion's Deck queue"></a>
+            <span>Check the queue</span>
+          </div>
+        </div>
+        <figcaption>DeckStream phone companion captured in local mock-library mode.</figcaption>
+      </figure>
+    </section>
+
+    <section class="section" id="flow" aria-labelledby="workflow">
+      <h2 id="workflow">From storage to Steam Deck</h2>
+      <ol class="flow">
+        <li><h3>Serve your library</h3><p>Expose authorized game folders from your NAS, Nextcloud or another WebDAV server using the DeckStream storage API.</p></li>
+        <li><h3>Queue a game</h3><p>Choose a folder in the phone companion or the optional Decky panel. Check its progress from the queue.</p></li>
+        <li><h3>Launch through Proton</h3><p>The daemon on the Deck mounts the folder with rclone and caches the data the game reads. The Deck renders the game locally.</p></li>
+      </ol>
+      <p><a href="https://github.com/hffgzktbcc-blip/deckstream#setup">Read the setup guide</a> · <a href="https://github.com/hffgzktbcc-blip/deckstream/blob/main/docs/STORAGE_API.md">Storage API requirements</a> · <a href="https://github.com/hffgzktbcc-blip/deckstream#how-it-works">Technical walkthrough</a></p>
+    </section>
+
+    <div class="section details">
+      <section id="try-it" aria-labelledby="try">
+        <h2 id="try">Try it without a Deck</h2>
+        <p>Run the phone companion and a mock library locally with Node.js 22.</p>
+        <pre tabindex="0" aria-label="Commands to start the local demo"><code>git clone https://github.com/hffgzktbcc-blip/deckstream.git
+cd deckstream
+npm start</code></pre>
+        <p>Open <code>http://127.0.0.1:8765</code> to try the library and queue.</p>
+      </section>
+      <section id="evidence" aria-labelledby="build-status">
+        <h2 id="build-status">What’s been verified</h2>
+        <p>API and browser checks exercise the current own-storage flow with mock storage. An independent clean-device launch is still unconfirmed.</p>
+        <p><a href="https://github.com/hffgzktbcc-blip/deckstream/releases/tag/v1.0.0">v1.0.0</a> predates the own-storage changes. Earlier device timings cover the predecessor runtime. LAN NAS performance and game compatibility are still open questions for this revision.</p>
+        <p><a href="https://github.com/hffgzktbcc-blip/deckstream/blob/main/docs/LIMITS.md">Evidence and limits</a> · <a href="https://github.com/hffgzktbcc-blip/deckstream/actions/workflows/tests.yml">Automated test results</a> · <a href="https://github.com/hffgzktbcc-blip/deckstream/blob/main/docs/ROADMAP.md">Roadmap</a></p>
+      </section>
+    </div>
+
+    <section id="test-on-a-deck" class="tester" aria-labelledby="testing">
+      <h2 id="testing">Have a Steam Deck and WebDAV storage?</h2>
+      <p>Try the documented setup with game files you’re authorized to use. Report a successful launch or the first step that fails.</p>
+      <ul>
+        <li>Record the exact commit, Deck model, SteamOS and Proton versions.</li>
+        <li>Include storage type, cache state and the last successful step.</li>
+        <li>Remove credentials, private hostnames and identifying details.</li>
+      </ul>
+      <div class="actions">
+        <a class="button primary" href="https://github.com/hffgzktbcc-blip/deckstream/issues/9">Read the tester call on GitHub</a>
+        <a class="button" href="https://github.com/hffgzktbcc-blip/deckstream/issues/new?template=launch-report.yml">Submit a launch report</a>
+      </div>
+      <p><a href="https://github.com/hffgzktbcc-blip/deckstream/discussions">Ask a question</a> · <a href="https://github.com/hffgzktbcc-blip/deckstream/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22">Find a first issue</a></p>
+    </section>
+  </main>
+
+  <footer class="wrap">
+    <p>DeckStream uses game files you supply and respects existing DRM. Use files and storage you’re authorized to access.</p>
+    <p><a href="https://github.com/hffgzktbcc-blip/deckstream/blob/main/LICENSE">MIT license</a> · <a href="https://github.com/hffgzktbcc-blip/deckstream/blob/main/SECURITY.md">Security</a> · <a href="https://github.com/hffgzktbcc-blip/deckstream/blob/main/docs/community/START_HERE.md">Contribute</a></p>
+  </footer>
+</body>
+</html>

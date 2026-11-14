@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="440" viewBox="0 0 1280 440">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0d14"/>
+      <stop offset="50%" stop-color="#101522"/>
+      <stop offset="100%" stop-color="#0d111a"/>
+    </linearGradient>
+    <linearGradient id="glowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.15"/>
+      <stop offset="50%" stop-color="#10b981" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0.15"/>
+    </linearGradient>
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1e2536"/>
+      <stop offset="100%" stop-color="#121722"/>
+    </linearGradient>
+    <filter id="cardShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="16" stdDeviation="20" flood-color="#000000" flood-opacity="0.75"/>
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1280" height="440" fill="url(#bg)"/>
+  <rect width="1280" height="440" fill="url(#glowGrad)"/>
+
+  <!-- Subtle Radial Glow behind logo -->
+  <circle cx="280" cy="200" r="280" fill="#3b82f6" opacity="0.06"/>
+
+  <!-- Left Side: Typography and Feature Pills -->
+  <g transform="translate(64, 0)">
+    <!-- Small Category Pill -->
+    <g transform="translate(0, 58)">
+      <rect width="194" height="26" rx="13" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+      <circle cx="14" cy="13" r="4" fill="#10b981"/>
+      <text x="26" y="17" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#94a3b8" letter-spacing="1">STEAM DECK &amp; LINUX PC</text>
+    </g>
+
+    <!-- Main Title -->
+    <text x="0" y="162" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="74" font-weight="900" fill="#f8fafc" letter-spacing="-1">DeckStream</text>
+
+    <!-- Taglines (Clean, wrapping with no cut-off) -->
+    <text x="2" y="212" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="22" font-weight="600" fill="#cbd5e1">Your remote PC game library, playable on a Steam Deck.</text>
+    
+    <text x="2" y="248" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="15" font-weight="400" fill="#94a3b8">Pick a title on your phone or web app; the Deck streams blocks on demand.</text>
+    <text x="2" y="272" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="15" font-weight="400" fill="#94a3b8">No full download first • Saves backed up • Native Proton.</text>
+
+    <!-- Feature Badges -->
+    <g transform="translate(0, 318)">
+      <!-- Pill 1: FUSE Copy-on-Write -->
+      <g transform="translate(0, 0)">
+        <rect width="176" height="38" rx="19" fill="#141a24" stroke="#232d3f" stroke-width="1.5"/>
+        <circle cx="20" cy="19" r="5" fill="#3fd6a4"/>
+        <text x="34" y="24" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#e2e8f0">FUSE Copy-on-Write</text>
+      </g>
+
+      <!-- Pill 2: Proton + UMU -->
+      <g transform="translate(190, 0)">
+        <rect width="180" height="38" rx="19" fill="#141a24" stroke="#232d3f" stroke-width="1.5"/>
+        <circle cx="20" cy="19" r="5" fill="#5ab0ff"/>
+        <text x="34" y="24" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#e2e8f0">Proton + umu-launcher</text>
+      </g>
+
+      <!-- Pill 3: Demand Profiling -->
+      <g transform="translate(384, 0)">
+        <rect width="194" height="38" rx="19" fill="#141a24" stroke="#232d3f" stroke-width="1.5"/>
+        <circle cx="20" cy="19" r="5" fill="#f1b647"/>
+        <text x="34" y="24" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#e2e8f0">Smart Startup Profiler</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- Right Side: Stylized Floating Game Cards -->
+  <!-- Card 1: Cyberpunk 2077 -->
+  <g transform="translate(740, 60) rotate(-6)" filter="url(#cardShadow)">
+    <rect width="168" height="260" rx="12" fill="url(#cardGrad)" stroke="#334155" stroke-width="1.5"/>
+    <rect x="0" y="0" width="168" height="120" rx="12" fill="#1e293b"/>
+    <!-- Art Header Simulation -->
+    <rect x="0" y="100" width="168" height="20" fill="#1e293b"/>
+    <rect x="14" y="18" width="56" height="18" rx="4" fill="#3b82f6"/>
+    <text x="42" y="31" font-family="sans-serif" font-size="9" font-weight="800" fill="#ffffff" text-anchor="middle">STREAMING</text>
+    
+    <text x="14" y="152" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="800" fill="#f8fafc">Cyberpunk</text>
+    <text x="14" y="172" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="800" fill="#f8fafc">2077</text>
+    <text x="14" y="196" font-family="sans-serif" font-size="11" fill="#94a3b8">Action RPG • 69 GB</text>
+    
+    <rect x="14" y="214" width="140" height="6" rx="3" fill="#1e293b"/>
+    <rect x="14" y="214" width="94" height="6" rx="3" fill="#3b82f6"/>
+    <text x="14" y="238" font-family="sans-serif" font-size="10" font-weight="600" fill="#10b981">Ready: 9s startup</text>
+  </g>
+
+  <!-- Card 2: Baldur's Gate 3 -->
+  <g transform="translate(900, 78) rotate(2)" filter="url(#cardShadow)">
+    <rect width="168" height="260" rx="12" fill="url(#cardGrad)" stroke="#475569" stroke-width="1.5"/>
+    <rect x="0" y="0" width="168" height="120" rx="12" fill="#2d2235"/>
+    <rect x="0" y="100" width="168" height="20" fill="#2d2235"/>
+    <rect x="14" y="18" width="56" height="18" rx="4" fill="#8b5cf6"/>
+    <text x="42" y="31" font-family="sans-serif" font-size="9" font-weight="800" fill="#ffffff" text-anchor="middle">READY</text>
+    
+    <text x="14" y="152" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="800" fill="#f8fafc">Baldur's</text>
+    <text x="14" y="172" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="800" fill="#f8fafc">Gate 3</text>
+    <text x="14" y="196" font-family="sans-serif" font-size="11" fill="#94a3b8">CRPG • 122 GB</text>
+    
+    <rect x="14" y="214" width="140" height="6" rx="3" fill="#1e293b"/>
+    <rect x="14" y="214" width="48" height="6" rx="3" fill="#8b5cf6"/>
+    <text x="14" y="238" font-family="sans-serif" font-size="10" font-weight="600" fill="#94a3b8">Startup: 9.4 GB</text>
+  </g>
+
+  <!-- Card 3: Sifu -->
+  <g transform="translate(1060, 48) rotate(8)" filter="url(#cardShadow)">
+    <rect width="168" height="260" rx="12" fill="url(#cardGrad)" stroke="#334155" stroke-width="1.5"/>
+    <rect x="0" y="0" width="168" height="120" rx="12" fill="#1b2a26"/>
+    <rect x="0" y="100" width="168" height="20" fill="#1b2a26"/>
+    <rect x="14" y="18" width="56" height="18" rx="4" fill="#10b981"/>
+    <text x="42" y="31" font-family="sans-serif" font-size="9" font-weight="800" fill="#ffffff" text-anchor="middle">ONLINE</text>
+    
+    <text x="14" y="152" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="800" fill="#f8fafc">Sifu</text>
+    <text x="14" y="196" font-family="sans-serif" font-size="11" fill="#94a3b8">Martial Arts • 16 GB</text>
+    
+    <rect x="14" y="214" width="140" height="6" rx="3" fill="#1e293b"/>
+    <rect x="14" y="214" width="120" height="6" rx="3" fill="#10b981"/>
+    <text x="14" y="238" font-family="sans-serif" font-size="10" font-weight="600" fill="#10b981">Profiled start</text>
+  </g>
+</svg>

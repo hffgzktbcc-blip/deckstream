@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Ask a question or share an idea
+    url: https://github.com/hffgzktbcc-blip/deckstream/discussions
+    about: Not a bug and not a task? Start a discussion.
+  - name: Report a security problem privately
+    url: https://github.com/hffgzktbcc-blip/deckstream/security/advisories/new
+    about: Credentials, storage relay access, job authorization or update integrity.

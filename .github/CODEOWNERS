@@ -1,0 +1,11 @@
+# Human approval must also be enabled in branch protection by the owner.
+/LICENSE @hffgzktbcc-blip
+/SECURITY.md @hffgzktbcc-blip
+/daemon/manifest.json @hffgzktbcc-blip
+/daemon/install.sh @hffgzktbcc-blip
+/daemon/cloud-install.sh @hffgzktbcc-blip
+/scripts/make_manifest.py @hffgzktbcc-blip
+/scripts/check_legal_guardrails.sh @hffgzktbcc-blip
+/api/_lib.js @hffgzktbcc-blip
+/api/storage.js @hffgzktbcc-blip
+/.github/ @hffgzktbcc-blip
