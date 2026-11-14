@@ -23,6 +23,14 @@ run_test() {
 echo "Running DeckStream test suite..."
 run_test "manifest"         python3 scripts/make_manifest.py --check
 run_test "version"          python3 scripts/check_version.py
+run_test "early_launch_calc" python3 scripts/test_early_launch_calc.py
+run_test "replay_rig"        python3 scripts/test_replay_rig.py
+run_test "deck_smoke"        bash scripts/test_deck_smoke.sh
+run_test "rollback_safety"   python3 scripts/test_rollback_safety.py
+run_test "suspend_resume"    python3 scripts/test_suspend_resume.py
+run_test "runner_lock"       bash scripts/test_runner_lock.sh
+run_test "daemon_safety"     python3 scripts/test_daemon_safety.py
+run_test "webdav_e2e"        python3 scripts/test_webdav_e2e.py
 run_test "demand_gate"      python3 scripts/test_demand_gate.py
 run_test "saves"            python3 scripts/test_saves.py
 run_test "proton_matcher"   python3 scripts/test_proton_matcher.py
