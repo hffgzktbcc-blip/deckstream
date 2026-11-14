@@ -40,6 +40,15 @@ jobs:
           npm i --no-save playwright@1.63.0
           npx playwright install --with-deps chromium
 
+      - name: Install rclone for real WebDAV integration tests
+        run: |
+          curl -fsSLo "$RUNNER_TEMP/rclone.zip" https://downloads.rclone.org/v1.75.1/rclone-v1.75.1-linux-amd64.zip
+          cd "$RUNNER_TEMP"
+          echo '982b5aa772841168f8e380f139e9e787b2a105403e32b94da8676a0e1c0a13ab  rclone.zip' | sha256sum -c -
+          unzip -q rclone.zip
+          sudo install rclone-v1.75.1-linux-amd64/rclone /usr/local/bin/rclone
+          rclone version
+
       - name: Run the DeckStream test suite
         run: bash scripts/run_all_tests.sh
 

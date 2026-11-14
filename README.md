@@ -150,6 +150,24 @@ python3 scripts/make_manifest.py   # after changing a shipped daemon file
 The browser test needs Playwright (`npm i --no-save playwright && npx playwright install chromium`); it is skipped
 without it, except in CI.
 
+With rclone on `PATH`, the suite also runs real localhost WebDAV → shaped proxy → rclone HTTP VFS
+replays and a storage-server integration check (library discovery, signed ranges, VFS reads, and cache prefill).
+CI installs rclone; these integration checks print a skip reason when it is missing locally.
+
+```bash
+python3 scripts/replay_rig.py --synthetic scattered --reads 20 --file-mb 64 --compare default streams4 small
+python3 scripts/early_launch_calc.py --profile PROFILE.json --rclone-log WARM.log --line-mbps 20
+DECK_HOST=deck@YOUR-DECK DECK_KEY=~/.ssh/YOUR-KEY bash scripts/deck_smoke.sh --slug example_game --appid auto --exe Game.exe --dry-run
+```
+
+Record warm read logs with `DECKSTREAM_DEMAND_LOG=1`. The early-launch calculator models required head start;
+it does not enable early launch. Replay timings describe this machine and the supplied workload/network settings,
+not Steam Deck launch times. The headless smoke harness is tested with mock SSH, including missing telemetry,
+missing processes, and cleanup; a real run requires your explicit host/key and an idle Deck.
+Set `DECKSTREAM_SMOKE_STORAGE` to the Deck's storage path to check its free space (default `/home/deck`).
+It cannot validate menus, controller input, or playability. Clean-device verification remains in #9/#39;
+see [the evidence limits](docs/LIMITS.md).
+
 ## Security
 
 - The Deck side runs as the normal `deck` user. No root.
