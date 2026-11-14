@@ -71,7 +71,7 @@ def main():
 
             upstream, up_port = rig.start_upstream(rclone, str(data))
             counters = rig.Counters()
-            proxy = rig.make_proxy(up_port, 0, 0, counters)
+            proxy = rig.make_proxy(up_port, 0, 0, counters, rig.proxy_paths(["Example Game/Game.exe"]))
             vfs, vfs_port, _ = rig.start_vfs(rclone, proxy.server_address[1], {}, str(tmp / "vfs-cache"))
             conn = http.client.HTTPConnection("127.0.0.1", vfs_port, timeout=20)
             try:
