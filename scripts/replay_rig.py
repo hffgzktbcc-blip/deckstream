@@ -150,7 +150,22 @@ class ProxyServer(socketserver.ThreadingMixIn, http.server.HTTPServer):
     allow_reuse_address = True
 
 
-def make_proxy(upstream_port, latency_s, bandwidth, counters):
+def proxy_paths(files):
+    """Build upstream targets solely from the fixture file list, including WebDAV directories."""
+    allowed_paths: dict[str, str] = {"/": "/"}
+    for name in files:
+        parts = name.split("/")
+        if any(part in ("", ".", "..") for part in parts):
+            raise ValueError("fixture paths must be relative and contain no traversal")
+        path = "/" + urllib.parse.quote(name, safe="/")
+        allowed_paths[path] = path
+        for depth in range(1, len(parts)):
+            directory = "/" + urllib.parse.quote("/".join(parts[:depth]), safe="/") + "/"
+            allowed_paths[directory] = directory
+    return allowed_paths
+
+
+def make_proxy(upstream_port, latency_s, bandwidth, counters, allowed_paths: dict[str, str]):
     limiter = Limiter(bandwidth)
 
     class H(http.server.BaseHTTPRequestHandler):
@@ -167,6 +182,10 @@ def make_proxy(upstream_port, latency_s, bandwidth, counters):
                 counters.end()
 
         def _request(self):
+            target = allowed_paths.get(self.path)
+            if target is None:
+                self.send_error(404, "Not Found")
+                return
             time.sleep(latency_s)          # the "first byte takes ~1 s" cost of every upstream request
             body = b""
             if self.headers.get("Content-Length"):
@@ -174,7 +193,7 @@ def make_proxy(upstream_port, latency_s, bandwidth, counters):
             hdrs = {k: v for k, v in self.headers.items() if k.lower() not in ("host", "connection", "proxy-connection")}
             conn = http.client.HTTPConnection("127.0.0.1", upstream_port, timeout=120)
             try:
-                conn.request(self.command, self.path, body=body or None, headers=hdrs)
+                conn.request(self.command, target, body=body or None, headers=hdrs)
                 resp = conn.getresponse()
             except (ConnectionRefusedError, socket.error, OSError):
                 try:
@@ -403,7 +422,7 @@ def main(argv=None):
         up, up_port = start_upstream(a.rclone, data)
         procs.append(up)
         counters = Counters()
-        srv = make_proxy(up_port, a.latency, int(a.bandwidth_mbps * MB), counters)
+        srv = make_proxy(up_port, a.latency, int(a.bandwidth_mbps * MB), counters, proxy_paths(names))
         proxy_port = srv.server_address[1]
 
         results = [run_config(a.rclone, c, CONFIGS[c], trace, counters, proxy_port, a.concurrency, tmp) for c in a.compare]

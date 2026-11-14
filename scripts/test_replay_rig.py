@@ -90,7 +90,7 @@ def test_proxy_counts_and_delays():
     up = rr.ProxyServer(("127.0.0.1", 0), _Upstream)
     threading.Thread(target=up.serve_forever, daemon=True).start()
     counters = rr.Counters()
-    proxy = rr.make_proxy(up.server_address[1], 0.3, 0, counters)
+    proxy = rr.make_proxy(up.server_address[1], 0.3, 0, counters, rr.proxy_paths(["f"]))
     try:
         port = proxy.server_address[1]
         c = http.client.HTTPConnection("127.0.0.1", port, timeout=10)
@@ -111,6 +111,20 @@ def test_proxy_counts_and_delays():
         assert counters.idle.wait(5), "proxy request did not finish counting"
         snap = counters.snapshot()
         assert snap["requests"] == 2 and snap["range_requests"] == 1, "PROPFIND is a request but not a range request: %s" % snap
+        # Rejected targets must never reach the upstream connection, even with a valid filename suffix.
+        for target in ("/missing", "http://example.invalid/f", "//example.invalid/f", "/../f", "/%2e%2e/f", "/f?url=http://example.invalid"):
+            c = http.client.HTTPConnection("127.0.0.1", port, timeout=10)
+            c.request("GET", target)
+            response = c.getresponse()
+            assert response.status == 404, (target, response.status)
+            response.read()
+            c.close()
+        assert counters.idle.wait(5)
+        assert counters.snapshot() == snap, "a rejected target contacted upstream"
+        assert rr.proxy_paths(["Example Game/Game.exe"]) == {
+            "/": "/", "/Example%20Game/": "/Example%20Game/",
+            "/Example%20Game/Game.exe": "/Example%20Game/Game.exe"}
+        print("[ok] server-owned path map rejects unknown, absolute, traversal and query targets without upstream requests")
     finally:
         proxy.shutdown()
         proxy.server_close()
@@ -142,7 +156,7 @@ def test_real_rclone():
             f.write(bytes(range(256)) * (64 * 1024))
         upstream, up_port = rr.start_upstream(rclone, data)
         counters = rr.Counters()
-        proxy = rr.make_proxy(up_port, 0.01, 32 * MB, counters)
+        proxy = rr.make_proxy(up_port, 0.01, 32 * MB, counters, rr.proxy_paths(["test.pak"]))
         try:
             results = []
             for config in ("default", "streams4", "small"):
