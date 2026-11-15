@@ -140,7 +140,8 @@ function create({ dir = '', key = '', publicUrl = '', mock = false } = {}) {
       const fid = u.searchParams.get('file_id');
       const f = fid ? g.files.find((x) => String(x.id) === fid) : g.files.slice().sort((a, b) => b.size - a.size)[0];
       if (!f) return send(404, { success: false, error: 'NO_FILE' });
-      const base = (publicUrl || `http://${req.headers.host}`).replace(/\/+$/, '');
+      let base = publicUrl || `http://${req.headers.host}`;
+      while (base.endsWith('/')) base = base.slice(0, -1);
       const enc = f.name.split('/').map(encodeURIComponent).join('/');
       return send(200, { success: true, data: `${base}/files/${enc}?sig=${sign(f.name)}` });
     }

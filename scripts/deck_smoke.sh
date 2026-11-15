@@ -200,7 +200,7 @@ if [ -n "$GAME_PID" ]; then
     dk "[ \"\$(ps -p $GAME_PID -o comm=)\" = '$PNAME' ] && kill -TERM $GAME_PID && echo TERM-sent-to-$GAME_PID"
 fi
 wound=0
-for i in 1 2 3 4 5 6 7 8 9 10 11 12; do
+for _ in 1 2 3 4 5 6 7 8 9 10 11 12; do
     sleep 5
     left="$(dk 'echo $(ls /home/deck/.local/share/deckstream/sessions 2>/dev/null | wc -l)/$(ps -eo comm | grep -c "^umu.exe$")' 2>/dev/null)"
     [ "$left" = "0/0" ] && { wound=1; break; }

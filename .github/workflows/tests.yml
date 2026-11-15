@@ -52,6 +52,9 @@ jobs:
       - name: Run the DeckStream test suite
         run: bash scripts/run_all_tests.sh
 
+      - name: Lint shell scripts with ShellCheck
+        run: shellcheck -S warning daemon/*.sh scripts/*.sh
+
       - name: The committed Decky zip matches its source
         run: |
           git show HEAD:decky/DeckStream.zip > "$RUNNER_TEMP/committed.zip"

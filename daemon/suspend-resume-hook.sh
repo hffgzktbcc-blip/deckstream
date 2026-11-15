@@ -26,7 +26,8 @@ SUSPEND_STATE="$STATE_DIR/suspend_state.json"
 mkdir -p "$STATE_DIR"
 
 log() {
-    local msg="[$(date -u +'%Y-%m-%dT%H:%M:%SZ')] $1"
+    local msg
+    msg="[$(date -u +'%Y-%m-%dT%H:%M:%SZ')] $1"
     echo "$msg"
     echo "$msg" >> "$LOG_FILE" 2>/dev/null || true
 }
@@ -52,7 +53,7 @@ if [ "$ACTION" = "post" ]; then
 
     # 1. Wait for network link to recover (max 10 seconds)
     net_ok=0
-    for i in $(seq 1 20); do
+    for _ in $(seq 1 20); do
         if command -v ip >/dev/null 2>&1; then
             if ip route | grep -q default; then
                 net_ok=1

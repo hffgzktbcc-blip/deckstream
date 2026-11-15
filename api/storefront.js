@@ -53,7 +53,17 @@ const COVER_TTL_MS = 24 * 3600 * 1000;
 let shelfCache = new Map();               // key -> { section, expires }  (kept after expiry: served if Steam is down)
 let coverCache = new Map();               // appId -> { url, expires }
 
-const decodeHtml = (v) => String(v).replace(/<[^>]+>/g, '')
+function stripHtmlTags(v) {
+  let cur = String(v || '');
+  let prev;
+  do {
+    prev = cur;
+    cur = cur.replace(/<[^>]+>/g, '');
+  } while (cur !== prev);
+  return cur.replace(/[<>]/g, '');
+}
+
+const decodeHtml = (v) => stripHtmlTags(v)
   .replace(/&#(x?[0-9a-f]+);/gi, (m, n) => { const c = n[0].toLowerCase() === 'x' ? parseInt(n.slice(1), 16) : parseInt(n, 10); return Number.isFinite(c) ? String.fromCodePoint(c) : m; })
   .replace(/&(amp|lt|gt|quot|apos);/g, (m, n) => ({ amp: '&', lt: '<', gt: '>', quot: '"', apos: "'" })[n])
   .replace(/[<>]/g, '').trim();
@@ -152,10 +162,11 @@ const STEAM_IMAGE = /^https:\/\/([a-z0-9-]+\.)*(steamstatic\.com|akamaihd\.net|s
 const steamImage = (u) => (typeof u === 'string' && STEAM_IMAGE.test(u) && !/["'<>\s]/.test(u) ? u.split('?')[0] : '');
 
 function htmlToParagraphs(html, maxChars = 2400) {
-  const text = String(html || '')
-    .replace(/<\s*(br|\/p|\/li|\/h[1-6]|\/ul|\/div)\s*\/?>/gi, '\n')
-    .replace(/<\s*li[^>]*>/gi, '\n• ')
-    .replace(/<[^>]+>/g, '');
+  const text = stripHtmlTags(
+    String(html || '')
+      .replace(/<\s*(br|\/p|\/li|\/h[1-6]|\/ul|\/div)\s*\/?>/gi, '\n')
+      .replace(/<\s*li[^>]*>/gi, '\n• ')
+  );
   const out = [];
   let used = 0;
   for (const raw of decodeHtml(text).split(/\n+/)) {
@@ -323,7 +334,7 @@ module.exports = async (req, res) => {
       const suggestions = matches.slice(0, 15).map(m => {
         const id = Number(m[1]);
         const nameMatch = m[2].match(/class="match_name[^"]*"[^>]*>([\s\S]*?)<\/div>/i);
-        const name = nameMatch ? nameMatch[1].replace(/<[^>]+>/g, '').trim() : 'Game';
+        const name = nameMatch ? stripHtmlTags(nameMatch[1]).trim() : 'Game';
         return {
           appId: id,
           title: name,

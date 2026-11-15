@@ -108,13 +108,16 @@ def extract_archive(archive_path, extract_dir):
                 t.extractall(extract_dir, filter="data")
             else:
                 root = extract_dir.resolve()
+                safe_members = []
                 for m in t.getmembers():
                     target = (root / m.name).resolve()
                     if root not in target.parents and target != root:
                         raise RuntimeError(f"Unsafe path in archive: {m.name}")
                     if m.issym() or m.islnk() or m.isdev():
                         raise RuntimeError(f"Archive contains a link or device file: {m.name}")
-                t.extractall(extract_dir)
+                    safe_members.append(m)
+                for m in safe_members:
+                    t.extract(m, extract_dir)
     elif shutil.which("7z"):
         subprocess.run(["7z", "x", str(p), f"-o{extract_dir}", "-y"],
                        check=True, stdout=subprocess.DEVNULL)

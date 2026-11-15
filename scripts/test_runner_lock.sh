@@ -30,7 +30,7 @@ rm -rf "\$RUN_LOCK" "\$RUN_LOCK.reclaim"
 STUB
 
 scenario() {   # scenario NAME SETUP... : 8 simultaneous launches, prints the number of winners
-    local name="$1" setup="$2" S; S="$(mktemp -d "$T/scenario.XXXXXX")"
+    local _name="$1" setup="$2" S; S="$(mktemp -d "$T/scenario.XXXXXX")"
     local LD="$S/rt/deckstream_locks"; mkdir -p "$LD" "$S/out"
     case "$setup" in
         fresh) ;;
@@ -42,12 +42,14 @@ scenario() {   # scenario NAME SETUP... : 8 simultaneous launches, prints the nu
         nopid_fresh) mkdir "$LD/runner_testgame.lock" ;;
         killed_holder)   # a real runner holds the lock and is then killed with SIGKILL: its lock must be free at once
             HOLD=30 bash "$T/stub.sh" "$S/rt" "$S/held" 0 >/dev/null 2>&1 & local hp=$!
-            mkdir -p "$S/held"; local w; for w in $(seq 1 100); do [ -f "$S/held/won_0" ] && break; sleep 0.05; done
+            mkdir -p "$S/held"; local _; for _ in $(seq 1 100); do [ -f "$S/held/won_0" ] && break; sleep 0.05; done
             kill -9 "$hp"; wait "$hp" 2>/dev/null || true; sleep 0.5 ;;
     esac
     local i; for i in 1 2 3 4 5 6 7 8; do bash "$T/stub.sh" "$S/rt" "$S/out" "$i" > "$S/out/log_$i" 2>&1 & done
     wait
-    ls "$S/out" | grep -c '^won_' || true
+    local count=0 f
+    for f in "$S/out"/won_*; do [ -e "$f" ] && count=$((count + 1)); done
+    echo "$count"
 }
 expect() {   # expect NAME SETUP WINNERS
     local got; got="$(scenario "$1" "$2")"

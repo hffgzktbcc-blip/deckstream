@@ -43,6 +43,9 @@ run_test "hedge_proxy"      python3 scripts/test_hedge_proxy.py
 run_test "parallel_dl"      python3 scripts/test_parallel_download.py
 run_test "parallel_unzip"   python3 scripts/test_parallel_unzip.py
 run_test "shell_syntax"     bash -c 'for f in daemon/*.sh scripts/*.sh; do bash -n "$f" || exit 1; done'
+if command -v shellcheck >/dev/null 2>&1; then
+    run_test "shellcheck"   shellcheck -S warning daemon/*.sh scripts/*.sh
+fi
 run_test "python_compile"   python3 -m py_compile daemon/*.py decky/main.py
 run_test "clean_tree"       python3 scripts/test_clean_tree.py
 run_test "api"              node scripts/test_api.js

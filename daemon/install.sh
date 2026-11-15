@@ -214,6 +214,7 @@ AUTO="${DECKSTREAM_AUTO_UPDATE:-0}"      # 1 = started by the daemon's self-upda
 SWAPPED=0
 # A self-update that stops before the swap (download, checksum or syntax failure, a job started) leaves a record, so the
 # phone shows it and the daemon backs off instead of retrying every 30 minutes.
+# shellcheck disable=SC2154  # rc is assigned inside the single-quoted EXIT trap
 trap 'rc=$?; rm -rf "$STAGE"; if [ "$AUTO" = 1 ] && [ $rc -ne 0 ] && [ "$SWAPPED" != 1 ]; then record_update "failed before install (exit $rc)"; fi' EXIT
 if [ -n "${DECKSTREAM_MANIFEST_FILE:-}" ]; then
     # A manifest the daemon already downloaded and verified against the pinned update key: use exactly that file,

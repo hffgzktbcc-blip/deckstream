@@ -24,18 +24,18 @@ xdotool getdisplaygeometry >/dev/null 2>&1 || exit 0
 
 # Windows that are never the game.
 EXCLUDE='^(Steam|steam|steamwebhelper|Steam Big Picture Mode|Chromium.*|Plasma.*|plasmashell.*|KDE.*|kwin.*|Konsole.*|Dolphin.*|Default IME|Input|Untitled|Xalia.*|Qt Selection.*|xsettingsd|MSCTFIME.*|CiceroUI.*|Wine.*|explorer\.exe|Desktop|Spectacle.*|Discover.*|.*[Oo]verlay.*|Wine System Tray)$'
-declare -A DONE
+declare -A SEEN
 end=$(( $(date +%s) + WATCH ))
 say "watching for the game window for ${WATCH}s"
 while [ "$(date +%s)" -lt "$end" ]; do
     for w in $(xdotool search --name '.' 2>/dev/null); do
-        [ -n "${DONE[$w]:-}" ] && continue
+        [ -n "${SEEN[$w]:-}" ] && continue
         name="$(xdotool getwindowname "$w" 2>/dev/null)"
         [[ "$name" =~ $EXCLUDE ]] && continue
         geo="$(xdotool getwindowgeometry --shell "$w" 2>/dev/null)"
         width="$(echo "$geo" | sed -n 's/^WIDTH=//p')"; height="$(echo "$geo" | sed -n 's/^HEIGHT=//p')"
         [ "${width:-0}" -ge 640 ] && [ "${height:-0}" -ge 400 ] || continue
-        DONE[$w]=1
+        SEEN[$w]=1
         active="$(xdotool getactivewindow getwindowname 2>/dev/null)"
         state="$(xwininfo -id "$w" 2>/dev/null | sed -n 's/.*Map State: //p' | head -n 1)"
         say "game window $w '$name' ${width}x${height} map=$state; active window before: '$active'"

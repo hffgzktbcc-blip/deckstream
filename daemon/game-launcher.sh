@@ -69,7 +69,10 @@ case "$CACHE_KEY" in */*|.|..) CACHE_KEY="" ;; esac   # a folder name, never a p
 for DM_KEY in $CACHE_KEY ${DECK_MODE_KEYS:-}; do
     case "$DM_KEY" in */*|.|..) continue ;; esac
     if [ -f "$HOME/.config/deckstream/deck_mode/$DM_KEY.env" ]; then
-        set -a; . "$HOME/.config/deckstream/deck_mode/$DM_KEY.env"; set +a
+        set -a
+        # shellcheck source=/dev/null  # per-game runtime env file generated on the Deck
+        . "$HOME/.config/deckstream/deck_mode/$DM_KEY.env"
+        set +a
         echo "[*] Deck mode: 30 fps, low graphics"; break
     fi
 done

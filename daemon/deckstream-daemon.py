@@ -252,7 +252,7 @@ def run_daemon():
                             plan_exe = ""   # only a clean path inside the mount is passed on
                         extra = f" {sh_quote(plan_exe)}" if plan_exe else ""
                         lf.write(f"exec bash {sh_quote(stream_runner_path)} {sh_quote(clean_slug)} {sh_quote(game_name)} {sh_quote(webdav_folder)}{extra}\n")
-                    os.chmod(launcher_file, 0o755)
+                    os.chmod(launcher_file, 0o700)
 
                     # Add non-steam shortcut pointing to the stream launcher
                     applied, app_id = request_shortcut(f"{game_name} (Cloud Stream)", str(launcher_file), job.get("artwork"))

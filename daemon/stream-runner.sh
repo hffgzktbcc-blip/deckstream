@@ -62,7 +62,7 @@ lock_duplicate() {   # lock_duplicate WHAT: tell the user, then leave without to
 }
 LOCK_STATE="$RUN_LOCK_DIR/.state_${GAME_ID}_$$"
 rm -f "$LOCK_STATE"
-( LD_PRELOAD= python3 -c '
+( LD_PRELOAD='' python3 -c '
 import fcntl, os, sys, time
 f = open(sys.argv[1], "a")
 try:
@@ -165,7 +165,7 @@ umount_fuse() {
 # serve the folders) and Wine's background services (which linger for a few seconds and never hold game files) are not
 # counted, nor is this script. Only our own processes are readable, which is all we need.
 mount_users() {   # one Python pass over /proc (a readlink per open file from bash would fork thousands of times)
-    LD_PRELOAD= python3 - "${DECKSTREAM_PROC_ROOT:-/proc}" "$$" "$@" <<'PY'
+    LD_PRELOAD='' python3 - "${DECKSTREAM_PROC_ROOT:-/proc}" "$$" "$@" <<'PY'
 import os, sys
 root, me, dirs = sys.argv[1], sys.argv[2], [d.rstrip("/") for d in sys.argv[3:] if d]
 skip = {"rclone", "fuse-overlayfs", "wineserver", "services.exe", "winedevice.exe", "umu.exe", "plugplay.exe", "explorer.exe",
@@ -220,7 +220,7 @@ WINESERVER_BIN=""
 SESSION_MARKER="$HOME/.local/share/deckstream/sessions/${GAME_ID}.$(date +%s).$$.json"
 # A session that ended badly (battery died, crash, quit mid-load) may not be finished yet; its recording shares this
 # game's log name and the recorder below truncates it. Merge it into the profile now, before the fill reads the profile.
-[ -f "$SP_PY" ] && LD_PRELOAD= python3 "$SP_PY" merge-pending --profile "$HOME/.local/share/deckstream/profiles/${GAME_ID}.json" \
+[ -f "$SP_PY" ] && LD_PRELOAD='' python3 "$SP_PY" merge-pending --profile "$HOME/.local/share/deckstream/profiles/${GAME_ID}.json" \
     --log "$HOME/.local/share/deckstream/profiles/${GAME_ID}.log" --window "${DECKSTREAM_PROFILE_SECONDS:-1200}" \
     --folder "$WEBDAV_FOLDER" 2>&1 | sed 's/^/[profile] /'
 # Launch timings (key=value lines, last value wins): Play -> fill -> mount -> game start, and how much was still
@@ -231,7 +231,7 @@ mark() { printf '%s=%s\n' "$1" "${2:-$(date +%s)}" >> "$LAUNCH_FILE" 2>/dev/null
 mark slug "$GAME_ID"; mark play; mark desktop "${XDG_CURRENT_DESKTOP:-unknown}"
 finish_session_now() {
     [ -f "$SP_PY" ] && [ -f "$SESSION_MARKER" ] || return 0
-    local cmd="LD_PRELOAD= python3 '$SP_PY' finish-session --marker '$SESSION_MARKER'"
+    local cmd="LD_PRELOAD='' python3 '$SP_PY' finish-session --marker '$SESSION_MARKER'"
     if command -v systemd-run >/dev/null 2>&1 && systemd-run --user --no-block --collect bash -c "$cmd" >/dev/null 2>&1; then
         return 0
     fi
@@ -475,7 +475,7 @@ if [ "${DECKSTREAM_PREMOUNT_FILL:-0}" = "1" ] && [ -f "$SP_PY" ] && [ -f "$STREA
         FILL_INHIBIT=(systemd-inhibit --what=sleep --who=DeckStream "--why=Preparing a game to play" --mode=block)
         mark sleep_inhibited 1
     fi
-    LD_PRELOAD= ${FILL_INHIBIT[@]+"${FILL_INHIBIT[@]}"} python3 "$SP_PY" fill-cache --cache-dir "$CACHE_DIR" "${FILL_ARGS[@]}" 2>&1 | tail -n 3 | sed 's/^/[fill] /'
+    LD_PRELOAD='' ${FILL_INHIBIT[@]+"${FILL_INHIBIT[@]}"} python3 "$SP_PY" fill-cache --cache-dir "$CACHE_DIR" "${FILL_ARGS[@]}" 2>&1 | tail -n 3 | sed 's/^/[fill] /'
     FILL_RC="${PIPESTATUS[0]}"
     mark fill_end; mark fill_rc "$FILL_RC"
     case "$FILL_RC" in
@@ -490,7 +490,7 @@ fi
 # then treats the file as "nothing cached" and DISCARDS the data (measured: 5.7 GB cached -> 0.5 GB). Rebuild the
 # record from the data files before rclone sees them.
 if [ -f "$SP_PY" ]; then
-    LD_PRELOAD= python3 "$SP_PY" repair-meta --cache-dir "$CACHE_DIR" 2>&1 | sed 's/^/[cache] /'
+    LD_PRELOAD='' python3 "$SP_PY" repair-meta --cache-dir "$CACHE_DIR" 2>&1 | sed 's/^/[cache] /'
 fi
 
 # 4. Mount just this game's folder (cached data is kept 90 days by default, not 3: a game left alone for a few days
@@ -505,7 +505,7 @@ echo -e "${GREEN}[*] Mounting RemoteStorage stream (cache: $CACHE_MAX at $CACHE_
 RCLONE_LOG_ARGS=(--log-file "$LOG_DIR/rclone_${GAME_ID}.log" --log-level NOTICE)
 if [ "${DECKSTREAM_DEMAND_LOG:-0}" = "1" ]; then
     DEMAND_LOG="$LOG_DIR/demand_${GAME_ID}.$(date +%s).log"
-    RCLONE_LOG_ARGS=(--log-file "$DEMAND_LOG" --log-level DEBUG --log-format date,time,microseconds)
+    RCLONE_LOG_ARGS=(--log-file "$DEMAND_LOG" --log-level DEBUG --log-format "date,time,microseconds")
     mark demand_log "$DEMAND_LOG"
     echo -e "${CYAN}[*] Demand log on: every read is recorded to $(basename "$DEMAND_LOG")${NC}"
 fi
@@ -545,11 +545,11 @@ case "$CACHE_NS" in tbstream\{*\}) ( umask 077; printf '%s\n' "$CACHE_NS" > "$NS
 if [ -n "$CACHE_NS" ] && [ -f "$SP_PY" ]; then
     # Bring over what earlier launches downloaded (they each used a different cache folder): a rename, instant, and
     # it happens before the game opens any file.
-    LD_PRELOAD= python3 "$SP_PY" adopt-cache --cache-dir "$CACHE_DIR" --current "$CACHE_NS" --folder "$WEBDAV_FOLDER" 2>&1 | sed 's/^/[cache] /'
-    LD_PRELOAD= python3 "$SP_PY" repair-meta --cache-dir "$CACHE_DIR" 2>&1 | sed 's/^/[cache] /'
+    LD_PRELOAD='' python3 "$SP_PY" adopt-cache --cache-dir "$CACHE_DIR" --current "$CACHE_NS" --folder "$WEBDAV_FOLDER" 2>&1 | sed 's/^/[cache] /'
+    LD_PRELOAD='' python3 "$SP_PY" repair-meta --cache-dir "$CACHE_DIR" 2>&1 | sed 's/^/[cache] /'
     # The session marker for the daemon: the profile is built only after a COLD run (almost empty cache at launch).
     COLD=0; [ "$(du -sm "$CACHE_DIR" 2>/dev/null | cut -f1)" -lt 500 ] 2>/dev/null && COLD=1
-    LD_PRELOAD= python3 "$SP_PY" session-start --marker "$SESSION_MARKER" --game-id "$GAME_ID" --cache-dir "$CACHE_DIR" \
+    LD_PRELOAD='' python3 "$SP_PY" session-start --marker "$SESSION_MARKER" --game-id "$GAME_ID" --cache-dir "$CACHE_DIR" \
         --ns "$CACHE_NS" --folder "$WEBDAV_FOLDER" --profile "$HOME/.local/share/deckstream/profiles/${GAME_ID}.json" \
         --profile-log "$HOME/.local/share/deckstream/profiles/${GAME_ID}.log" --rclone-pid "$RCLONE_PID" --cold "$COLD" \
         --profile-seconds "${DECKSTREAM_PROFILE_SECONDS:-1200}"
@@ -562,7 +562,7 @@ if command -v fuse-overlayfs &>/dev/null; then
     # steam_settings) get an English copy in this game's write folder, written before the layer is mounted. Per game
     # id, so a new id for the same release is covered too. Never replaces a file already there. Off: DECKSTREAM_ENGLISH=0.
     if [ "${DECKSTREAM_ENGLISH:-1}" != "0" ] && [ -f "$HOME/.config/deckstream/language_fix.py" ]; then
-        LD_PRELOAD= bounded 30 python3 "$HOME/.config/deckstream/language_fix.py" --game "$GAME_DIR" --writes "$WRITE_DIR" 2>&1 | head -n 20 || true
+        LD_PRELOAD='' bounded 30 python3 "$HOME/.config/deckstream/language_fix.py" --game "$GAME_DIR" --writes "$WRITE_DIR" 2>&1 | head -n 20 || true
     fi
     OVERLAY_ERR=$(fuse-overlayfs -o lowerdir="$GAME_DIR",upperdir="$WRITE_DIR",workdir="$WORK_DIR" "$MERGED_DIR" 2>&1)
     OVERLAY_RC=$?
@@ -638,7 +638,10 @@ case "$CACHE_KEY" in */*|.|..) CACHE_KEY="" ;; esac   # a folder name, never a p
 for DM_KEY in $CACHE_KEY ${DECK_MODE_KEYS:-}; do
     case "$DM_KEY" in */*|.|..) continue ;; esac
     if [ -f "$HOME/.config/deckstream/deck_mode/$DM_KEY.env" ]; then
-        set -a; . "$HOME/.config/deckstream/deck_mode/$DM_KEY.env"; set +a
+        set -a
+        # shellcheck source=/dev/null  # per-game runtime env file generated on the Deck
+        . "$HOME/.config/deckstream/deck_mode/$DM_KEY.env"
+        set +a
         echo "[*] Deck mode: 30 fps, low graphics"; break
     fi
 done
@@ -692,7 +695,7 @@ if [ "${DECKSTREAM_PROFILE:-1}" != "0" ] && [ -f "$SP_PY" ]; then
     # With a profile already there, record only what is NEW this run (what is cached now, from earlier runs or the
     # pre-mount fill, is the baseline); finish-session merges it into the profile so it grows run by run.
     BASELINE=""; [ -f "$PROFILE" ] && BASELINE="--baseline"
-    LD_PRELOAD= python3 "$SP_PY" record --cache-dir "$CACHE_DIR" --folder "$WEBDAV_FOLDER" --log "$PROFILE_LOG" --interval 10 $BASELINE >/dev/null 2>&1 &
+    LD_PRELOAD='' python3 "$SP_PY" record --cache-dir "$CACHE_DIR" --folder "$WEBDAV_FOLDER" --log "$PROFILE_LOG" --interval 10 $BASELINE >/dev/null 2>&1 &
     RECORD_PID=$!
     # Post-mount background prefetch: fetches later ranges (or edges) while the game runs.
     # DECKSTREAM_PREFETCH_DELAY (seconds, default 0: immediate) holds back the background prefetch so it
@@ -700,12 +703,12 @@ if [ "${DECKSTREAM_PROFILE:-1}" != "0" ] && [ -f "$SP_PY" ]; then
     PREFETCH_DELAY="${DECKSTREAM_PREFETCH_DELAY:-0}"
     if [ -f "$PROFILE" ] && [ "${DECKSTREAM_PROFILE_PREFETCH:-1}" != "0" ]; then
         if [ "$PREFETCH_DELAY" -gt 0 ] 2>/dev/null; then
-            LD_PRELOAD= bash -c 'sleep "$1"; exec nice -n 10 python3 "$2" prefetch --mount "$3" --profile "$4" \
+            LD_PRELOAD='' bash -c 'sleep "$1"; exec nice -n 10 python3 "$2" prefetch --mount "$3" --profile "$4" \
                 --workers "$5" --cache-dir "$6" --folder "$7" --include-later --log "$8"' _ \
                 "$PREFETCH_DELAY" "$SP_PY" "$GAME_DIR" "$PROFILE" "${DECKSTREAM_PREFETCH_WORKERS:-6}" \
                 "$CACHE_DIR" "$WEBDAV_FOLDER" "$LOG_DIR/stream_prefetch_${GAME_ID}.log" >/dev/null 2>&1 &
         else
-            LD_PRELOAD= nice -n 10 python3 "$SP_PY" prefetch --mount "$GAME_DIR" --profile "$PROFILE" \
+            LD_PRELOAD='' nice -n 10 python3 "$SP_PY" prefetch --mount "$GAME_DIR" --profile "$PROFILE" \
                 --workers "${DECKSTREAM_PREFETCH_WORKERS:-6}" --cache-dir "$CACHE_DIR" --folder "$WEBDAV_FOLDER" \
                 --include-later --log "$LOG_DIR/stream_prefetch_${GAME_ID}.log" >/dev/null 2>&1 &
         fi
@@ -714,12 +717,12 @@ if [ "${DECKSTREAM_PROFILE:-1}" != "0" ] && [ -f "$SP_PY" ]; then
         # No profile yet (a game never played here): at least fetch the header and index (first and last MB) of every big
         # archive in parallel, since a game always reads those first. Skips what is cached. DECKSTREAM_EDGE_PREFETCH=0 turns it off.
         if [ "$PREFETCH_DELAY" -gt 0 ] 2>/dev/null; then
-            LD_PRELOAD= bash -c 'sleep "$1"; exec nice -n 10 python3 "$2" prefetch-edges --mount "$3" \
+            LD_PRELOAD='' bash -c 'sleep "$1"; exec nice -n 10 python3 "$2" prefetch-edges --mount "$3" \
                 --cache-dir "$4" --folder "$5" --log "$6"' _ \
                 "$PREFETCH_DELAY" "$SP_PY" "$GAME_DIR" "$CACHE_DIR" "$WEBDAV_FOLDER" \
                 "$LOG_DIR/stream_edges_${GAME_ID}.log" >/dev/null 2>&1 &
         else
-            LD_PRELOAD= nice -n 10 python3 "$SP_PY" prefetch-edges --mount "$GAME_DIR" --cache-dir "$CACHE_DIR" --folder "$WEBDAV_FOLDER" \
+            LD_PRELOAD='' nice -n 10 python3 "$SP_PY" prefetch-edges --mount "$GAME_DIR" --cache-dir "$CACHE_DIR" --folder "$WEBDAV_FOLDER" \
                 --log "$LOG_DIR/stream_edges_${GAME_ID}.log" >/dev/null 2>&1 &
         fi
         PREFETCH_PID=$!
@@ -747,7 +750,7 @@ if [ "$WARMUP_MODE" != "0" ] && [ -f "$WARM_PY" ]; then
         WARM_DELAY=$(( ${DECKSTREAM_PROFILE_SECONDS:-1200} + 30 ))
     fi
     # If a prefetch (profile replay or header/footer fetch) is running it uses the whole line, so the warm-up waits for it.
-    LD_PRELOAD= bash -c 'pf="$1"; shift; while [ -n "$pf" ] && kill -0 "$pf" 2>/dev/null; do sleep 3; done; exec nice -n 19 "$@"' _ "$PREFETCH_PID" \
+    LD_PRELOAD='' bash -c 'pf="$1"; shift; while [ -n "$pf" ] && kill -0 "$pf" 2>/dev/null; do sleep 3; done; exec nice -n 19 "$@"' _ "$PREFETCH_PID" \
         python3 "$WARM_PY" "$GAME_DIR" --delay "$WARM_DELAY" --mbps "${DECKSTREAM_WARMUP_MBPS:-8}" \
         --log "$LOG_DIR/stream_warmup_${GAME_ID}.log" >/dev/null 2>&1 &
     WARM_PID=$!
@@ -842,8 +845,7 @@ while users="$(mount_users "$GAME_DIR" "$MERGED_DIR" | grep -vxE "${PREFETCH_PID
     sleep 5; WAITED=$(( WAITED + 5 ))
 done
 [ -n "$WARM_PID" ] && kill "$WARM_PID" 2>/dev/null
-SESSION_DONE=1
-[ -f "$SP_PY" ] && LD_PRELOAD= python3 "$SP_PY" session-done --marker "$SESSION_MARKER" >/dev/null 2>&1   # the daemon takes it from here
+[ -f "$SP_PY" ] && LD_PRELOAD='' python3 "$SP_PY" session-done --marker "$SESSION_MARKER" >/dev/null 2>&1   # the daemon takes it from here
 GAME_DURATION=$(( $(date +%s) - LAUNCH_AT ))
 echo -e "${CYAN}[*] Game exited after ${GAME_DURATION}s.${NC}"
 echo "[stats] cached from RemoteStorage: $(du -sh "$CACHE_DIR" 2>/dev/null | cut -f1) (cap $CACHE_MAX)"

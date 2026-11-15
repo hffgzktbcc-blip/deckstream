@@ -232,5 +232,5 @@ def make_game_launcher(game_name, exe_path):
     with open(script, "w") as f:
         f.write("#!/usr/bin/env bash\n")
         f.write(f"exec bash {q(helper)} {q(exe_path)} {q(prefix_dir_for(exe_path, slug))} {q(slug)} {q(game_name)}\n")
-    os.chmod(script, 0o755)
+    os.chmod(script, 0o700)
     return str(script)

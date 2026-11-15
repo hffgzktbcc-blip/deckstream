@@ -3,6 +3,7 @@ import hashlib, importlib, io, json, os, sys, tempfile
 from contextlib import redirect_stdout
 from email.utils import formatdate
 from pathlib import Path
+from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parent.parent
 home = Path(tempfile.mkdtemp()); os.environ["HOME"] = str(home)
@@ -32,7 +33,8 @@ def fake(**o):
         if "/api/queue" in url:
             assert headers and headers.get("x-deckstream-secret") == SECRET
             return o.get("queue", 200), {"Date": formatdate(doctor.now() + o.get("skew", 0), usegmt=True)}, b"{}"
-        if url.startswith("http://nas.lan:8781"):
+        parsed = urlparse(url)
+        if parsed.scheme == "http" and parsed.netloc == "nas.lan:8781":
             import base64
             assert method == "PROPFIND" and headers["Authorization"] == "Basic " + base64.b64encode(f"deckstream:{KEY}".encode()).decode()
             return o.get("storage", 207), {}, b""
