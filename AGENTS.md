@@ -1,5 +1,11 @@
 # Working on DeckStream
 
+## Family-wide source of truth
+
+Before planning any work, read the **canonical [Ounce Family Nov 2026–Nov 2027 roadmap](https://github.com/hffgzktbcc-blip/ounce-core/blob/main/docs/roadmap/OUNCE_FAMILY_1_YEAR_ROADMAP.md)**. It sets family-wide priorities for ounce-core, ounce-hb, ounce-runtime and DeckStream; this repo's `PLAN.md` remains authoritative for **DeckStream-specific acceptance gates**, particularly an actual own-storage Steam Deck launch report. Do not mistake cross-repo roadmap aspiration for demonstrated DeckStream compatibility.
+
+Cross-check live main, merged/open PRs and issues, GitHub Actions results, and published releases before choosing work. Never recreate a completed task based on dated plans, cached handoffs or stale checklists. Record verified completions in the *active* roadmap or issue with evidence instead of adding another competing handoff. Current owner instructions set authorized scope. Keep licensing and provenance boundaries intact: the GPL runtime is an external subprocess/JSON-contract integration, not a source of code to copy into MIT DeckStream.
+
 Build useful end-to-end results. The current request sets scope; `PLAN.md` is the prioritized
 backlog, not a permission system.
 

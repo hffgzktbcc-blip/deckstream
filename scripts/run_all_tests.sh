@@ -23,6 +23,7 @@ run_test() {
 echo "Running DeckStream test suite..."
 run_test "manifest"         python3 scripts/make_manifest.py --check
 run_test "version"          python3 scripts/check_version.py
+run_test "links"            python3 scripts/test_check_links.py
 run_test "early_launch_calc" python3 scripts/test_early_launch_calc.py
 run_test "replay_rig"        python3 scripts/test_replay_rig.py
 run_test "deck_smoke"        bash scripts/test_deck_smoke.sh
@@ -45,6 +46,8 @@ run_test "parallel_unzip"   python3 scripts/test_parallel_unzip.py
 run_test "shell_syntax"     bash -c 'for f in daemon/*.sh scripts/*.sh; do bash -n "$f" || exit 1; done'
 if command -v shellcheck >/dev/null 2>&1; then
     run_test "shellcheck"   shellcheck -S warning daemon/*.sh scripts/*.sh
+else
+    echo "NOTE: shellcheck not installed; skipped here but CI enforces it (install shellcheck to match CI)"
 fi
 run_test "python_compile"   python3 -m py_compile daemon/*.py decky/main.py
 run_test "clean_tree"       python3 scripts/test_clean_tree.py

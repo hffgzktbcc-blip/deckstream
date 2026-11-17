@@ -5,7 +5,7 @@ DeckStream helps users launch PC games from their own storage on a Steam Deck. A
 ## Baseline
 
 - Own-storage API, WebDAV launch path and companion are implemented. [Reviewed revision](https://github.com/hffgzktbcc-blip/deckstream/commit/4919033ffbc88cc4d817075da30bac670ead08cd)
-- Hosted tests passed, including the browser flow with mock storage and the Decky archive rebuild comparison. [CI run](https://github.com/hffgzktbcc-blip/deckstream/actions/runs/40287235671)
+- Baseline dates from the reviewed revision above; `main` has since merged the Q1 CI and CodeQL gates (#45). Check live CI, not this line. Hosted tests passed at that revision, including the browser flow with mock storage and the Decky archive rebuild comparison. [CI run](https://github.com/hffgzktbcc-blip/deckstream/actions/runs/40287235671)
 - The v1.0.0 release predates the own-storage changes. README hardware numbers describe the predecessor runtime. [Release](https://github.com/hffgzktbcc-blip/deckstream/releases/tag/v1.0.0) · [Reported measurements](README.md#measured)
 
 ## Standing priorities
@@ -22,8 +22,8 @@ Owner = the maintainer (holds a Deck, repo settings and release rights). Agent =
 |---|---|---|---|
 | 1 | **First real launch (priority 1).** Fresh install on a Deck with authorized files and your own storage; keep the revision, doctor bundle and the stage where it first failed. | Owner | A redacted report on issue #9, success or failure. No release before this. |
 | 2 | **Fix what step 1 finds (priority 2).** | Agent | Each fix has a failing-then-passing test linked from the report. |
-| 3 | **Security follow-up.** Remove leftover refs and branches that still carry personal data (`refs/handoff/*`, `clean-*`); either call `assertPublicHttpUrl` where the site fetches a user-supplied URL or delete it; run the CodeQL results through and fix real findings. | Owner removes refs, Agent fixes code | `git ls-remote origin` shows no stray refs; CodeQL has no open high findings; the URL check is used or gone. |
-| 4 | **Reliability checks in CI.** Type-check the Decky panel (#26) and run shellcheck (#27). Fix what they find. | Agent | Both run in CI and pass; any fix has a test. |
+| 3 | **Security follow-up.** Remove leftover refs and branches that still carry personal data (`refs/handoff/*`, `clean-*`); run the CodeQL results through and fix real findings. (Done: `assertPublicHttpUrl` is used in `api/push.js` and tested in `scripts/test_api.js`.) | Owner removes refs, Agent fixes code | `git ls-remote origin` shows no stray refs; CodeQL has no open high findings. |
+| 4 | **Reliability checks in CI.** **Done:** `tsc --noEmit` and shellcheck run in `.github/workflows/tests.yml`. | Agent | Both run in CI and pass. |
 | 5 | **Startup comparison (priority 3).** Cold unprofiled, cold profiled and warm runs on one game, byte counts and milestone times. | Owner runs, Agent writes up | A table in the repo with conditions and raw numbers. |
 | 6 | **Release candidate (priority 4).** Only after steps 1 to 4. Rebuild the Decky zip, refresh the manifest, publish checksums and notes that claim only what was measured. | Agent prepares, Owner publishes | Tagged pre-release; `docs/LIMITS.md` matches. |
 | 7 | **Independent testing (priority 6).** Point issue #9 at the release candidate. A hand-written tester call is the owner's choice, in one community that allows it. | Owner | One report from someone outside the project. |
