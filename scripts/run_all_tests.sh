@@ -45,6 +45,8 @@ run_test "parallel_unzip"   python3 scripts/test_parallel_unzip.py
 run_test "shell_syntax"     bash -c 'for f in daemon/*.sh scripts/*.sh; do bash -n "$f" || exit 1; done'
 if command -v shellcheck >/dev/null 2>&1; then
     run_test "shellcheck"   shellcheck -S warning daemon/*.sh scripts/*.sh
+else
+    echo "NOTE: shellcheck not installed; skipped here but CI enforces it (install shellcheck to match CI)"
 fi
 run_test "python_compile"   python3 -m py_compile daemon/*.py decky/main.py
 run_test "clean_tree"       python3 scripts/test_clean_tree.py
