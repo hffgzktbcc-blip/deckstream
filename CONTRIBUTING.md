@@ -74,7 +74,7 @@ A new part must also be added to `_PARTS` in `deckstream-daemon.py` and to `SHIP
 ## Your first contribution
 
 - New here? Read [docs/community/START_HERE.md](docs/community/START_HERE.md), then pick a
-  [good first issue](https://github.com/hffgzktbcc-blip/deckstream/issues?q=is%3Aopen+label%3A%22good+first+issue%22). Comment "I'll take this" so two people
+  [good first issue](https://github.com/hffgzktbcc-blip/deckstream/issues?q=is%3Aopen+label%3A%22good+first+issue%22). Comment `/claim` (or "I'll take this") and the claim bot assigns you and adds `claimed`, so two people
   do not collide; if nothing happens for a week the issue is free again.
 - You do not need a Steam Deck for tests, docs or the companion app. `npm start` runs the app against a mock library.
 - Have a Deck? A [launch report](https://github.com/hffgzktbcc-blip/deckstream/issues/new?template=launch-report.yml) is a contribution, including when it failed.
