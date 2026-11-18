@@ -54,6 +54,12 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq --no-install-recommends wine64 fuse3 fuse-overlayfs xvfb x11-utils mingw-w64 e2fsprogs libgl1-mesa-dri libglx-mesa0
 
+      - name: Cache the pinned GE-Proton used by the launch rig
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/deckstream-rig
+          key: deckstream-rig-GE-Proton10-34
+
       - name: Run the DeckStream test suite
         env:
           DECKSTREAM_RIG_REQUIRED: '1'   # the launch rig must run in CI, never skip

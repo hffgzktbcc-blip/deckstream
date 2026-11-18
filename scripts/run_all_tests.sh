@@ -35,6 +35,7 @@ run_test "webdav_e2e"        python3 scripts/test_webdav_e2e.py
 run_test "launch_rig"        bash scripts/test_launch_rig.sh
 run_test "launch_rig_cond"   env RIG_SCENARIO=conditions bash scripts/test_launch_rig.sh
 run_test "launch_rig_gfx"    env RIG_SCENARIO=gfx bash scripts/test_launch_rig.sh
+run_test "launch_rig_proton" env RIG_SCENARIO=proton bash scripts/test_launch_rig.sh
 run_test "demand_gate"      python3 scripts/test_demand_gate.py
 run_test "saves"            python3 scripts/test_saves.py
 run_test "proton_matcher"   python3 scripts/test_proton_matcher.py

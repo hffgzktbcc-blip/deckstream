@@ -5,7 +5,7 @@ Notable changes to DeckStream.
 ## Unreleased
 
 ### Added
-- Clean-Linux launch rig (`scripts/test_launch_rig.sh`, run in CI, scenarios `basic`, `conditions` and `gfx`): the real runner and launcher end to end against a local WebDAV server, FUSE mount and probe exes built from this repo's source, under Wine and Xvfb, with an emulated SD card, slow link, controller entry and a Direct3D 11 read-back. `scripts/rig_real_game.sh` runs the same path for a game you own on your own machine and writes a report.
+- Clean-Linux launch rig (`scripts/test_launch_rig.sh`, run in CI, scenarios `basic`, `conditions`, `gfx` and `proton`): the real runner and launcher end to end against a local WebDAV server, FUSE mount and probe exes built from this repo's source, under Wine and Xvfb, with an emulated SD card, slow link, controller entry a Direct3D 11 read-back, and a real GE-Proton10-34 run with DXVK on software Vulkan. `scripts/rig_real_game.sh` runs the same path for a game you own on your own machine and writes a report.
 - Project foundations: vision, limits, roadmap and milestones (`docs/`), agent working rules (`AGENTS.md`, `CLAUDE.md`,
   `GEMINI.md`, Copilot instructions) with a git-based handoff tool (`scripts/handoff.sh`), code of conduct, CODEOWNERS,
   issue forms, Dependabot and a first-PR welcome.
