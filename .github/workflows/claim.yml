@@ -44,5 +44,6 @@ jobs:
             gh issue comment "$NUMBER" --body "Thanks @$AUTHOR — this issue is already assigned. Other open starter issues: https://github.com/$GH_REPO/issues?q=is%3Aissue+is%3Aopen+no%3Aassignee+label%3A%22good+first+issue%22%2C%22help+wanted%22"
             exit 0
           fi
+          gh label create claimed --color FBCA04 --description "Someone said they are on it" 2>/dev/null || true
           gh issue edit "$NUMBER" --add-assignee "$AUTHOR" --add-label claimed
           gh issue comment "$NUMBER" --body "Assigned to @$AUTHOR. Please open a draft PR or comment within a week if you're still working on it, so others can pick it up otherwise."
