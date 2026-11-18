@@ -5,6 +5,7 @@ Notable changes to DeckStream.
 ## Unreleased
 
 ### Added
+- `decky-zip` workflow: rebuilds and pushes `decky/DeckStream.zip` on Dependabot PRs that touch `decky/`, so those bumps no longer fail CI on a stale zip (#56).
 - Project foundations: vision, limits, roadmap and milestones (`docs/`), agent working rules (`AGENTS.md`, `CLAUDE.md`,
   `GEMINI.md`, Copilot instructions) with a git-based handoff tool (`scripts/handoff.sh`), code of conduct, CODEOWNERS,
   issue forms, Dependabot and a first-PR welcome.
