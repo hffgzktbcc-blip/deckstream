@@ -5,7 +5,8 @@
 # redistributes game files, and the sandbox HOME is thrown away afterwards. It does not say where to get games.
 #
 # Usage:
-#   bash scripts/rig_real_game.sh --game-dir "/path/to/GameFolder" --exe "Rel/Path/Game.exe" [options]
+#   bash scripts/rig_real_game.sh --game-dir "/path/to/GameFolder" [--exe "Rel/Path/Game.exe"] [options]
+#   (without --exe the largest plausible .exe in the folder is used)
 # Options:
 #   --real-proton   use the Proton already installed for your user (Steam compatibilitytools.d / Proton* / umu). Without it
 #                   the rig uses Wine as a stand-in, which says little about Proton-specific behaviour.
@@ -31,7 +32,15 @@ while [ $# -gt 0 ]; do
         *) echo "unknown option: $1" >&2; exit 2 ;;
     esac
 done
-[ -d "$GAME_DIR" ] && [ -n "$EXE_REL" ] && [ -f "$GAME_DIR/$EXE_REL" ] || { echo "need --game-dir DIR and --exe REL (a file inside DIR)" >&2; exit 2; }
+[ -d "$GAME_DIR" ] || { echo "need --game-dir DIR (and optionally --exe REL, a file inside DIR)" >&2; exit 2; }
+if [ -z "$EXE_REL" ]; then
+    # no --exe: pick the largest .exe within 3 levels, skipping installers, uninstallers, crash reporters and redistributables
+    EXE_REL="$(cd "$GAME_DIR" && find . -maxdepth 3 -type f -iname '*.exe' -printf '%s %P\n' 2>/dev/null \
+        | grep -v -i -E 'unins|crash|redist|setup|vcredist|dxsetup|dotnet|installer|helper|report' | sort -rn | head -n 1 | cut -d' ' -f2-)"
+    [ -n "$EXE_REL" ] || { echo "no .exe found in $GAME_DIR; pass --exe REL" >&2; exit 2; }
+    echo "auto-picked exe: $EXE_REL  (pass --exe to override)"
+fi
+[ -f "$GAME_DIR/$EXE_REL" ] || { echo "--exe must be a file inside --game-dir" >&2; exit 2; }
 case "/$EXE_REL/" in */../*) echo "--exe must stay inside --game-dir" >&2; exit 2 ;; esac
 GAME_DIR="$(cd "$GAME_DIR" && pwd)"
 for c in rclone fusermount3 python3 curl; do command -v "$c" >/dev/null 2>&1 || { echo "missing: $c" >&2; exit 2; }; done
