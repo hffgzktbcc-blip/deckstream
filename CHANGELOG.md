@@ -5,6 +5,7 @@ Notable changes to DeckStream.
 ## Unreleased
 
 ### Added
+- Clean-Linux launch rig (`scripts/test_launch_rig.sh`, run in CI, scenarios `basic`, `conditions`, `gfx` and `proton`): the real runner and launcher end to end against a local WebDAV server, FUSE mount and probe exes built from this repo's source, under Wine and Xvfb, with an emulated SD card, slow link, controller entry a Direct3D 11 read-back, and a real GE-Proton10-34 run with DXVK on software Vulkan. `scripts/rig_real_game.sh` runs the same path for a game you own on your own machine and writes a report.
 - `decky-zip` workflow: rebuilds and pushes `decky/DeckStream.zip` on Dependabot PRs that touch `decky/`, so those bumps no longer fail CI on a stale zip (#56).
 - Project foundations: vision, limits, roadmap and milestones (`docs/`), agent working rules (`AGENTS.md`, `CLAUDE.md`,
   `GEMINI.md`, Copilot instructions) with a git-based handoff tool (`scripts/handoff.sh`), code of conduct, CODEOWNERS,
