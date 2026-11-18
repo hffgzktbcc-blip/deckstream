@@ -5,6 +5,7 @@ Notable changes to DeckStream.
 ## Unreleased
 
 ### Added
+- Clean-Linux launch rig (`scripts/test_launch_rig.sh`, run in CI): the real runner and launcher end to end against a local WebDAV server, FUSE mount and a probe exe built from this repo's source, under Wine and Xvfb. `scripts/rig_real_game.sh` runs the same path for a game you own on your own machine and writes a report.
 - Project foundations: vision, limits, roadmap and milestones (`docs/`), agent working rules (`AGENTS.md`, `CLAUDE.md`,
   `GEMINI.md`, Copilot instructions) with a git-based handoff tool (`scripts/handoff.sh`), code of conduct, CODEOWNERS,
   issue forms, Dependabot and a first-PR welcome.
