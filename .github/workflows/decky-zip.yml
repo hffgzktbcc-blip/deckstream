@@ -1,0 +1,72 @@
+name: decky-zip
+
+# Dependabot bumps in decky/ change package.json or the bundled dist, which makes the committed
+# decky/DeckStream.zip stale (issue #56). This rebuilds the zip on those PRs and pushes it back.
+#
+# pull_request_target is required: Dependabot's pull_request token is read-only. To keep that safe the
+# job only runs for Dependabot PRs from this repository, installs with lifecycle scripts disabled, and
+# builds the exact head commit it was triggered for.
+on:
+  pull_request_target:
+    branches: [ main ]
+    paths: [ 'decky/**' ]
+
+permissions:
+  contents: write   # push the rebuilt zip to the Dependabot branch
+  actions: write    # re-dispatch `tests`: pushes made with GITHUB_TOKEN do not trigger workflows
+
+concurrency:
+  group: decky-zip-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  rebuild:
+    if: >-
+      github.event.pull_request.user.login == 'dependabot[bot]' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      HEAD_REF: ${{ github.event.pull_request.head.ref }}
+      HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      GH_TOKEN: ${{ github.token }}
+      npm_config_ignore_scripts: 'true'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v4.4.0
+        with:
+          version: 10
+
+      - name: Rebuild decky/DeckStream.zip
+        run: |
+          git show HEAD:decky/DeckStream.zip > "$RUNNER_TEMP/committed.zip"
+          bash scripts/build_decky.sh
+          mkdir "$RUNNER_TEMP/committed" "$RUNNER_TEMP/built"
+          unzip -q "$RUNNER_TEMP/committed.zip" -d "$RUNNER_TEMP/committed"
+          unzip -q decky/DeckStream.zip -d "$RUNNER_TEMP/built"
+          # Compare contents, not zip bytes: the same source can zip to different bytes.
+          if diff -rq "$RUNNER_TEMP/committed" "$RUNNER_TEMP/built"; then
+            echo "decky/DeckStream.zip already matches its source; nothing to push."
+            git checkout -- decky/DeckStream.zip
+            echo "changed=false" >> "$GITHUB_ENV"
+          else
+            echo "changed=true" >> "$GITHUB_ENV"
+          fi
+
+      - name: Push the rebuilt zip and re-run the tests
+        if: env.changed == 'true'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add decky/DeckStream.zip
+          git commit -m "chore: rebuild decky/DeckStream.zip for dependency bump"
+          # Refuse to push if Dependabot moved the branch since this run started.
+          git push --force-with-lease="refs/heads/${HEAD_REF}:${HEAD_SHA}" origin "HEAD:refs/heads/${HEAD_REF}"
+          gh workflow run tests.yml --ref "$HEAD_REF"
