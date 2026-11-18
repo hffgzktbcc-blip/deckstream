@@ -12,5 +12,5 @@ mkdir -p "$stage/DeckStream/dist"
 cp plugin.json package.json main.py "$stage/DeckStream/"
 cp dist/index.js "$stage/DeckStream/dist/"
 rm -f DeckStream.zip
-(cd "$stage" && TZ=UTC find DeckStream -exec touch -d '2026-01-01 00:00:00' {} + && zip -qrX "$OLDPWD/DeckStream.zip" DeckStream)
+(cd "$stage" && TZ=UTC find DeckStream -exec touch -t 202601010000 {} + && zip -qrX "$OLDPWD/DeckStream.zip" DeckStream)
 echo "decky/DeckStream.zip: $(du -h DeckStream.zip | cut -f1)"
