@@ -14,7 +14,7 @@ Notable changes to DeckStream.
 
 ### Fixed
 - `scripts/build_decky.sh` stamps files with `touch -t`, so the Decky zip can be rebuilt on macOS as well as Linux
-  (#55, #57; thanks to @bfs2021).
+  (#55, #57; patch first posted by @awais-ur-rehman, PR by @bfs2021).
 
 ### Security
 - Push subscriptions must use an https endpoint on a public address; the server refuses to store or send to
