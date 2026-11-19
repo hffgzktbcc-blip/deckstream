@@ -1,6 +1,6 @@
 {
-  "version": "v5fe528fdd9",
-  "released": 1794765461,
+  "version": "v4247cd9fca",
+  "released": 1795077542,
   "files": {
     "cloud-install.sh": {
       "sha256": "880bf33aa8282596acf8e9e1627f894039d7c723f17446e38d8995b624d2e8ad",
@@ -23,9 +23,9 @@
       "bytes": 8035
     },
     "doctor.py": {
-      "sha256": "244a402302d17ee17a8351ea3a4bc2fcb0f35208b97fb96c52ba81f0bd155cbe",
+      "sha256": "0a51432b27170f06b08c8f4caa16d95ca487d1705b10124fbb02af0640cddbf4",
       "mode": "755",
-      "bytes": 22421
+      "bytes": 24579
     },
     "ds_cache.py": {
       "sha256": "0a3100292228be6c17df71e0380659c7979b668383492e174daf0a4ded36e78a",
@@ -78,9 +78,9 @@
       "bytes": 2703
     },
     "game-launcher.sh": {
-      "sha256": "624bdd836325dd68c1cacb9bd80616aa32b6c0402dd8d7e6dd89fc5b6f9e00a0",
+      "sha256": "e4477db61ccdfcce69a7d20c997b83c47f516859dea9e16cbf43e1a3b597817d",
       "mode": "755",
-      "bytes": 9904
+      "bytes": 16291
     },
     "hedge_proxy.py": {
       "sha256": "8eaf6768a00ceb51857c3ab205f52d2d7131f9667bb4609493c1139092d4afd5",
@@ -98,9 +98,9 @@
       "bytes": 4434
     },
     "launch_report.py": {
-      "sha256": "cebeb485e83439d4593c087078e6d1a576a6e8befbd3f81724ffc5598cd627d4",
+      "sha256": "148c0e71c9de92cec0bfe38e0205fbfa9e494357373d5c80e1067cd7d9672bf0",
       "mode": "755",
-      "bytes": 5652
+      "bytes": 15578
     },
     "parallel_download.py": {
       "sha256": "50cc4862cdcd49741887cdb2a914377fdcf2052ce431445d0b70a20e3bfabfff",
