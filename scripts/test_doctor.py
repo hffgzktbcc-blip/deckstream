@@ -52,9 +52,10 @@ def fake(**o):
         if argv[0] == "iw": return 0, "Power save: on\n"
         if argv[0] == "steamos-readonly": return 0, "enabled\n"
         if argv[0] == "pactl" and argv[1] == "get-default-sink": return 0, o.get("sink", "alsa_output.pci-0000_04_00.5-platform-acp5x_mach.0.HiFi__Speaker__sink") + "\n"
+        if argv[1:] == ["doctor", "--json"]: return o.get("ounce_rc", 0), o.get("ounce_out", "")
         return 0, ""
     doctor.run_cmd = run
-    have = {"rclone": "/home/deck/.local/bin/rclone", "ludusavi": "/home/deck/.local/bin/ludusavi"}
+    have = {"rclone": "/home/deck/.local/bin/rclone", "ludusavi": "/home/deck/.local/bin/ludusavi", **o.get("extra_bins", {})}
     for gone in o.get("missing", []): have.pop(gone, None)
     doctor.which = lambda n: have.get(n)
     doctor.fuse_device_ready = lambda: True
@@ -125,6 +126,34 @@ assert r.status == "warn" and "fusermount3 -uz" in r.fix and "cyberpunk" in r.de
 doctor.stale_stream_mounts = lambda: []
 assert "Stale stream mounts" not in res()
 print("[ok] a stale stream mount is flagged; none means no line")
+
+# 6d. ounce-hb doctor --json probing (optional .nro homebrew runner)
+assert res()["Ounce homebrew runner"].status == "info"
+hb_ok = json.dumps({
+    "schema": "ounce.doctor.v1",
+    "os": "linux",
+    "arch": "x86_64",
+    "aarch64_hw_replay": False,
+    "ounce_core": {"found": True, "path": "/usr/bin/ounce-core", "version": "ounce-core 0.10.0"},
+    "ounce_runtime": {"found": True, "path": "/usr/bin/ounce-runtime", "version": "ounce-runtime 0.6.0"},
+    "toolchain": {},
+})
+r = res(extra_bins={"ounce-hb": "/usr/bin/ounce-hb"}, ounce_rc=0, ounce_out=hb_ok)["Ounce homebrew runner"]
+assert r.status == "ok" and "ounce-core 0.10.0" in r.detail and "ounce-runtime 0.6.0" in r.detail, r
+hb_none = json.dumps({
+    "schema": "ounce.doctor.v1",
+    "os": "linux",
+    "arch": "x86_64",
+    "ounce_core": {"found": False, "path": None, "version": None},
+    "ounce_runtime": {"found": False, "path": None, "version": None},
+})
+r = res(extra_bins={"ounce-hb": "/usr/bin/ounce-hb"}, ounce_rc=3, ounce_out=hb_none)["Ounce homebrew runner"]
+assert r.status == "warn" and "no execution engine" in r.detail, r
+r = res(extra_bins={"ounce-hb": "/usr/bin/ounce-hb"}, ounce_rc=1, ounce_out="not json")["Ounce homebrew runner"]
+assert r.status == "warn" and "failed" in r.detail, r
+r = res(extra_bins={"ounce-runtime": "/usr/bin/ounce-runtime"})["Ounce homebrew runner"]
+assert r.status == "ok" and "ounce-runtime" in r.detail, r
+print("[ok] ounce-hb doctor --json probed when present; missing stays info, missing engines or bad JSON warn")
 
 # 7. a check that crashes must not hide the others
 doctor.check_proton = lambda: 1 / 0

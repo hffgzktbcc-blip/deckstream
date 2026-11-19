@@ -44,6 +44,7 @@ run_test "daemon_parts"     python3 scripts/test_daemon_parts.py
 run_test "language_fix"     python3 scripts/test_language_fix.py
 run_test "umu_gameid"       python3 scripts/test_umu_gameid.py
 run_test "doctor"           python3 scripts/test_doctor.py
+run_test "nro_launch"       python3 scripts/test_nro_launch.py
 run_test "hedge_proxy"      python3 scripts/test_hedge_proxy.py
 run_test "parallel_dl"      python3 scripts/test_parallel_download.py
 run_test "parallel_unzip"   python3 scripts/test_parallel_unzip.py
@@ -58,6 +59,11 @@ run_test "clean_tree"       python3 scripts/test_clean_tree.py
 run_test "api"              node scripts/test_api.js
 run_test "push"             node scripts/test_push.js
 run_test "decky_plugin"     python3 scripts/test_decky_plugin.py
+if [ -x decky/node_modules/.bin/tsc ] && command -v pnpm >/dev/null 2>&1; then
+    run_test "decky_tsc"    pnpm --dir decky exec tsc --noEmit
+else
+    echo "NOTE: decky dependencies not installed; skipped tsc --noEmit here (CI enforces it)"
+fi
 run_test "app_e2e"          node scripts/test_e2e_app.js
 
 if [ $FAILED -eq 0 ]; then

@@ -1,13 +1,16 @@
 #!/usr/bin/env bash
-# DeckStream - launches an installed Windows game through Proton with its own prefix.
+# DeckStream - launches an installed Windows game through Proton/umu, or a homebrew .nro through an external Ounce runner.
 # Steam shortcuts point at a tiny per-game script that calls this, so you never
 # need to "Force compatibility tool" in Steam.
 # Usage: game-launcher.sh "/path/to/Game.exe" "/path/to/prefix_dir" [slug] [title]
 #
-# Launcher choice: umu-launcher (Proton plus Valve's Steam Linux Runtime, as Hydra/Lutris do) when umu and
+# Launcher choice (.exe): umu-launcher (Proton plus Valve's Steam Linux Runtime, as Hydra/Lutris do) when umu and
 # its runtime are installed, otherwise plain Proton. umu uses the SAME prefix folder, so saves stay put.
 # If umu cannot start the game within 10 s the launcher retries with plain Proton.
 # Env: DECKSTREAM_LAUNCHER=proton forces plain Proton; DECKSTREAM_GAMEID=umu-<steam appid> picks umu's fixes.
+# Homebrew (.nro/.NRO): dispatched before Proton/umu checks to an external subprocess (never bundled):
+#   DECKSTREAM_NRO_RUNNER=hb -> external `ounce-hb run --json` (with `--sdmc <dir>` if configured)
+#   default                  -> external `ounce-runtime run <exe> --present=gpu` (with `--sdmc=<dir>` if configured)
 
 EXE="${1:-}"
 PREFIX="${2:-}"
@@ -15,40 +18,22 @@ SLUG="${3:-}"      # optional: used for save backups
 TITLE="${4:-}"
 LOG_DIR="$HOME/.local/share/deckstream/logs"
 mkdir -p "$LOG_DIR"
-exec > >(tee -a "$LOG_DIR/play_$(basename "$PREFIX").log") 2>&1
+LOG_TAG="$(basename "${PREFIX:-${SLUG:-${EXE:-launch}}}")"
+exec > >(tee -a "$LOG_DIR/play_${LOG_TAG}.log") 2>&1
 
 fail() { echo "[!] $1"; command -v notify-send &>/dev/null && notify-send "DeckStream" "$1"; exit 1; }
 [ -f "$EXE" ] || fail "Game executable not found: $EXE (is the SD card inserted?)"
-mkdir -p "$PREFIX" || fail "Cannot create Proton prefix at $PREFIX"
+IS_NRO=0
+case "$EXE" in
+    *.nro|*.NRO) IS_NRO=1 ;;
+esac
+if [ "$IS_NRO" -eq 1 ]; then
+    [ -z "$PREFIX" ] || mkdir -p "$PREFIX" || fail "Cannot create game data directory at $PREFIX"
+else
+    mkdir -p "$PREFIX" || fail "Cannot create Proton prefix at $PREFIX"
+fi
 
-# ---- umu (preferred) -------------------------------------------------------------------------------
-UMU_RUN="$HOME/.local/share/deckstream/umu-test/umu/umu-run"
-UMU_PROTON=""
-umu_ready() {
-    [ "${DECKSTREAM_LAUNCHER:-umu}" = "proton" ] && return 1
-    [ -f "$UMU_RUN" ] || return 1
-    ls "$HOME/.local/share/umu/steamrt4"/steamrt4_platform_* >/dev/null 2>&1 || return 1   # runtime downloaded
-    command -v python3 >/dev/null 2>&1 && python3 -c 'import sys; sys.exit(0 if sys.version_info >= (3, 10) else 1)' || return 1
-    local d
-    for root in "$HOME/.steam/root/compatibilitytools.d" "$HOME/.local/share/Steam/compatibilitytools.d"; do
-        for d in "$root"/GE-Proton*; do
-            [ -f "$d/proton" ] && [ -f "$d/toolmanifest.vdf" ] && UMU_PROTON="$(printf '%s\n%s\n' "$UMU_PROTON" "$d" | sed '/^$/d' | sort -V | tail -n 1)"
-        done
-    done
-    [ -n "$UMU_PROTON" ]
-}
-
-PROTON_BIN=""
-for p in "$HOME"/.steam/root/compatibilitytools.d/*/proton \
-         "$HOME/.local/share/Steam/steamapps/common/Proton - Experimental/proton" \
-         "$HOME"/.local/share/Steam/steamapps/common/Proton*/proton; do
-    [ -f "$p" ] && { PROTON_BIN="$p"; break; }
-done
-[ -z "$PROTON_BIN" ] && fail "No Proton found. Install Proton Experimental from Steam (Library > Tools)."
-
-export STEAM_COMPAT_DATA_PATH="$PREFIX"
-export STEAM_COMPAT_CLIENT_INSTALL_PATH="$HOME/.local/share/Steam"
-CACHE_KEY="${SLUG:-$(basename "$PREFIX")}"
+CACHE_KEY="${SLUG:-$(basename "${PREFIX:-${EXE%.*}}")}"
 # Deck mode names an installed game by its folder (the phone's installed list), the shortcut by its title: try both.
 DECK_MODE_KEYS=""
 DM_DIR="$(dirname "$EXE")"
@@ -95,6 +80,175 @@ case "${DECKSTREAM_FPS_CAP:-}" in
        echo "[*] Frame rate capped at $DECKSTREAM_FPS_CAP fps" ;;
 esac
 # <<< game_env
+
+resolve_external_bin() {
+    local bin="$1"
+    case "$bin" in
+        */*) [ -f "$bin" ] && [ -x "$bin" ] && { printf '%s\n' "$bin"; return 0; } ;;
+        *)   command -v "$bin" 2>/dev/null && return 0 ;;
+    esac
+    return 1
+}
+
+launch_nro() {
+    local sdmc_dir=""
+    if [ -n "${DECKSTREAM_NRO_SDMC+x}" ]; then
+        case "$DECKSTREAM_NRO_SDMC" in
+            ""|0|none|NONE|off|OFF) sdmc_dir="" ;;
+            *) sdmc_dir="$DECKSTREAM_NRO_SDMC" ;;
+        esac
+    elif [ -n "$SLUG" ] && [ -d "$HOME/.local/share/deckstream/stream/writes/$SLUG" ]; then
+        sdmc_dir="$HOME/.local/share/deckstream/stream/writes/$SLUG/sdmc"
+    elif [ -n "$PREFIX" ]; then
+        sdmc_dir="$PREFIX/sdmc"
+    fi
+    if [ -n "$sdmc_dir" ]; then
+        mkdir -p "$sdmc_dir" || fail "Cannot create SDMC directory at $sdmc_dir"
+        echo "[*] sdmc:/ mapped to $sdmc_dir"
+    fi
+
+    local script_dir report_py launches_dir report_slug report_json
+    script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    report_py="$script_dir/launch_report.py"
+    [ -f "$report_py" ] || report_py="$HOME/.config/deckstream/launch_report.py"
+    launches_dir="$HOME/.local/share/deckstream/launches"
+    mkdir -p "$launches_dir"
+    report_slug="${CACHE_KEY:-$(basename "${EXE%.*}")}"
+    case "$report_slug" in ''|.|..|*/*) report_slug="nro" ;; esac
+    report_json="${DECKSTREAM_NRO_REPORT_JSON:-$launches_dir/${report_slug}.$(date +%s).$$.ounce.json}"
+    mkdir -p "$(dirname "$report_json")"
+
+    local cmd_rc hb_out=""
+    cd "$(dirname "$EXE")" || true
+    if [ "${DECKSTREAM_NRO_RUNNER:-runtime}" = "hb" ]; then
+        local hb_bin hb_resolved
+        hb_bin="${OUNCE_HB_BIN:-ounce-hb}"
+        hb_resolved="$(resolve_external_bin "$hb_bin")" || fail "External runner '$hb_bin' not found on PATH (DeckStream never bundles ounce-hb)."
+        echo "[*] $(date) launching $EXE with external $hb_bin"
+        local -a cmd=("$hb_resolved" run --json)
+        [ -n "$sdmc_dir" ] && cmd+=(--sdmc "$sdmc_dir")
+        cmd+=("$EXE")
+        hb_out="$(mktemp)"
+        OUNCE_REPORT_JSON="$report_json" "${cmd[@]}" > "$hb_out"
+        cmd_rc=$?
+        cat "$hb_out"
+    else
+        local rt_bin rt_resolved
+        rt_bin="${OUNCE_RUNTIME_BIN:-ounce-runtime}"
+        rt_resolved="$(resolve_external_bin "$rt_bin")" || fail "External runner '$rt_bin' not found on PATH (DeckStream never bundles ounce-runtime)."
+        echo "[*] $(date) launching $EXE with external $rt_bin (--present=gpu)"
+        local -a cmd=("$rt_resolved" run "$EXE" --present=gpu)
+        [ -n "$sdmc_dir" ] && cmd+=("--sdmc=$sdmc_dir")
+        OUNCE_REPORT_JSON="$report_json" "${cmd[@]}"
+        cmd_rc=$?
+    fi
+
+    local final_rc="$cmd_rc"
+    if command -v python3 >/dev/null 2>&1; then
+        local parsed_rc
+        parsed_rc="$(python3 - "$report_py" "$report_json" "$hb_out" "$cmd_rc" "${DECKSTREAM_LAUNCH_FILE:-}" <<'PY'
+import importlib.util
+import json
+import os
+import sys
+from pathlib import Path
+
+report_py, report_json, hb_out, cmd_rc_raw, launch_file = sys.argv[1:6]
+cmd_rc = int(cmd_rc_raw)
+mod = None
+if report_py and os.path.isfile(report_py):
+    spec = importlib.util.spec_from_file_location("launch_report", report_py)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+
+def summarize_file_or_text(path_str):
+    if not path_str or not os.path.isfile(path_str):
+        return None, None
+    raw = Path(path_str).read_text(encoding="utf-8", errors="replace").strip()
+    if not raw:
+        return None, None
+    candidates = [raw] + [line.strip() for line in reversed(raw.splitlines()) if line.strip().startswith("{")]
+    for cand in candidates:
+        try:
+            obj = json.loads(cand)
+        except ValueError:
+            continue
+        if isinstance(obj, dict):
+            if mod is not None:
+                s = mod.summarize_ounce_run(obj, allow_hb=True)
+                if s:
+                    return s, obj
+            elif obj.get("schema") in ("ounce.run.v1", "ounce.hb.run.v1"):
+                stop = obj.get("stop_kind") or obj.get("stop")
+                ec = obj.get("exit_code")
+                if isinstance(stop, str) and stop:
+                    s = {"schema": obj["schema"], "stop_kind": stop, "exit_code": ec if isinstance(ec, int) and not isinstance(ec, bool) else None}
+                    return s, obj
+    return None, None
+
+summary, raw_obj = summarize_file_or_text(report_json)
+if summary is None and hb_out:
+    summary, raw_obj = summarize_file_or_text(hb_out)
+    if summary is not None and raw_obj and raw_obj.get("schema") == "ounce.run.v1" and not os.path.isfile(report_json):
+        Path(report_json).write_text(json.dumps(raw_obj, indent=2) + "\n", encoding="utf-8")
+
+if summary is not None:
+    ec = summary.get("exit_code")
+    msg = f"[ounce] stop_kind={summary['stop_kind']} exit_code={ec if ec is not None else cmd_rc}"
+    if summary.get("fault_summary"):
+        msg += f" | {summary['fault_summary']}"
+    print(msg, file=sys.stderr)
+    if launch_file and os.path.isfile(launch_file):
+        with open(launch_file, "a", encoding="utf-8") as fh:
+            if os.path.isfile(report_json):
+                fh.write(f"ounce_report={report_json}\n")
+            fh.write(f"stop_kind={summary['stop_kind']}\n")
+            if ec is not None:
+                fh.write(f"exit_code={ec}\n")
+            if summary.get("fault_summary"):
+                fh.write(f"ounce_message={summary['fault_summary']}\n")
+    print(ec if isinstance(ec, int) else cmd_rc)
+else:
+    print(cmd_rc)
+PY
+)" && case "$parsed_rc" in ''|*[!0-9]*) ;; *) final_rc="$parsed_rc" ;; esac
+    fi
+    [ -n "$hb_out" ] && rm -f "$hb_out"
+    return "$final_rc"
+}
+
+if [ "$IS_NRO" -eq 1 ]; then
+    launch_nro
+    exit $?
+fi
+
+# ---- umu (preferred) -------------------------------------------------------------------------------
+UMU_RUN="$HOME/.local/share/deckstream/umu-test/umu/umu-run"
+UMU_PROTON=""
+umu_ready() {
+    [ "${DECKSTREAM_LAUNCHER:-umu}" = "proton" ] && return 1
+    [ -f "$UMU_RUN" ] || return 1
+    ls "$HOME/.local/share/umu/steamrt4"/steamrt4_platform_* >/dev/null 2>&1 || return 1   # runtime downloaded
+    command -v python3 >/dev/null 2>&1 && python3 -c 'import sys; sys.exit(0 if sys.version_info >= (3, 10) else 1)' || return 1
+    local d
+    for root in "$HOME/.steam/root/compatibilitytools.d" "$HOME/.local/share/Steam/compatibilitytools.d"; do
+        for d in "$root"/GE-Proton*; do
+            [ -f "$d/proton" ] && [ -f "$d/toolmanifest.vdf" ] && UMU_PROTON="$(printf '%s\n%s\n' "$UMU_PROTON" "$d" | sed '/^$/d' | sort -V | tail -n 1)"
+        done
+    done
+    [ -n "$UMU_PROTON" ]
+}
+
+PROTON_BIN=""
+for p in "$HOME"/.steam/root/compatibilitytools.d/*/proton \
+         "$HOME/.local/share/Steam/steamapps/common/Proton - Experimental/proton" \
+         "$HOME"/.local/share/Steam/steamapps/common/Proton*/proton; do
+    [ -f "$p" ] && { PROTON_BIN="$p"; break; }
+done
+[ -z "$PROTON_BIN" ] && fail "No Proton found. Install Proton Experimental from Steam (Library > Tools)."
+
+export STEAM_COMPAT_DATA_PATH="$PREFIX"
+export STEAM_COMPAT_CLIENT_INSTALL_PATH="$HOME/.local/share/Steam"
 cd "$(dirname "$EXE")" || true
 echo "[*] $(date) launching $EXE with $(basename "$(dirname "$PROTON_BIN")")"
 SAVES_PY="$HOME/.config/deckstream/saves.py"

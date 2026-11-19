@@ -5,6 +5,7 @@ Notable changes to DeckStream.
 ## Unreleased
 
 ### Added
+- Homebrew `.nro`/`.NRO` dispatch in `daemon/game-launcher.sh` before Proton/umu checks (external `ounce-runtime run "$EXE" --present=gpu` by default, or `ounce-hb run --json "$EXE"` when `DECKSTREAM_NRO_RUNNER=hb`, with per-game `--sdmc` mapping), `ounce-hb doctor --json` probing in `daemon/doctor.py`, `ounce.run.v1` (`stop_kind`, `exit_code`, fault details) surfacing in `daemon/launch_report.py`, and stub-binary tests (`scripts/test_nro_launch.py`).
 - Clean-Linux launch rig (`scripts/test_launch_rig.sh`, run in CI, scenarios `basic`, `conditions`, `gfx` and `proton`): the real runner and launcher end to end against a local WebDAV server, FUSE mount and probe exes built from this repo's source, under Wine and Xvfb, with an emulated SD card, slow link, controller entry a Direct3D 11 read-back, and a real GE-Proton10-34 run with DXVK on software Vulkan. `scripts/rig_real_game.sh` runs the same path for a game you own on your own machine and writes a report.
 - `decky-zip` workflow: rebuilds and pushes `decky/DeckStream.zip` on Dependabot PRs that touch `decky/`, so those bumps no longer fail CI on a stale zip (#56).
 - Project foundations: vision, limits, roadmap and milestones (`docs/`), agent working rules (`AGENTS.md`, `CLAUDE.md`,

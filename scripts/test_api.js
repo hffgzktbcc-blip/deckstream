@@ -88,11 +88,28 @@ const listen = (srv) => new Promise((r) => srv.listen(0, '127.0.0.1', () => r(sr
   assert.ok(!lib.isAllowedDownloadUrl('http://cdn.example.com/f'), 'extra hosts need https');
   assert.ok(!lib.isAllowedDownloadUrl('https://cdn.example.com.evil.io/f'));
 
-  // Public-address check for user-supplied URLs: literal IPv6 forms that reach private space are refused.
+  // Public-address check for user-supplied URLs: literal IPv6 forms, non-http schemes, credentials and DNS rebinding are refused.
   for (const u of ['http://127.0.0.1/', 'http://[::1]/', 'http://[::ffff:127.0.0.1]/', 'http://[::ffff:7f00:1]/',
     'http://[::7f00:1]/', 'http://[64:ff9b::a9fe:a9fe]/', 'http://[fe90::1]/', 'http://[febf::1]/',
     'http://[fd00::1]/', 'http://[ff02::1]/', 'http://[2002:c0a8:101::1]/', 'http://169.254.169.254/']) {
     await assert.rejects(lib.assertPublicHttpUrl(u), /public address/, u);
+  }
+  await assert.rejects(lib.assertPublicHttpUrl('not a url'), /Invalid URL/);
+  await assert.rejects(lib.assertPublicHttpUrl('ftp://1.1.1.1/'), /Only http\(s\) URLs/);
+  await assert.rejects(lib.assertPublicHttpUrl('https://user:pass@1.1.1.1/'), /Credentials/);
+  const dnsPromises = require('dns').promises;
+  const origLookup = dnsPromises.lookup;
+  try {
+    dnsPromises.lookup = async () => [{ address: '127.0.0.1' }];
+    await assert.rejects(lib.assertPublicHttpUrl('https://rebind.example/'), /public address/);
+    dnsPromises.lookup = async () => [{ address: '93.184.216.34' }, { address: '10.0.0.5' }];
+    await assert.rejects(lib.assertPublicHttpUrl('https://mixed.example/'), /public address/);
+    dnsPromises.lookup = async () => [];
+    await assert.rejects(lib.assertPublicHttpUrl('https://empty.example/'), /public address/);
+    dnsPromises.lookup = async () => [{ address: '93.184.216.34' }];
+    assert.strictEqual((await lib.assertPublicHttpUrl('https://public.example/path')).hostname, 'public.example');
+  } finally {
+    dnsPromises.lookup = origLookup;
   }
   for (const u of ['https://[2606:4700:4700::1111]/', 'https://1.1.1.1/', 'https://[::ffff:1.1.1.1]/']) {
     assert.strictEqual((await lib.assertPublicHttpUrl(u)).protocol, 'https:', u);

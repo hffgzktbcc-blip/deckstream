@@ -272,6 +272,51 @@ def check_proton():
     return [R(FAIL, "Proton", "no Proton version found", "Install GE-Proton with ProtonUp-Qt (Discover store) or Proton Experimental in Steam.")]
 
 
+def _describe_ounce_engine(name, info):
+    if not isinstance(info, dict) or not info.get("found"):
+        return f"{name}: missing"
+    ver = info.get("version") or info.get("path") or "found"
+    return f"{name}: {ver}"
+
+
+def check_ounce():
+    hb_env = os.environ.get("OUNCE_HB_BIN", "").strip()
+    rt_env = os.environ.get("OUNCE_RUNTIME_BIN", "").strip()
+    hb = hb_env if (hb_env and os.path.isfile(hb_env) and os.access(hb_env, os.X_OK)) else which("ounce-hb")
+    rt = rt_env if (rt_env and os.path.isfile(rt_env) and os.access(rt_env, os.X_OK)) else which("ounce-runtime")
+
+    if not hb:
+        if rt:
+            return [R(OK, "Ounce homebrew runner", f"ounce-runtime at {rt} (ounce-hb not installed; optional)")]
+        return [R(INFO, "Ounce homebrew runner", "not installed (optional; needed only for .nro homebrew)",
+                  "Install ounce-runtime or ounce-hb externally if you run .nro homebrew.")]
+
+    rc, out = run_cmd([hb, "doctor", "--json"])
+    try:
+        data = json.loads(out)
+    except (TypeError, ValueError):
+        data = None
+
+    if not isinstance(data, dict) or data.get("schema") != "ounce.doctor.v1":
+        snippet = (out or "").strip().splitlines()[0][:120] if (out or "").strip() else "no JSON output"
+        return [R(WARN, "Ounce homebrew runner", f"ounce-hb doctor --json failed (exit {rc}): {snippet}",
+                  "Check that ounce-hb on PATH is up to date and supports 'doctor --json'.")]
+
+    core = data.get("ounce_core") or {}
+    runtime = data.get("ounce_runtime") or {}
+    core_ok = bool(core.get("found"))
+    rt_ok = bool(runtime.get("found"))
+    detail = f"ounce-hb ({hb}); {_describe_ounce_engine('ounce-core', core)}; {_describe_ounce_engine('ounce-runtime', runtime)}"
+    host = "/".join(p for p in (data.get("os"), data.get("arch")) if p)
+    if host:
+        detail += f" [{host}]"
+
+    if core_ok or rt_ok:
+        return [R(OK, "Ounce homebrew runner", detail)]
+    return [R(WARN, "Ounce homebrew runner", detail + " (no execution engine found)",
+              "Install ounce-runtime or ounce-core on PATH (or set OUNCE_RUNTIME_BIN / OUNCE_CORE_BIN).")]
+
+
 def check_disks():
     out = []
     free = disk_free_gb(HOME)
@@ -426,7 +471,7 @@ def run_checks():
     cfg = load_json(CONF / "daemon_config.json", {})
     results = []
     for fn in (check_python, lambda: check_config(cfg), lambda: check_dns(cfg), lambda: check_server(cfg), check_storage,
-               check_rclone, check_fuse, check_proton, check_disks, check_services, check_saves, check_system,
+               check_rclone, check_fuse, check_proton, check_ounce, check_disks, check_services, check_saves, check_system,
                check_audio, check_stale_mounts, lambda: check_install(cfg)):
         try:
             results.extend(fn())
