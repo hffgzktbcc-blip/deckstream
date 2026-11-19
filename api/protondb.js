@@ -5,6 +5,14 @@ const { applyCors, requireSecret } = require('./_lib');
 const CACHE = new Map();
 const CACHE_TTL = 3600 * 1000 * 24; // 24 hours in memory
 
+function cleanTitle(title) {
+  return String(title || '')
+    .replace(/\b(v?\d+(\.\d+)+|deluxe|ultimate|complete|goty|edition|remastered|directors cut|enhanced)\b/gi, '')
+    .replace(/[\[\]\(\)\-_]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 module.exports = async (req, res) => {
   if (applyCors(req, res, 'GET, OPTIONS')) return;
   if (!requireSecret(req, res)) return;
@@ -21,11 +29,7 @@ module.exports = async (req, res) => {
     let cleanGameTitle = title;
     if (!appId && title) {
       // Strip version numbers, edition words and punctuation for a clean Steam search
-      cleanGameTitle = title
-        .replace(/\b(v?\d+(\.\d+)+|deluxe|ultimate|complete|goty|edition|remastered|directors cut|enhanced)\b/gi, '')
-        .replace(/[\[\]\(\)\-_]/g, ' ')
-        .replace(/\s+/g, ' ')
-        .trim();
+      cleanGameTitle = cleanTitle(title);
 
       const cachedApp = CACHE.get(`steam:${cleanGameTitle.toLowerCase()}`);
       if (cachedApp && cachedApp.expires > Date.now()) {
@@ -120,3 +124,4 @@ module.exports = async (req, res) => {
     return res.status(500).json({ error: 'Failed to retrieve ProtonDB info: ' + err.message });
   }
 };
+module.exports.cleanTitle = cleanTitle;

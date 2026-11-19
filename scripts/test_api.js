@@ -143,7 +143,68 @@ const listen = (srv) => new Promise((r) => srv.listen(0, '127.0.0.1', () => r(sr
   assert.strictEqual(r.code, 200, JSON.stringify(r.body));
   assert.strictEqual(r.body.plan.recommendation, 'stream', JSON.stringify(r.body.plan));
 
+  // Profile validator (api/profile.js cleanProfile): rejects path traversal, absolute paths, and malformed ranges.
+  const { cleanProfile } = api('profile.js');
+  assert.strictEqual(cleanProfile(null), null);
+  assert.strictEqual(cleanProfile({ folder: '../evil', ranges: [{ f: 'a.pak', o: 0, n: 64 }] }), null);
+  assert.strictEqual(cleanProfile({ folder: '/etc', ranges: [{ f: 'a.pak', o: 0, n: 64 }] }), null);
+  assert.strictEqual(cleanProfile({ folder: 'Game\\Sub', ranges: [{ f: 'a.pak', o: 0, n: 64 }] }), null);
+  assert.strictEqual(cleanProfile({ folder: 'Game', ranges: [{ f: '../etc/passwd', o: 0, n: 64 }] }), null);
+  assert.strictEqual(cleanProfile({ folder: 'Game', ranges: [{ f: '/etc/passwd', o: 0, n: 64 }] }), null);
+  assert.strictEqual(cleanProfile({ folder: 'Game', ranges: [{ f: 'a/./b.pak', o: 0, n: 64 }] }), null);
+  assert.strictEqual(cleanProfile({ folder: 'Game', ranges: [] }), null, 'empty profile rejected');
+  assert.strictEqual(cleanProfile({ folder: 'Game', ranges: [{ f: 'a.pak', o: 0, n: 0 }] }), null, 'zero length rejected');
+  assert.strictEqual(cleanProfile({ folder: 'Game', ranges: [{ f: 'a.pak', o: -4, n: 64 }] }), null, 'negative offset rejected');
+  assert.strictEqual(cleanProfile({ folder: 'Game', ranges: [{ f: 'a.pak', o: 0, n: 2 ** 41 }] }), null, 'oversized length rejected');
+  const validProf = cleanProfile({
+    folder: 'Tiny Game',
+    ranges: [
+      { t: 1.25, f: 'bin/tiny.exe', o: 0, n: 4096, extra: 'ignored' },
+      { t: -5, f: 'data.pak', o: 1024, n: 2048 }, // overlapping / negative t clamped to 0
+    ],
+    later: [{ t: 45.5, f: 'data.pak', o: 0, n: 4096 }],
+    demand: [{ f: 'data.pak', o: 4096, n: 1024 }],
+    runs: 3,
+    total_bytes: 8192,
+    stable: true,
+    unexpected: 'stripped',
+  });
+  assert.ok(validProf, 'valid profile accepted');
+  assert.strictEqual(validProf.version, 1);
+  assert.strictEqual(validProf.folder, 'Tiny Game');
+  assert.strictEqual(validProf.ranges.length, 2);
+  assert.deepStrictEqual(validProf.ranges[0], { t: 1.25, f: 'bin/tiny.exe', o: 0, n: 4096 });
+  assert.strictEqual(validProf.ranges[1].t, 0, 'negative timestamp clamped to 0');
+  assert.strictEqual(validProf.later.length, 1);
+  assert.strictEqual(validProf.demand.length, 1);
+  assert.strictEqual(validProf.runs, 3);
+  assert.strictEqual(validProf.total_bytes, 8192);
+  assert.strictEqual(validProf.stable, true);
+  assert.strictEqual(validProf.unexpected, undefined);
+
+  // ProtonDB title sanitizer (api/protondb.js cleanTitle): strips versions, edition words, and punctuation.
+  const { cleanTitle } = api('protondb.js');
+  assert.strictEqual(cleanTitle('Game v1.2.3 GOTY Edition'), 'Game');
+  assert.strictEqual(cleanTitle('Game (Deluxe)'), 'Game');
+  assert.strictEqual(cleanTitle('Game_Name-Remastered'), 'Game Name');
+  assert.strictEqual(cleanTitle('Cyberpunk 2077 [v1.6.1] Ultimate Complete Edition'), 'Cyberpunk 2077');
+  assert.strictEqual(cleanTitle('Death Stranding Directors Cut Enhanced'), 'Death Stranding');
+  assert.strictEqual(cleanTitle(''), '');
+
+  // Status relative timestamp helper (api/status.js timeAgo): boundaries from missing/future to days.
+  const { timeAgo } = api('status.js');
+  const now = Date.now();
+  assert.strictEqual(timeAgo(0), 'never');
+  assert.strictEqual(timeAgo(null), 'never');
+  assert.strictEqual(timeAgo(NaN), 'never');
+  assert.strictEqual(timeAgo(now + 30_000), 'just now', 'future timestamp clamps to 0s');
+  assert.strictEqual(timeAgo(now - 5_000), 'just now', '< 10s');
+  assert.strictEqual(timeAgo(now - 25_000), '25s ago', '< 60s');
+  assert.strictEqual(timeAgo(now - 5 * 60_000), '5m ago', '< 3600s');
+  assert.strictEqual(timeAgo(now - 3 * 3600_000), '3h ago', '< 86400s');
+  assert.strictEqual(timeAgo(now - 2 * 86400_000), '2d ago', '>= 86400s');
+
   srv.close();
   fs.rmSync(dir, { recursive: true, force: true });
-  console.log('[ok] api: storage relay allowlist/503/401, storage server (signed links, Range, traversal, mount), download hosts, search, plan');
+  console.log('[ok] api: storage relay allowlist/503/401, storage server (signed links, Range, traversal, mount), download hosts, search, plan, profile, protondb, status');
 })().catch((e) => { console.error(e); process.exit(1); });
