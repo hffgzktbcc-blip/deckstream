@@ -45,6 +45,10 @@ run_test "language_fix"     python3 scripts/test_language_fix.py
 run_test "umu_gameid"       python3 scripts/test_umu_gameid.py
 run_test "doctor"           python3 scripts/test_doctor.py
 run_test "nro_launch"       python3 scripts/test_nro_launch.py
+run_test "startup_profile"  python3 scripts/test_startup_profile.py
+run_test "launch_report"    python3 scripts/test_launch_report.py
+run_test "warmup"           python3 scripts/test_warmup.py
+run_test "deck_preset"      python3 scripts/test_deck_preset.py
 run_test "hedge_proxy"      python3 scripts/test_hedge_proxy.py
 run_test "parallel_dl"      python3 scripts/test_parallel_download.py
 run_test "parallel_unzip"   python3 scripts/test_parallel_unzip.py

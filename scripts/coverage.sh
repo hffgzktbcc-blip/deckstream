@@ -9,7 +9,8 @@ cd "$ROOT"
 rm -rf coverage .coverage .coverage.*
 mkdir -p coverage
 
-PY_TESTS=(demand_gate saves proton_matcher deck_mode language_fix umu_gameid doctor nro_launch hedge_proxy
+PY_TESTS=(demand_gate saves proton_matcher deck_mode language_fix umu_gameid doctor nro_launch
+          startup_profile launch_report warmup deck_preset hedge_proxy
           parallel_download parallel_unzip decky_plugin)
 for t in "${PY_TESTS[@]}"; do
     python3 -m coverage run --parallel-mode --source=daemon,decky --omit='*/node_modules/*' "scripts/test_$t.py" >/dev/null 2>&1
