@@ -9,6 +9,8 @@ Cross-check live main, merged/open PRs and issues, GitHub Actions results, and p
 Build useful end-to-end results. The current request sets scope; `PLAN.md` is the prioritized
 backlog, not a permission system.
 
+**Public docs are part of the change.** For any user-visible change to the phone companion, launcher, API, daemon or Decky panel, update affected README, setup, limits and `Unreleased` changelog in the same PR. Follow the [family public docs contract](https://github.com/hffgzktbcc-blip/ounce-core/blob/main/docs/PUBLIC_DOCS_CONTRACT.md). A repo with no independent Steam Deck run must never describe a mock/local success as proven device compatibility. If only internals change, state `Docs: none — <reason>` in the PR body; the lightweight CI guard checks that decision. Prefer links to [the live releases](https://github.com/hffgzktbcc-blip/deckstream/releases/latest) over frozen “latest version” labels.
+
 - Inspect relevant code and existing work, then act, on a topic branch. Preserve unrelated changes
   and stage only your own paths.
 - Keep process proportional: no mandatory design approvals, extra plan documents or agent swarms
