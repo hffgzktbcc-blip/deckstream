@@ -9,14 +9,13 @@
   <img alt="License" src="https://img.shields.io/badge/License-MIT-blue?labelColor=1c2027">
 </p>
 
-**DeckStream** plays PC games you already own, stored on your own server (a NAS, Nextcloud, or anything that speaks
-WebDAV), on a **Steam Deck** without copying the whole game to the Deck first.
+**DeckStream aims to let Steam Deck owners launch PC games they already own from their NAS or WebDAV storage without copying the whole game first.** The local launch path has automated checks, but a clean independent Steam Deck launch still needs to be reported.
 
 **[Try one small test this week—Steam Deck optional →](docs/community/TRY_THIS_WEEK.md)**
 
 **Looking for the first independent tester?** [Join the Steam Deck + NAS/WebDAV test call (#9)](https://github.com/hffgzktbcc-blip/deckstream/issues/9) — clean-device successes *and failures* welcome.
 
-**New here?** [Project homepage](https://hffgzktbcc-blip.github.io/deckstream/) · [Try the companion locally](#development) · [Self-hosting setup](#setup) · [Report a real Steam Deck test](https://github.com/hffgzktbcc-blip/deckstream/issues/new?template=launch-report.yml) · [Beginner-friendly issues](https://github.com/hffgzktbcc-blip/deckstream/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
+**New here?** [Project homepage](https://hffgzktbcc-blip.github.io/deckstream/) · [Latest published release](https://github.com/hffgzktbcc-blip/deckstream/releases/latest) · [Try the companion locally](#development) · [Self-hosting setup](#setup) · [Report a real Steam Deck test](https://github.com/hffgzktbcc-blip/deckstream/issues/new?template=launch-report.yml) · [Beginner-friendly issues](https://github.com/hffgzktbcc-blip/deckstream/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
 
 > **Current status (November 2026):** The own-storage app and launch path are implemented and have automated checks with mock storage. A clean Steam Deck launch of this revision, LAN NAS performance and an independent reproduction are **not yet established**. [v1.0.0](https://github.com/hffgzktbcc-blip/deckstream/releases/tag/v1.0.0) predates the own-storage changes; it is not a verified release of the current flow. See [evidence and limits](docs/LIMITS.md).
 
