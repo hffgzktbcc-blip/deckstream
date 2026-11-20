@@ -1,5 +1,10 @@
 ## User-visible result
 
+## Public documentation impact
+<!-- Update the affected README, setup, limits and Unreleased changelog in this PR if behaviour changed. -->
+- Docs updated: <!-- names and outcome -->
+<!-- If none: Docs: none — internal-only change because ... -->
+
 ## How to reproduce or verify
 
 ## Checks run and gaps

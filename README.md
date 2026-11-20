@@ -9,14 +9,13 @@
   <img alt="License" src="https://img.shields.io/badge/License-MIT-blue?labelColor=1c2027">
 </p>
 
-**DeckStream** plays PC games you already own, stored on your own server (a NAS, Nextcloud, or anything that speaks
-WebDAV), on a **Steam Deck** without copying the whole game to the Deck first.
+**DeckStream aims to let Steam Deck owners launch PC games they already own from their NAS or WebDAV storage without copying the whole game first.** The local launch path has automated checks, but a clean independent Steam Deck launch still needs to be reported.
 
 **[Try one small test this week—Steam Deck optional →](docs/community/TRY_THIS_WEEK.md)**
 
 **Looking for the first independent tester?** [Join the Steam Deck + NAS/WebDAV test call (#9)](https://github.com/hffgzktbcc-blip/deckstream/issues/9) — clean-device successes *and failures* welcome.
 
-**New here?** [Project homepage](https://hffgzktbcc-blip.github.io/deckstream/) · [Try the companion locally](#development) · [Self-hosting setup](#setup) · [Report a real Steam Deck test](https://github.com/hffgzktbcc-blip/deckstream/issues/new?template=launch-report.yml) · [Beginner-friendly issues](https://github.com/hffgzktbcc-blip/deckstream/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
+**New here?** [Project homepage](https://hffgzktbcc-blip.github.io/deckstream/) · [Latest published release](https://github.com/hffgzktbcc-blip/deckstream/releases/latest) · [Try the companion locally](#development) · [Self-hosting setup](#setup) · [Report a real Steam Deck test](https://github.com/hffgzktbcc-blip/deckstream/issues/new?template=launch-report.yml) · [Beginner-friendly issues](https://github.com/hffgzktbcc-blip/deckstream/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
 
 > **Current status (November 2026):** The own-storage app and launch path are implemented and have automated checks with mock storage. A clean Steam Deck launch of this revision, LAN NAS performance and an independent reproduction are **not yet established**. [v1.0.0](https://github.com/hffgzktbcc-blip/deckstream/releases/tag/v1.0.0) predates the own-storage changes; it is not a verified release of the current flow. See [evidence and limits](docs/LIMITS.md).
 
@@ -41,14 +40,14 @@ start-up, starts it through **Proton**, and reads the rest while you play.
 
 DeckStream is one of four independent, open-source projects sharing an evidence-first philosophy and a community:
 
-| Project | What it is for | When to choose it | Licence | Link |
-| :--- | :--- | :--- | :--- | :--- |
-| **ounce-core** | ARM64 execution and verification research engine. Runs programs across three CPU tiers and compares output with real hardware. | You want evidence-first correctness, hardware differential checks, or the safe-Rust core. | MIT | [github.com/hffgzktbcc-blip/ounce-core](https://github.com/hffgzktbcc-blip/ounce-core) |
-| **ounce-hb** | Simplified homebrew runner built around Ounce-Core with diagnostics, process safety, and stable exit codes. | You want a simple way to run your own homebrew from a script or terminal and see why a run stopped. | MIT | [github.com/hffgzktbcc-blip/ounce-hb](https://github.com/hffgzktbcc-blip/ounce-hb) |
-| **ounce-runtime** | Experimental performance runtime with native JIT, host GPU presentation, and controller support. | You want to experiment with high performance, visual rendering, or controller input under GPL-3.0-or-later terms. | GPL-3.0-or-later | [github.com/hffgzktbcc-blip/ounce-runtime](https://github.com/hffgzktbcc-blip/ounce-runtime) |
-| **deckstream** (this repo) | Steam Deck NAS/WebDAV game launcher and streaming-oriented experimentation. | You want an on-demand virtual filesystem for handheld Linux gaming PCs (SteamOS) with Gaming Mode integration. | MIT | You are here |
+**Four independent projects. Choose the job you need done:**
 
-**Independent siblings, clean boundaries.** Each project solves a distinct problem with its own repository, tests, and releases. DeckStream is an independent sibling, not an Ounce-Core derivative; no code flows inappropriately across licensing boundaries (`ounce-core`, `ounce-hb`, and `deckstream` are MIT; `ounce-runtime` is GPL-3.0-or-later).
+- **[Ounce-Core](https://github.com/hffgzktbcc-blip/ounce-core)** checks supported ARM64 programs against recorded hardware references.
+- **[Ounce-HB](https://github.com/hffgzktbcc-blip/ounce-hb)** runs your own open-source homebrew through an engine and explains why it stopped.
+- **[Ounce-Runtime](https://github.com/hffgzktbcc-blip/ounce-runtime)** experiments with faster ARM64 execution, graphics and controller input.
+- **[DeckStream](https://github.com/hffgzktbcc-blip/deckstream)** aims to launch PC games from your NAS/WebDAV storage on Steam Deck; an independent device run is still outstanding.
+
+**[Choose the right Ounce project in one minute](https://github.com/hffgzktbcc-blip/ounce-core/blob/main/docs/FAMILY.md)** for the first task, limitations, licences and current-release links. These projects have separate evidence and release decisions. DeckStream is not an ARM64 engine, and GPL code is not copied into MIT siblings.
 
 ---
 
