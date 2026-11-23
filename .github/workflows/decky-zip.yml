@@ -32,7 +32,7 @@ jobs:
       GH_TOKEN: ${{ github.token }}
       npm_config_ignore_scripts: 'true'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ github.event.pull_request.head.sha }}
 
