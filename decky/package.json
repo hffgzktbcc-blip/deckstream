@@ -11,9 +11,9 @@
     "@decky/rollup": "1.0.2",
     "@decky/ui": "4.16.5",
     "@types/react": "18.3.3",
-    "@types/react-dom": "19.0.1",
+    "@types/react-dom": "19.3.0",
     "@types/webpack": "5.28.5",
-    "rollup": "4.68.2",
+    "rollup": "4.68.7",
     "typescript": "7.0.2"
   },
   "dependencies": {
